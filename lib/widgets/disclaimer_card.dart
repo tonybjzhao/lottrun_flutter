@@ -27,13 +27,6 @@ class DisclaimerCard extends StatelessWidget {
                         .bodySmall
                         ?.copyWith(color: const Color(0xFF7B5800)),
                   ),
-                  Text(
-                    '仅供娱乐，请理性参与。',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: const Color(0xFF7B5800)),
-                  ),
                 ],
               ),
             ),

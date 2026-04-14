@@ -275,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
             OutlinedButton.icon(
               onPressed: _isLoading ? null : _showThreePicks,
               icon: const Icon(Icons.filter_3_rounded, size: 18),
-              label: const Text('Generate 3 Picks  生成3组号码'),
+              label: const Text('Generate 3 Picks'),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -326,15 +326,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color:
                                   theme.colorScheme.onSurface.withAlpha(130),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '基于真实开奖数据，试试一组有趣的号码 🎲',
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color:
-                                  theme.colorScheme.onSurface.withAlpha(100),
                             ),
                           ),
                         ],
@@ -393,7 +384,7 @@ class _MiniPickCard extends StatelessWidget {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$label copied · 已复制'),
+          content: Text('$label copied to clipboard.'),
           duration: const Duration(seconds: 2),
         ),
       );

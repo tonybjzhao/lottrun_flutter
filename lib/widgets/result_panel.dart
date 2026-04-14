@@ -36,7 +36,7 @@ class ResultPanel extends StatelessWidget {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Copied · 已复制'),
+          content: Text('Copied to clipboard.'),
           duration: Duration(seconds: 2),
         ),
       );
@@ -73,7 +73,7 @@ class ResultPanel extends StatelessWidget {
             ),
             const SizedBox(height: 3),
             Text(
-              '${pick.style.description}  ${pick.style.descriptionZh}',
+              pick.style.description,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface.withAlpha(120),
               ),
@@ -116,7 +116,7 @@ class ResultPanel extends StatelessWidget {
             // ── Fun disclaimer (caption style, no box) ───────────
             const SizedBox(height: 14),
             Text(
-              'Generated for fun using historical patterns · 基于历史数据生成，仅供娱乐',
+              'Generated for fun using historical patterns.',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.onSurface.withAlpha(90),
                 fontStyle: FontStyle.italic,

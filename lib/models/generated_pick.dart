@@ -30,18 +30,6 @@ enum PlayStyle {
     }
   }
 
-  String get descriptionZh {
-    switch (this) {
-      case PlayStyle.balanced:
-        return '号码均匀分布在各区间';
-      case PlayStyle.hot:
-        return '偏向近期高频出现的号码';
-      case PlayStyle.cold:
-        return '偏向长期未出现的号码';
-      case PlayStyle.random:
-        return '完全随机生成';
-    }
-  }
 }
 
 class GeneratedPick {
