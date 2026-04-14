@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery.dart';
 import '../data/seed_lotteries.dart';
@@ -6,6 +7,7 @@ import '../services/generator_service.dart';
 import '../services/lottery_service.dart';
 import '../services/local_storage_service.dart';
 import '../widgets/disclaimer_card.dart';
+import '../widgets/lotto_ball.dart';
 import '../widgets/result_panel.dart';
 import '../widgets/style_chip_group.dart';
 import 'history_screen.dart';
@@ -50,6 +52,69 @@ class _HomeScreenState extends State<HomeScreen> {
         _isSaved = true;
       }
     });
+  }
+
+  void _showThreePicks() {
+    final history =
+        LotteryService.instance.getRecentDraws(_selectedLottery.id, limit: 100);
+    final picks = List.generate(
+      3,
+      (_) => GeneratorService.instance.generate(
+        lottery: _selectedLottery,
+        style: _selectedStyle,
+        history: history,
+      ),
+    );
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.75,
+        minChildSize: 0.4,
+        maxChildSize: 0.92,
+        builder: (_, controller) => Column(
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Text(
+                '3 Picks · ${_selectedLottery.name}',
+                style: Theme.of(ctx).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: ListView.separated(
+                controller: controller,
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                itemCount: picks.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 12),
+                itemBuilder: (_, i) => _MiniPickCard(
+                  pick: picks[i],
+                  label: 'Pick ${i + 1}',
+                  lottery: _selectedLottery,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _generate() async {
@@ -185,7 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 24),
 
-            // ── Generate button ───────────────────────────────────
+            // ── Generate buttons ──────────────────────────────────
             FilledButton.icon(
               onPressed: _isLoading ? null : _generate,
               icon: _isLoading
@@ -202,6 +267,17 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+              ),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              onPressed: _isLoading ? null : _showThreePicks,
+              icon: const Icon(Icons.filter_3_rounded, size: 18),
+              label: const Text('Generate 3 Picks  生成3组号码'),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14)),
               ),
@@ -281,6 +357,91 @@ class _HomeScreenState extends State<HomeScreen> {
           style: theme.textTheme.labelSmall?.copyWith(
             color: theme.colorScheme.onSurface.withAlpha(80),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Mini pick card used in the "3 Picks" bottom sheet ─────────────────────────
+
+class _MiniPickCard extends StatelessWidget {
+  final GeneratedPick pick;
+  final String label;
+  final Lottery lottery;
+
+  const _MiniPickCard({
+    required this.pick,
+    required this.label,
+    required this.lottery,
+  });
+
+  String _buildCopyText() {
+    final main = pick.mainNumbers.join('  ');
+    final lines = <String>[
+      '$label · ${pick.style.label} · ${lottery.name}',
+      main,
+      if (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
+        'Powerball: ${pick.bonusNumbers!.join(' ')}',
+      'Generated for fun — LottFun',
+    ];
+    return lines.join('\n');
+  }
+
+  Future<void> _copy(BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: _buildCopyText()));
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$label copied · 已复制'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      elevation: 1,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () => _copy(context),
+                  child: Icon(Icons.copy_rounded,
+                      size: 16,
+                      color: theme.colorScheme.onSurface.withAlpha(130)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                ...pick.mainNumbers
+                    .map((n) => LottoBall(number: n, size: 38)),
+                if (pick.bonusNumbers != null)
+                  ...pick.bonusNumbers!
+                      .map((n) => LottoBall(number: n, isBonus: true, size: 38)),
+              ],
+            ),
+          ],
         ),
       ),
     );

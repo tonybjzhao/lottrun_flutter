@@ -36,7 +36,7 @@ class ResultPanel extends StatelessWidget {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Copied to clipboard.'),
+          content: Text('Copied · 已复制'),
           duration: Duration(seconds: 2),
         ),
       );
@@ -73,9 +73,9 @@ class ResultPanel extends StatelessWidget {
             ),
             const SizedBox(height: 3),
             Text(
-              pick.style.description,
+              '${pick.style.description}  ${pick.style.descriptionZh}',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha(130),
+                color: theme.colorScheme.onSurface.withAlpha(120),
               ),
             ),
             const SizedBox(height: 16),
@@ -84,65 +84,53 @@ class ResultPanel extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: pick.mainNumbers.map((n) => LottoBall(number: n)).toList(),
+              children:
+                  pick.mainNumbers.map((n) => LottoBall(number: n)).toList(),
             ),
 
-            // ── Bonus balls ──────────────────────────────────────
+            // ── Bonus ball (Powerball) ────────────────────────────
             if (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'Powerball  ',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withAlpha(140),
+                    'Powerball',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: const Color(0xFFD32F2F),
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.3,
                     ),
                   ),
+                  const SizedBox(width: 10),
                   ...pick.bonusNumbers!.map(
                     (n) => Padding(
                       padding: const EdgeInsets.only(right: 8),
-                      child: LottoBall(number: n, isBonus: true, size: 40),
+                      child: LottoBall(number: n, isBonus: true),
                     ),
                   ),
                 ],
               ),
             ],
 
-            // ── Fun disclaimer ───────────────────────────────────
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Generated for fun using historical patterns.',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withAlpha(150),
-                    ),
-                  ),
-                  Text(
-                    '基于历史数据生成，仅供娱乐。',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withAlpha(150),
-                    ),
-                  ),
-                ],
+            // ── Fun disclaimer (caption style, no box) ───────────
+            const SizedBox(height: 14),
+            Text(
+              'Generated for fun using historical patterns · 基于历史数据生成，仅供娱乐',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurface.withAlpha(90),
+                fontStyle: FontStyle.italic,
               ),
             ),
 
             // ── Actions ──────────────────────────────────────────
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Text(
                   timeStr,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withAlpha(100),
+                    color: theme.colorScheme.onSurface.withAlpha(90),
                   ),
                 ),
                 const Spacer(),
