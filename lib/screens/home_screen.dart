@@ -12,6 +12,8 @@ import '../widgets/result_panel.dart';
 import '../widgets/style_chip_group.dart';
 import 'history_screen.dart';
 
+// ── Home screen ───────────────────────────────────────────────────────────────
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -55,64 +57,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showThreePicks() {
-    final history =
-        LotteryService.instance.getRecentDraws(_selectedLottery.id, limit: 100);
-    final picks = List.generate(
-      3,
-      (_) => GeneratorService.instance.generate(
-        lottery: _selectedLottery,
-        style: _selectedStyle,
-        history: history,
-      ),
-    );
-
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (ctx) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.75,
-        minChildSize: 0.4,
-        maxChildSize: 0.92,
-        builder: (_, controller) => Column(
-          children: [
-            const SizedBox(height: 12),
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Text(
-                '3 Picks · ${_selectedLottery.name}',
-                style: Theme.of(ctx).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-              ),
-            ),
-            const Divider(height: 1),
-            Expanded(
-              child: ListView.separated(
-                controller: controller,
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                itemCount: picks.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 12),
-                itemBuilder: (_, i) => _MiniPickCard(
-                  pick: picks[i],
-                  label: 'Pick ${i + 1}',
-                  lottery: _selectedLottery,
-                ),
-              ),
-            ),
-          ],
-        ),
+      builder: (ctx) => _ThreePicksSheet(
+        lottery: _selectedLottery,
+        style: _selectedStyle,
       ),
     );
   }
@@ -120,11 +73,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _generate() async {
     setState(() => _isLoading = true);
 
-    // Brief pause so the "Generating…" state is visible / feels intentional
     await Future.delayed(const Duration(milliseconds: 700));
 
-    final history = LotteryService.instance
-        .getRecentDraws(_selectedLottery.id, limit: 100);
+    final history =
+        LotteryService.instance.getRecentDraws(_selectedLottery.id, limit: 100);
 
     final pick = GeneratorService.instance.generate(
       lottery: _selectedLottery,
@@ -191,9 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) =>
-                    HistoryScreen(lottery: _selectedLottery),
-              ),
+                  builder: (_) => HistoryScreen(lottery: _selectedLottery)),
             ),
             icon: const Icon(Icons.history_rounded),
             tooltip: 'History',
@@ -213,10 +163,10 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 6),
             InputDecorator(
               decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 4),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<Lottery>(
@@ -333,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
             ),
 
-            const SizedBox(height: 80), // space for ad banner
+            const SizedBox(height: 80),
           ],
         ),
       ),
@@ -354,7 +304,215 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// ── Mini pick card used in the "3 Picks" bottom sheet ─────────────────────────
+// ── 3-picks bottom sheet ──────────────────────────────────────────────────────
+
+class _ThreePicksSheet extends StatefulWidget {
+  final Lottery lottery;
+  final PlayStyle style;
+
+  const _ThreePicksSheet({required this.lottery, required this.style});
+
+  @override
+  State<_ThreePicksSheet> createState() => _ThreePicksSheetState();
+}
+
+class _ThreePicksSheetState extends State<_ThreePicksSheet>
+    with TickerProviderStateMixin {
+  late List<GeneratedPick> _picks;
+  late AnimationController _animController;
+  bool _isRegenerating = false;
+
+  /// Use different history windows per pick so each pick has a different
+  /// frequency distribution → naturally diverse results.
+  static const _historyWindows = [30, 60, 100];
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 750),
+    );
+    _picks = _generatePicks();
+    _animController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  List<GeneratedPick> _generatePicks() {
+    return List.generate(3, (i) {
+      final history = LotteryService.instance
+          .getRecentDraws(widget.lottery.id, limit: _historyWindows[i]);
+      return GeneratorService.instance.generate(
+        lottery: widget.lottery,
+        style: widget.style,
+        history: history,
+      );
+    });
+  }
+
+  Future<void> _regenerate() async {
+    setState(() => _isRegenerating = true);
+    await Future.delayed(const Duration(milliseconds: 350));
+    if (!mounted) return;
+    setState(() {
+      _picks = _generatePicks();
+      _isRegenerating = false;
+    });
+    _animController
+      ..reset()
+      ..forward();
+  }
+
+  String _buildCopyAll() {
+    final lines = <String>[
+      'LottFun · ${widget.style.label} · ${widget.lottery.name}',
+    ];
+    for (var i = 0; i < _picks.length; i++) {
+      final p = _picks[i];
+      final main = p.mainNumbers.join('  ');
+      final bonus = (p.bonusNumbers != null && p.bonusNumbers!.isNotEmpty)
+          ? '  |  PB ${p.bonusNumbers!.join(' ')}'
+          : '';
+      lines.add('Pick ${i + 1}: $main$bonus');
+    }
+    lines.add('Generated for fun — LottFun');
+    return lines.join('\n');
+  }
+
+  Future<void> _copyAll() async {
+    await Clipboard.setData(ClipboardData(text: _buildCopyAll()));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('All 3 picks copied to clipboard.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Animation<double> _cardAnimation(int index) {
+    final start = index * 0.18;
+    return CurvedAnimation(
+      parent: _animController,
+      curve: Interval(start, (start + 0.55).clamp(0.0, 1.0),
+          curve: Curves.easeOutBack),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.78,
+      minChildSize: 0.4,
+      maxChildSize: 0.93,
+      builder: (_, controller) => Column(
+        children: [
+          // ── Handle ─────────────────────────────────────────────
+          const SizedBox(height: 10),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+
+          // ── Header row ─────────────────────────────────────────
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '3 Picks · ${widget.style.label} · ${widget.lottery.name}',
+                    style: theme.textTheme.titleSmall
+                        ?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: _isRegenerating ? null : _regenerate,
+                  icon: _isRegenerating
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child:
+                              CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.refresh_rounded, size: 16),
+                  label:
+                      Text(_isRegenerating ? 'Generating…' : 'Regenerate'),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 6),
+                    textStyle: const TextStyle(fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+
+          // ── Pick list ───────────────────────────────────────────
+          Expanded(
+            child: ListView.separated(
+              controller: controller,
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+              itemCount: _picks.length,
+              separatorBuilder: (context, index) =>
+                  const SizedBox(height: 10),
+              itemBuilder: (_, i) {
+                final anim = _cardAnimation(i);
+                return AnimatedBuilder(
+                  animation: anim,
+                  builder: (_, child) => Opacity(
+                    opacity: anim.value.clamp(0.0, 1.0),
+                    child: Transform.translate(
+                      offset: Offset(0, 18 * (1 - anim.value)),
+                      child: child,
+                    ),
+                  ),
+                  child: _MiniPickCard(
+                    pick: _picks[i],
+                    label: 'Pick ${i + 1}',
+                    lottery: widget.lottery,
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // ── Copy All button ─────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+            child: FilledButton.icon(
+              onPressed: _copyAll,
+              icon: const Icon(Icons.copy_all_rounded, size: 18),
+              label: const Text('Copy All Picks'),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Mini pick card ────────────────────────────────────────────────────────────
 
 class _MiniPickCard extends StatelessWidget {
   final GeneratedPick pick;
@@ -369,14 +527,10 @@ class _MiniPickCard extends StatelessWidget {
 
   String _buildCopyText() {
     final main = pick.mainNumbers.join('  ');
-    final lines = <String>[
-      '$label · ${pick.style.label} · ${lottery.name}',
-      main,
-      if (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
-        'Powerball: ${pick.bonusNumbers!.join(' ')}',
-      'Generated for fun — LottFun',
-    ];
-    return lines.join('\n');
+    final bonus = (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
+        ? '  |  PB ${pick.bonusNumbers!.join(' ')}'
+        : '';
+    return '$label · ${pick.style.label} · ${lottery.name}\n$main$bonus\nGenerated for fun — LottFun';
   }
 
   Future<void> _copy(BuildContext context) async {
@@ -395,10 +549,11 @@ class _MiniPickCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       elevation: 1,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -412,15 +567,20 @@ class _MiniPickCard extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                GestureDetector(
-                  onTap: () => _copy(context),
-                  child: Icon(Icons.copy_rounded,
-                      size: 16,
-                      color: theme.colorScheme.onSurface.withAlpha(130)),
+                TextButton.icon(
+                  onPressed: () => _copy(context),
+                  icon: const Icon(Icons.copy_rounded, size: 14),
+                  label: const Text('Copy'),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
+                    textStyle: const TextStyle(fontSize: 12),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Wrap(
               spacing: 6,
               runSpacing: 6,
@@ -428,8 +588,8 @@ class _MiniPickCard extends StatelessWidget {
                 ...pick.mainNumbers
                     .map((n) => LottoBall(number: n, size: 38)),
                 if (pick.bonusNumbers != null)
-                  ...pick.bonusNumbers!
-                      .map((n) => LottoBall(number: n, isBonus: true, size: 38)),
+                  ...pick.bonusNumbers!.map(
+                      (n) => LottoBall(number: n, isBonus: true, size: 38)),
               ],
             ),
           ],
