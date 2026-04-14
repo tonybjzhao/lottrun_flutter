@@ -32,6 +32,7 @@ class ResultPanel extends StatelessWidget {
   }
 
   Future<void> _copy(BuildContext context) async {
+    HapticFeedback.lightImpact();
     await Clipboard.setData(ClipboardData(text: _buildCopyText()));
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

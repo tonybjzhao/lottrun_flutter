@@ -88,6 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await LocalStorageService.instance.saveLastStyle(_selectedStyle);
 
     if (!mounted) return;
+    HapticFeedback.lightImpact();
     setState(() {
       _pick = pick;
       _isSaved = false;
@@ -97,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _savePick() async {
     if (_pick == null) return;
+    HapticFeedback.lightImpact();
     await LocalStorageService.instance.saveLastPick(_pick!);
     if (!mounted) return;
     setState(() => _isSaved = true);
@@ -344,7 +346,7 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
   }
 
   List<GeneratedPick> _generatePicks() {
-    return List.generate(3, (i) {
+    final raw = List.generate(3, (i) {
       final history = LotteryService.instance
           .getRecentDraws(widget.lottery.id, limit: _historyWindows[i]);
       return GeneratorService.instance.generate(
@@ -353,9 +355,39 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
         history: history,
       );
     });
+    return _diversifyPowerballs(raw);
+  }
+
+  /// Ensure each pick has a distinct Powerball number so users don't think
+  /// duplicate powerballs mean something is broken.
+  List<GeneratedPick> _diversifyPowerballs(List<GeneratedPick> picks) {
+    if (!widget.lottery.hasBonus) return picks;
+    final min = widget.lottery.bonusMin!;
+    final max = widget.lottery.bonusMax!;
+    final used = <int>{};
+    final pool = ([for (var i = min; i <= max; i++) i]..shuffle());
+
+    return picks.map((pick) {
+      if (pick.bonusNumbers == null || pick.bonusNumbers!.isEmpty) return pick;
+      var bonus = pick.bonusNumbers!.first;
+      if (used.contains(bonus)) {
+        final replacement = pool.firstWhere((n) => !used.contains(n),
+            orElse: () => bonus);
+        bonus = replacement;
+      }
+      used.add(bonus);
+      return GeneratedPick(
+        lotteryId: pick.lotteryId,
+        style: pick.style,
+        mainNumbers: pick.mainNumbers,
+        bonusNumbers: [bonus],
+        createdAt: pick.createdAt,
+      );
+    }).toList();
   }
 
   Future<void> _regenerate() async {
+    HapticFeedback.lightImpact();
     setState(() => _isRegenerating = true);
     await Future.delayed(const Duration(milliseconds: 350));
     if (!mounted) return;
@@ -385,6 +417,7 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
   }
 
   Future<void> _copyAll() async {
+    HapticFeedback.lightImpact();
     await Clipboard.setData(ClipboardData(text: _buildCopyAll()));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -534,6 +567,7 @@ class _MiniPickCard extends StatelessWidget {
   }
 
   Future<void> _copy(BuildContext context) async {
+    HapticFeedback.lightImpact();
     await Clipboard.setData(ClipboardData(text: _buildCopyText()));
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
