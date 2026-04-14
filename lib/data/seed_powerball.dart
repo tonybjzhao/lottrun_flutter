@@ -1,8 +1,7 @@
 import '../models/lottery_draw.dart';
 
-/// 275 real AU Powerball draws scraped from official source.
-/// mainNumbers: 7 balls (1–35), bonusNumbers: [powerball] (1–20).
-final List<LotteryDraw> kPowerbballDraws = [
+/// 275 real AU Powerball draws.
+final List<LotteryDraw> kPowerballDraws = [
   LotteryDraw(lotteryId: 'au_powerball', drawDate: DateTime(2026, 4, 9), mainNumbers: [3, 15, 17, 26, 27, 32, 33], bonusNumbers: [20]),
   LotteryDraw(lotteryId: 'au_powerball', drawDate: DateTime(2026, 4, 2), mainNumbers: [20, 23, 27, 30, 32, 34, 35], bonusNumbers: [18]),
   LotteryDraw(lotteryId: 'au_powerball', drawDate: DateTime(2026, 3, 26), mainNumbers: [5, 9, 20, 22, 24, 25, 28], bonusNumbers: [20]),

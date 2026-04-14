@@ -130,7 +130,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               size: 48, color: theme.colorScheme.onSurface.withAlpha(60)),
           const SizedBox(height: 12),
           Text(
-            'No history data yet.\n(Oz Lotto & Saturday Lotto coming soon)',
+            'No history data available yet.',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withAlpha(100),

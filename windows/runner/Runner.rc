@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.in5km" "\0"
-            VALUE "FileDescription", "lottfun_flutter" "\0"
+            VALUE "FileDescription", "LottFun" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "lottfun_flutter" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.in5km. All rights reserved." "\0"
             VALUE "OriginalFilename", "lottfun_flutter.exe" "\0"
-            VALUE "ProductName", "lottfun_flutter" "\0"
+            VALUE "ProductName", "LottFun" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

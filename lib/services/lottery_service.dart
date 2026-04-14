@@ -1,5 +1,7 @@
 import '../data/seed_lotteries.dart';
+import '../data/seed_oz_lotto.dart';
 import '../data/seed_powerball.dart';
+import '../data/seed_saturday_lotto.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 
@@ -22,7 +24,11 @@ class LotteryService {
   List<LotteryDraw> getDraws(String lotteryId) {
     switch (lotteryId) {
       case 'au_powerball':
-        return kPowerbballDraws;
+        return kPowerballDraws;
+      case 'au_ozlotto':
+        return kOzLottoDraws;
+      case 'au_saturday':
+        return kSaturdayLottoDraws;
       default:
         return [];
     }
