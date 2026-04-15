@@ -30,11 +30,19 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isSaved = false;
   bool _isLoading = false;
   bool _isPickExpanded = false;
+  int _luckOffset = 0; // shifts ±10 each generate
+  int _streak = 0;
 
   @override
   void initState() {
     super.initState();
     _restorePrefs();
+    _initStreak();
+  }
+
+  Future<void> _initStreak() async {
+    final streak = await LocalStorageService.instance.recordDailyOpen();
+    if (mounted) setState(() => _streak = streak);
   }
 
   Future<void> _restorePrefs() async {
@@ -97,6 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _isSaved = false;
       _isLoading = false;
       _isPickExpanded = false;
+      _luckOffset = Random().nextInt(21) - 10; // −10 to +10
     });
   }
 
@@ -207,7 +216,11 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 24),
 
             // ── Luck label + countdown ────────────────────────────
-            _LuckBar(lottery: _selectedLottery),
+            _LuckBar(
+              lottery: _selectedLottery,
+              luckOffset: _luckOffset,
+              streak: _streak,
+            ),
             const SizedBox(height: 12),
 
             // ── Generate buttons ──────────────────────────────────
@@ -298,13 +311,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _LuckBar extends StatelessWidget {
   final Lottery lottery;
-  const _LuckBar({required this.lottery});
+  final int luckOffset;
+  final int streak;
 
-  /// Stable daily value seeded by calendar date (65–95 range).
+  const _LuckBar({
+    required this.lottery,
+    this.luckOffset = 0,
+    this.streak = 0,
+  });
+
+  /// Base daily value seeded by calendar date (65–92), shifted by luckOffset.
   int get _luckPct {
     final d = DateTime.now().toLocal();
     final seed = d.year * 10000 + d.month * 100 + d.day;
-    return 65 + Random(seed).nextInt(31);
+    final base = 65 + Random(seed).nextInt(28); // 65–92
+    return (base + luckOffset).clamp(50, 99);
   }
 
   /// Next draw date for known AU lotteries (AEST = UTC+10).
@@ -340,24 +361,35 @@ class _LuckBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final countdown = _nextDraw();
-    return Row(
+    final right = streak >= 2
+        ? '🔥 $streak-day streak'
+        : countdown.isNotEmpty
+            ? '⏳ $countdown'
+            : null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '🍀 Today\'s luck: $_luckPct%',
-          style: theme.textTheme.labelMedium?.copyWith(
-            color: theme.colorScheme.primary,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        if (countdown.isNotEmpty) ...[
-          const Spacer(),
-          Text(
-            '⏳ $countdown',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurface.withAlpha(130),
+        Row(
+          children: [
+            Text(
+              '🍀 Today\'s luck: $_luckPct%',
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-          ),
-        ],
+            if (right != null) ...[
+              const Spacer(),
+              Text(
+                right,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withAlpha(130),
+                ),
+              ),
+            ],
+          ],
+        ),
       ],
     );
   }
@@ -559,7 +591,7 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('All 3 picks copied to clipboard.'),
+          content: Text('Copied! Good luck 🍀'),
           duration: Duration(seconds: 2),
         ),
       );

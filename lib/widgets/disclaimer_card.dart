@@ -21,7 +21,7 @@ class DisclaimerCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'For entertainment only. Please play responsibly.',
+                    '🍀 Just for fun — play responsibly.',
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall

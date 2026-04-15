@@ -10,6 +10,8 @@ class LocalStorageService {
   static const _keyLotteryId = 'last_lottery_id';
   static const _keyStyle = 'last_style';
   static const _keyPick = 'last_pick';
+  static const _keyStreakDate = 'streak_date';
+  static const _keyStreakCount = 'streak_count';
 
   Future<String?> getLastLotteryId() async {
     final prefs = await SharedPreferences.getInstance();
@@ -58,6 +60,32 @@ class LocalStorageService {
       return null;
     }
   }
+
+  /// Records today's open and returns the current streak count.
+  /// Call once on app start.
+  Future<int> recordDailyOpen() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = _dateKey(DateTime.now());
+    final last = prefs.getString(_keyStreakDate);
+    final count = prefs.getInt(_keyStreakCount) ?? 0;
+
+    if (last == today) return count; // already recorded today
+
+    final yesterday = _dateKey(DateTime.now().subtract(const Duration(days: 1)));
+    final newCount = (last == yesterday) ? count + 1 : 1;
+
+    await prefs.setString(_keyStreakDate, today);
+    await prefs.setInt(_keyStreakCount, newCount);
+    return newCount;
+  }
+
+  Future<int> getStreak() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyStreakCount) ?? 0;
+  }
+
+  String _dateKey(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
   Future<void> saveLastPick(GeneratedPick pick) async {
     final prefs = await SharedPreferences.getInstance();

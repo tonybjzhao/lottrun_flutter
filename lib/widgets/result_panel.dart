@@ -132,18 +132,19 @@ class _ResultPanelState extends State<ResultPanel>
     String label;
     Color color;
     if (matched.length >= 5 || (matched.length >= 4 && bonusHit)) {
-      label =
-          '🎯 ${matched.length} matched${bonusHit ? ' + PB' : ''}! Last draw $dateStr';
+      label = '🎯 Incredible! ${matched.length}${bonusHit ? ' + PB' : ''} matched last draw ($dateStr)!';
       color = Colors.green.shade700;
     } else if (matched.length >= 3) {
-      label =
-          '✅ ${matched.length} matched${bonusHit ? ' + PB' : ''}. Last draw $dateStr';
+      label = '😮 So close! ${matched.length}${bonusHit ? ' + PB' : ''} matched last draw ($dateStr)!';
       color = theme.colorScheme.primary;
-    } else if (matched.isNotEmpty) {
-      label = '${matched.length} matched last draw ($dateStr)';
+    } else if (matched.length == 2) {
+      label = '🙌 Almost! 2 numbers matched last draw ($dateStr)';
+      color = theme.colorScheme.onSurface.withAlpha(160);
+    } else if (matched.length == 1) {
+      label = '1 number matched last draw ($dateStr) — try again!';
       color = theme.colorScheme.onSurface.withAlpha(140);
     } else {
-      label = '0 matched last draw ($dateStr)';
+      label = '0 matched last draw ($dateStr) — luck is building!';
       color = theme.colorScheme.onSurface.withAlpha(100);
     }
 
