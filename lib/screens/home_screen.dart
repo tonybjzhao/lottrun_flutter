@@ -465,10 +465,22 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    '3 Picks · ${widget.style.label} · ${widget.lottery.name}',
-                    style: theme.textTheme.titleSmall
-                        ?.copyWith(fontWeight: FontWeight.w700),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '3 Picks · ${widget.style.label} · ${widget.lottery.name}',
+                        style: theme.textTheme.titleSmall
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Generated from 5 years of real draw history',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withAlpha(120),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 TextButton.icon(
@@ -515,7 +527,7 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
                   ),
                   child: _MiniPickCard(
                     pick: _picks[i],
-                    label: 'Pick ${i + 1}',
+                    label: 'Pick ${i + 1} · ${_picks[i].style.tagline}',
                     lottery: widget.lottery,
                   ),
                 );
@@ -562,29 +574,60 @@ class _CompactPickBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return GestureDetector(
-      onTap: onExpand,
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+      builder: (_, value, child) => Opacity(
+        opacity: value,
+        child: Transform.translate(
+          offset: Offset(0, 10 * (1 - value)),
+          child: child,
+        ),
+      ),
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 1,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          child: Row(
-            children: [
-              // Style emoji + balls
-              Expanded(
-                child: SingleChildScrollView(
+        clipBehavior: Clip.hardEdge,
+        child: InkWell(
+          onTap: onExpand,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 10, 10, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Label row ─────────────────────────────────
+                Row(
+                  children: [
+                    Text(
+                      'Quick Pick · ${pick.style.tagline}',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    const Spacer(),
+                    Icon(
+                      Icons.expand_more_rounded,
+                      size: 18,
+                      color: theme.colorScheme.onSurface.withAlpha(100),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                // ── Balls ──────────────────────────────────────
+                SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      // Main balls
                       ...pick.mainNumbers.map(
                         (n) => Padding(
                           padding: const EdgeInsets.only(right: 5),
                           child: LottoBall(number: n, size: 34),
                         ),
                       ),
-                      // Bonus separator + ball
                       if (pick.bonusNumbers != null &&
                           pick.bonusNumbers!.isNotEmpty) ...[
                         const SizedBox(width: 6),
@@ -598,14 +641,8 @@ class _CompactPickBanner extends StatelessWidget {
                     ],
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Icon(
-                Icons.expand_more_rounded,
-                size: 20,
-                color: theme.colorScheme.onSurface.withAlpha(100),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
