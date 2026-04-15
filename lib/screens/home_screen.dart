@@ -352,9 +352,8 @@ class _LuckBar extends StatelessWidget {
 
     final diff = next.difference(now);
     if (diff.inDays >= 2) return 'Next draw in ${diff.inDays}d';
-    if (diff.inDays == 1) return 'Next draw tomorrow';
     if (diff.inHours >= 1) return 'Next draw in ${diff.inHours}h';
-    return 'Draw today!';
+    return 'Draw soon!';
   }
 
   @override
@@ -698,7 +697,7 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
                   ),
                   child: _MiniPickCard(
                     pick: _picks[i],
-                    label: 'Pick ${i + 1} · ${_picks[i].style.tagline}',
+                    label: const ['⭐ Best Pick', '🔥 Hot Trend', '🎲 Lucky Mix'][i],
                     lottery: widget.lottery,
                   ),
                 );
