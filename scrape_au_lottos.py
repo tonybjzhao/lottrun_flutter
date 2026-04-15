@@ -17,6 +17,8 @@ from playwright.sync_api import sync_playwright
 class GameConfig:
     name: str
     url: str
+    # Stable per-draw result page used for CI-friendly incremental fetches.
+    result_url_template: str
     weekday: int  # Monday=0 ... Sunday=6
     main_count: int
     supp_count: int
@@ -28,10 +30,11 @@ class GameConfig:
 OZ_LOTTO = GameConfig(
     name="Oz Lotto",
     url="https://www.thelott.com/oz-lotto/results",
+    result_url_template="https://australia.national-lottery.com/oz-lotto/results/{date_slug}",
     weekday=1,  # Tuesday
     main_count=7,
     supp_count=2,
-    output_csv="oz_lotto_5y.csv",
+    output_csv="docs/oz_lotto.csv",
     min_ball=1,
     max_ball=47,
 )
@@ -39,10 +42,11 @@ OZ_LOTTO = GameConfig(
 SATURDAY_LOTTO = GameConfig(
     name="Saturday Lotto",
     url="https://www.thelott.com/saturday-lotto/results",
+    result_url_template="https://australia.national-lottery.com/saturday-lotto/results/{date_slug}",
     weekday=5,  # Saturday
     main_count=6,
     supp_count=2,
-    output_csv="saturday_lotto_5y.csv",
+    output_csv="docs/saturday_lotto.csv",
     min_ball=1,
     max_ball=45,
 )
@@ -50,7 +54,7 @@ SATURDAY_LOTTO = GameConfig(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Scrape Australia Oz Lotto and Saturday Lotto results from The Lott."
+        description="Scrape Australia Oz Lotto and Saturday Lotto results into GitHub Pages CSVs."
     )
     parser.add_argument(
         "--years",
@@ -285,30 +289,71 @@ def parse_draw_block(full_text: str, target_date: date, game: GameConfig) -> Opt
 
 
 def search_one_draw(page, game: GameConfig, d: date) -> Optional[dict]:
-    page.goto(game.url, wait_until="domcontentloaded", timeout=60000)
-    accept_cookies_if_present(page)
-    page.wait_for_timeout(1500)
+    date_slug = d.strftime("%d-%m-%Y")
+    result_url = game.result_url_template.format(date_slug=date_slug)
+    page.goto(result_url, wait_until="domcontentloaded", timeout=60000)
+    page.wait_for_timeout(800)
 
-    if not fill_search_date(page, d):
-        print(f"[WARN] Could not find a date input for {game.name} {d}")
+    ball_values = [
+        value.strip()
+        for value in page.locator("ul.balls li.ball").all_inner_texts()
+        if value.strip().isdigit()
+    ]
+    required = game.main_count + game.supp_count
+    if len(ball_values) < required:
         return None
 
-    click_search(page)
-    page.wait_for_timeout(2500)
+    title = page.title()
+    match = re.search(r"Draw\s+(\d+)", title, re.IGNORECASE)
+    draw_number = int(match.group(1)) if match else None
+    numbers = [int(value) for value in ball_values[:required]]
 
-    try:
-        body_text = page.locator("body").inner_text(timeout=10000)
-    except Exception:
-        body_text = page.content()
+    return {
+        "game": game.name,
+        "draw_date": d.isoformat(),
+        "draw_number": draw_number,
+        "main_numbers": numbers[: game.main_count],
+        "supp_numbers": numbers[game.main_count : required],
+    }
 
-    return parse_draw_block(body_text, d, game)
+
+def read_existing_rows(game: GameConfig) -> List[dict]:
+    output_path = Path(game.output_csv)
+    if not output_path.exists():
+        return []
+
+    rows: List[dict] = []
+    with output_path.open(newline="", encoding="utf-8") as file:
+        reader = csv.DictReader(file)
+        for item in reader:
+            rows.append(
+                {
+                    "game": item["game"],
+                    "draw_date": item["draw_date"],
+                    "draw_number": int(item["draw_number"]) if item["draw_number"] else None,
+                    "main_numbers": [
+                        int(item[f"main_{i + 1}"])
+                        for i in range(game.main_count)
+                        if item.get(f"main_{i + 1}")
+                    ],
+                    "supp_numbers": [
+                        int(item[f"supp_{i + 1}"])
+                        for i in range(game.supp_count)
+                        if item.get(f"supp_{i + 1}")
+                    ],
+                }
+            )
+    return rows
 
 
 def save_csv(rows: List[dict], game: GameConfig) -> None:
     main_cols = [f"main_{i + 1}" for i in range(game.main_count)]
     supp_cols = [f"supp_{i + 1}" for i in range(game.supp_count)]
 
-    with open(game.output_csv, "w", newline="", encoding="utf-8") as file:
+    output_path = Path(game.output_csv)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with output_path.open("w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
         writer.writerow(["game", "draw_date", "draw_number", *main_cols, *supp_cols])
 
@@ -336,12 +381,22 @@ def target_dates_for_game(game: GameConfig, *, years: int, weeks: Optional[int])
 
 
 def scrape_game(game: GameConfig, *, years: int, weeks: Optional[int], headed: bool, delay: float) -> List[dict]:
+    existing_rows = read_existing_rows(game)
     target_dates = target_dates_for_game(game, years=years, weeks=weeks)
 
-    print(f"\n=== {game.name} ===")
-    print(f"Target draw dates: {len(target_dates)}")
+    if existing_rows:
+        latest_existing = max(date.fromisoformat(row["draw_date"]) for row in existing_rows)
+        target_dates = [draw_date for draw_date in target_dates if draw_date > latest_existing]
 
-    rows: List[dict] = []
+    print(f"\n=== {game.name} ===")
+    print(f"Existing rows: {len(existing_rows)}")
+    print(f"Missing draw dates: {len(target_dates)}")
+
+    if not target_dates:
+        print(f"{game.name} is already up to date.")
+        return sorted(existing_rows, key=lambda row: row["draw_date"])
+
+    rows: List[dict] = list(existing_rows)
 
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=not headed)
@@ -355,7 +410,6 @@ def scrape_game(game: GameConfig, *, years: int, weeks: Optional[int], headed: b
             viewport={"width": 1440, "height": 2000},
         )
         page = context.new_page()
-
         for index, draw_date in enumerate(target_dates, start=1):
             print(f"[{index}/{len(target_dates)}] {game.name} {draw_date} ... ", end="", flush=True)
             try:
