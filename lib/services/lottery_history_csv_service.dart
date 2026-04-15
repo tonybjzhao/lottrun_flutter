@@ -14,13 +14,15 @@ class LotteryHistoryCsvService {
   static final LotteryHistoryCsvService instance = LotteryHistoryCsvService._();
 
   static const Map<String, String> _csvUrls = {
+    'au_powerball':
+        'https://tonybjzhao.github.io/lottrun_flutter/powerball.csv',
     'au_ozlotto': 'https://tonybjzhao.github.io/lottrun_flutter/oz_lotto.csv',
     'au_saturday':
         'https://tonybjzhao.github.io/lottrun_flutter/saturday_lotto.csv',
-    // Powerball can be added later once the public CSV is available.
   };
 
   static const Map<String, String> _cacheKeys = {
+    'au_powerball': 'cache_powerball_csv',
     'au_ozlotto': 'cache_oz_lotto_csv',
     'au_saturday': 'cache_saturday_lotto_csv',
   };
@@ -131,7 +133,7 @@ class LotteryHistoryCsvService {
     final bonusNumbers = <int>[];
     final bonusCount = lottery.bonusCount ?? 0;
     for (var i = 0; i < bonusCount; i++) {
-      final index = 10 + i;
+      final index = 3 + lottery.mainCount + i;
       if (index >= row.length) break;
       final value = row[index]?.toString().trim() ?? '';
       if (value.isEmpty) continue;

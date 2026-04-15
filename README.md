@@ -32,6 +32,7 @@ python3 scrape_au_lottos.py
 
 Outputs:
 
+- `docs/powerball.csv`
 - `docs/oz_lotto.csv`
 - `docs/saturday_lotto.csv`
 

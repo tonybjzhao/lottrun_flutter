@@ -27,6 +27,18 @@ class GameConfig:
     max_ball: int
 
 
+POWERBALL = GameConfig(
+    name="Powerball",
+    url="https://www.thelott.com/powerball/results",
+    result_url_template="https://australia.national-lottery.com/powerball/results/{date_slug}",
+    weekday=3,  # Thursday
+    main_count=7,
+    supp_count=1,
+    output_csv="docs/powerball.csv",
+    min_ball=1,
+    max_ball=35,
+)
+
 OZ_LOTTO = GameConfig(
     name="Oz Lotto",
     url="https://www.thelott.com/oz-lotto/results",
@@ -54,7 +66,7 @@ SATURDAY_LOTTO = GameConfig(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Scrape Australia Oz Lotto and Saturday Lotto results into GitHub Pages CSVs."
+        description="Scrape Australia Powerball, Oz Lotto, and Saturday Lotto results into GitHub Pages CSVs."
     )
     parser.add_argument(
         "--years",
@@ -70,9 +82,9 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--game",
-        choices=("oz", "saturday", "both"),
-        default="both",
-        help="Which game to scrape. Default: both",
+        choices=("powerball", "oz", "saturday", "all"),
+        default="all",
+        help="Which game to scrape. Default: all",
     )
     parser.add_argument(
         "--headed",
@@ -443,11 +455,13 @@ def scrape_game(game: GameConfig, *, years: int, weeks: Optional[int], headed: b
 
 
 def selected_games(game_arg: str) -> List[GameConfig]:
+    if game_arg == "powerball":
+        return [POWERBALL]
     if game_arg == "oz":
         return [OZ_LOTTO]
     if game_arg == "saturday":
         return [SATURDAY_LOTTO]
-    return [OZ_LOTTO, SATURDAY_LOTTO]
+    return [POWERBALL, OZ_LOTTO, SATURDAY_LOTTO]
 
 
 def main() -> None:
