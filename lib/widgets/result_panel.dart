@@ -13,6 +13,7 @@ class ResultPanel extends StatelessWidget {
   final LotteryDraw? recentDraw; // for match-check display
   final VoidCallback onSave;
   final bool isSaved;
+  final VoidCallback? onCollapse;
 
   const ResultPanel({
     super.key,
@@ -21,6 +22,7 @@ class ResultPanel extends StatelessWidget {
     this.recentDraw,
     required this.onSave,
     this.isSaved = false,
+    this.onCollapse,
   });
 
   // ── Helpers ────────────────────────────────────────────────────────────────
@@ -119,19 +121,40 @@ class ResultPanel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── Emotional tagline ────────────────────────────────
-            Text(
-              '${pick.style.tagline} · ${lottery.name}',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              pick.style.taglineSubtitle,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha(140),
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${pick.style.tagline} · ${lottery.name}',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        pick.style.taglineSubtitle,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withAlpha(140),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (onCollapse != null)
+                  IconButton(
+                    onPressed: onCollapse,
+                    icon: const Icon(Icons.keyboard_arrow_up_rounded),
+                    iconSize: 20,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    tooltip: 'Collapse',
+                  ),
+              ],
             ),
             const SizedBox(height: 16),
 

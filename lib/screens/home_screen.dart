@@ -27,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   GeneratedPick? _pick;
   bool _isSaved = false;
   bool _isLoading = false;
+  bool _isPickExpanded = false;
 
   @override
   void initState() {
@@ -93,6 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _pick = pick;
       _isSaved = false;
       _isLoading = false;
+      _isPickExpanded = false;
     });
   }
 
@@ -239,53 +241,58 @@ class _HomeScreenState extends State<HomeScreen> {
             // ── Result / empty state ──────────────────────────────
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 400),
-              transitionBuilder: (child, animation) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0, 0.08),
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeOutCubic,
-                    )),
-                    child: child,
-                  ),
-                );
-              },
-              child: _pick != null
-                  ? ResultPanel(
-                      key: ValueKey(_pick!.createdAt),
-                      pick: _pick!,
-                      lottery: _selectedLottery,
-                      recentDraw: LotteryService.instance
-                          .getRecentDraws(_selectedLottery.id, limit: 1)
-                          .firstOrNull,
-                      onSave: _savePick,
-                      isSaved: _isSaved,
-                    )
-                  : Padding(
+              transitionBuilder: (child, animation) => FadeTransition(
+                opacity: animation,
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0, 0.08),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
+                  )),
+                  child: child,
+                ),
+              ),
+              child: _pick == null
+                  ? Padding(
                       key: const ValueKey('empty'),
                       padding: const EdgeInsets.symmetric(vertical: 32),
                       child: Column(
                         children: [
                           Icon(Icons.casino_outlined,
                               size: 52,
-                              color:
-                                  theme.colorScheme.onSurface.withAlpha(55)),
+                              color: theme.colorScheme.onSurface.withAlpha(55)),
                           const SizedBox(height: 12),
                           Text(
                             'Try a fun pick based on real draw history 🎲',
                             textAlign: TextAlign.center,
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color:
-                                  theme.colorScheme.onSurface.withAlpha(130),
+                              color: theme.colorScheme.onSurface.withAlpha(130),
                             ),
                           ),
                         ],
                       ),
-                    ),
+                    )
+                  : _isPickExpanded
+                      ? ResultPanel(
+                          key: const ValueKey('expanded'),
+                          pick: _pick!,
+                          lottery: _selectedLottery,
+                          recentDraw: LotteryService.instance
+                              .getRecentDraws(_selectedLottery.id, limit: 1)
+                              .firstOrNull,
+                          onSave: _savePick,
+                          isSaved: _isSaved,
+                          onCollapse: () =>
+                              setState(() => _isPickExpanded = false),
+                        )
+                      : _CompactPickBanner(
+                          key: ValueKey(_pick!.createdAt),
+                          pick: _pick!,
+                          onExpand: () =>
+                              setState(() => _isPickExpanded = true),
+                        ),
             ),
 
             const SizedBox(height: 80),
@@ -534,6 +541,73 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Compact pick banner (home screen lightweight preview) ─────────────────────
+
+class _CompactPickBanner extends StatelessWidget {
+  final GeneratedPick pick;
+  final VoidCallback onExpand;
+
+  const _CompactPickBanner({
+    super.key,
+    required this.pick,
+    required this.onExpand,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return GestureDetector(
+      onTap: onExpand,
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 1,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            children: [
+              // Style emoji + balls
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      // Main balls
+                      ...pick.mainNumbers.map(
+                        (n) => Padding(
+                          padding: const EdgeInsets.only(right: 5),
+                          child: LottoBall(number: n, size: 34),
+                        ),
+                      ),
+                      // Bonus separator + ball
+                      if (pick.bonusNumbers != null &&
+                          pick.bonusNumbers!.isNotEmpty) ...[
+                        const SizedBox(width: 6),
+                        ...pick.bonusNumbers!.map(
+                          (n) => Padding(
+                            padding: const EdgeInsets.only(right: 5),
+                            child: LottoBall(number: n, isBonus: true, size: 34),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.expand_more_rounded,
+                size: 20,
+                color: theme.colorScheme.onSurface.withAlpha(100),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
