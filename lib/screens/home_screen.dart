@@ -214,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     )
                   : const Icon(Icons.casino_rounded),
               label: Text(
-                _isLoading ? 'Generating…' : 'Generate Numbers',
+                _isLoading ? 'Generating…' : 'Try My Luck',
                 style: const TextStyle(fontSize: 16),
               ),
               style: FilledButton.styleFrom(
@@ -259,6 +259,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       key: ValueKey(_pick!.createdAt),
                       pick: _pick!,
                       lottery: _selectedLottery,
+                      recentDraw: LotteryService.instance
+                          .getRecentDraws(_selectedLottery.id, limit: 1)
+                          .firstOrNull,
                       onSave: _savePick,
                       isSaved: _isSaved,
                     )

@@ -17,6 +17,34 @@ enum PlayStyle {
     }
   }
 
+  /// Short emotional headline shown on the result card.
+  String get tagline {
+    switch (this) {
+      case PlayStyle.balanced:
+        return '⚖️ Balanced Pick';
+      case PlayStyle.hot:
+        return '🔥 Hot Trend Pick';
+      case PlayStyle.cold:
+        return '❄️ Cold Comeback Pick';
+      case PlayStyle.random:
+        return '🎲 Pure Luck Pick';
+    }
+  }
+
+  /// One-liner shown under the tagline.
+  String get taglineSubtitle {
+    switch (this) {
+      case PlayStyle.balanced:
+        return 'Even spread across all number ranges.';
+      case PlayStyle.hot:
+        return 'These numbers have been trending recently.';
+      case PlayStyle.cold:
+        return "These numbers haven't appeared in a while.";
+      case PlayStyle.random:
+        return 'Completely random — pure chance!';
+    }
+  }
+
   String get description {
     switch (this) {
       case PlayStyle.balanced:
@@ -29,7 +57,6 @@ enum PlayStyle {
         return 'Pure random selection';
     }
   }
-
 }
 
 class GeneratedPick {

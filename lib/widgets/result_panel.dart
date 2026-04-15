@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery.dart';
+import '../models/lottery_draw.dart';
 import 'lotto_ball.dart';
 
 class ResultPanel extends StatelessWidget {
   final GeneratedPick pick;
   final Lottery lottery;
+  final LotteryDraw? recentDraw; // for match-check display
   final VoidCallback onSave;
   final bool isSaved;
 
@@ -15,9 +18,22 @@ class ResultPanel extends StatelessWidget {
     super.key,
     required this.pick,
     required this.lottery,
+    this.recentDraw,
     required this.onSave,
     this.isSaved = false,
   });
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
+  String _buildShareText() {
+    final main = pick.mainNumbers.join('  ');
+    final bonus = (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
+        ? '\n+ Powerball: ${pick.bonusNumbers!.join(' ')}'
+        : '';
+    return '${pick.style.tagline} — ${lottery.name}\n\n$main$bonus\n\n'
+        '${pick.style.taglineSubtitle}\n'
+        'Generated for fun — LottFun 🎲';
+  }
 
   String _buildCopyText() {
     final main = pick.mainNumbers.join('  ');
@@ -44,10 +60,55 @@ class ResultPanel extends StatelessWidget {
     }
   }
 
+  Future<void> _share() async {
+    HapticFeedback.lightImpact();
+    await Share.share(_buildShareText());
+  }
+
+  // ── Match check ────────────────────────────────────────────────────────────
+
+  Widget? _buildMatchRow(ThemeData theme) {
+    if (recentDraw == null) return null;
+    final draw = recentDraw!;
+    final matched =
+        pick.mainNumbers.where((n) => draw.mainNumbers.contains(n)).toList();
+    final bonusHit = pick.bonusNumbers != null &&
+        draw.bonusNumbers != null &&
+        pick.bonusNumbers!.any((n) => draw.bonusNumbers!.contains(n));
+    final dateStr = DateFormat('d MMM yyyy').format(draw.drawDate);
+
+    String label;
+    Color color;
+    if (matched.length >= 5 || (matched.length >= 4 && bonusHit)) {
+      label = '🎯 ${matched.length} matched${bonusHit ? ' + PB' : ''}! Last draw $dateStr';
+      color = Colors.green.shade700;
+    } else if (matched.length >= 3) {
+      label = '✅ ${matched.length} matched${bonusHit ? ' + PB' : ''}. Last draw $dateStr';
+      color = theme.colorScheme.primary;
+    } else if (matched.isNotEmpty) {
+      label = '${matched.length} matched last draw ($dateStr)';
+      color = theme.colorScheme.onSurface.withAlpha(140);
+    } else {
+      label = '0 matched last draw ($dateStr)';
+      color = theme.colorScheme.onSurface.withAlpha(100);
+    }
+
+    return Text(
+      label,
+      style: theme.textTheme.labelSmall?.copyWith(
+        color: color,
+        fontWeight: matched.length >= 3 ? FontWeight.w600 : FontWeight.normal,
+      ),
+    );
+  }
+
+  // ── Build ──────────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final timeStr = DateFormat('d MMM yyyy · HH:mm').format(pick.createdAt);
+    final matchRow = _buildMatchRow(theme);
 
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -57,26 +118,19 @@ class ResultPanel extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Header ──────────────────────────────────────────
-            Row(
-              children: [
-                Icon(Icons.star_rounded,
-                    color: theme.colorScheme.primary, size: 18),
-                const SizedBox(width: 6),
-                Text(
-                  '${pick.style.label} · ${lottery.name}',
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 3),
+            // ── Emotional tagline ────────────────────────────────
             Text(
-              pick.style.description,
+              '${pick.style.tagline} · ${lottery.name}',
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              pick.style.taglineSubtitle,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha(120),
+                color: theme.colorScheme.onSurface.withAlpha(140),
               ),
             ),
             const SizedBox(height: 16),
@@ -89,7 +143,7 @@ class ResultPanel extends StatelessWidget {
                   pick.mainNumbers.map((n) => LottoBall(number: n)).toList(),
             ),
 
-            // ── Bonus ball (Powerball) ────────────────────────────
+            // ── Bonus ball ───────────────────────────────────────
             if (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty) ...[
               const SizedBox(height: 8),
               Row(
@@ -114,12 +168,18 @@ class ResultPanel extends StatelessWidget {
               ),
             ],
 
-            // ── Fun disclaimer (caption style, no box) ───────────
-            const SizedBox(height: 14),
+            // ── Match check ──────────────────────────────────────
+            if (matchRow != null) ...[
+              const SizedBox(height: 10),
+              matchRow,
+            ],
+
+            // ── Disclaimer ───────────────────────────────────────
+            const SizedBox(height: 10),
             Text(
               'Generated for fun using historical patterns.',
               style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha(90),
+                color: theme.colorScheme.onSurface.withAlpha(80),
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -131,7 +191,7 @@ class ResultPanel extends StatelessWidget {
                 Text(
                   timeStr,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withAlpha(90),
+                    color: theme.colorScheme.onSurface.withAlpha(80),
                   ),
                 ),
                 const Spacer(),
@@ -145,7 +205,18 @@ class ResultPanel extends StatelessWidget {
                     textStyle: const TextStyle(fontSize: 13),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
+                OutlinedButton.icon(
+                  onPressed: _share,
+                  icon: const Icon(Icons.share_rounded, size: 15),
+                  label: const Text('Share'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 6),
+                    textStyle: const TextStyle(fontSize: 13),
+                  ),
+                ),
+                const SizedBox(width: 6),
                 OutlinedButton.icon(
                   onPressed: isSaved ? null : onSave,
                   icon: Icon(
