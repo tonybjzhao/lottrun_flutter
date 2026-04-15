@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../admob_ids.dart';
 import '../feature_flags.dart';
 import 'package:intl/intl.dart';
 import '../models/lottery.dart';
@@ -33,7 +34,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     if (kShowHistoryBannerAd) {
       _bannerAd = BannerAd(
-        adUnitId: 'ca-app-pub-9718685783142362/2914534027',
+        adUnitId: AdMobIds.historyBanner,
         size: AdSize.banner,
         request: const AdRequest(),
         listener: BannerAdListener(
