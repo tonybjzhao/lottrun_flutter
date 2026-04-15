@@ -1,5 +1,7 @@
 import '../models/lottery_draw.dart';
 
+const String kSaturdayLottoDrawsUpdatedAt = '2026-04-14';
+
 /// 276 real AU Saturday Lotto draws.
 final List<LotteryDraw> kSaturdayLottoDraws = [
   LotteryDraw(lotteryId: 'au_saturday', drawDate: DateTime(2026, 4, 11), mainNumbers: [8, 11, 15, 32, 33, 44], bonusNumbers: [35, 41]),

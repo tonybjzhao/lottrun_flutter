@@ -1,5 +1,7 @@
 import '../models/lottery_draw.dart';
 
+const String kPowerballDrawsUpdatedAt = '2026-04-14';
+
 /// 275 real AU Powerball draws.
 final List<LotteryDraw> kPowerballDraws = [
   LotteryDraw(lotteryId: 'au_powerball', drawDate: DateTime(2026, 4, 9), mainNumbers: [3, 15, 17, 26, 27, 32, 33], bonusNumbers: [20]),

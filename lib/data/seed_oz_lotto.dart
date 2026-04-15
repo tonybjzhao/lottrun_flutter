@@ -1,5 +1,7 @@
 import '../models/lottery_draw.dart';
 
+const String kOzLottoDrawsUpdatedAt = '2026-04-14';
+
 /// 276 real AU Oz Lotto draws.
 final List<LotteryDraw> kOzLottoDraws = [
   LotteryDraw(lotteryId: 'au_ozlotto', drawDate: DateTime(2026, 4, 14), mainNumbers: [2, 5, 19, 25, 30, 36, 39], bonusNumbers: [13, 40]),
