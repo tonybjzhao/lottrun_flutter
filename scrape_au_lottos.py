@@ -299,6 +299,10 @@ def search_one_draw(page, game: GameConfig, d: date) -> Optional[dict]:
         for value in page.locator("ul.balls li.ball").all_inner_texts()
         if value.strip().isdigit()
     ]
+    if not ball_values:
+        print(f"[WARN] No balls found for {game.name} {d}")
+        return None
+
     required = game.main_count + game.supp_count
     if len(ball_values) < required:
         return None
@@ -306,6 +310,10 @@ def search_one_draw(page, game: GameConfig, d: date) -> Optional[dict]:
     title = page.title()
     match = re.search(r"Draw\s+(\d+)", title, re.IGNORECASE)
     draw_number = int(match.group(1)) if match else None
+    if draw_number is None:
+        print(f"[WARN] Missing draw number for {game.name} {d}")
+        return None
+
     numbers = [int(value) for value in ball_values[:required]]
 
     return {
