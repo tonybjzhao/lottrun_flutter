@@ -50,3 +50,10 @@ app.*.map.json
 # Local IDE / tool settings
 .claude/
 .qwen/
+
+# iOS build cache
+ios/build/
+
+# Local log / debug files
+*.txt
+diff.txt
