@@ -290,18 +290,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      // ── Ad banner placeholder ─────────────────────────────────
-      bottomNavigationBar: Container(
-        height: 52,
-        color: theme.colorScheme.surfaceContainerHighest,
-        alignment: Alignment.center,
-        child: Text(
-          'Ad Banner Placeholder',
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.onSurface.withAlpha(80),
-          ),
-        ),
-      ),
     );
   }
 }
