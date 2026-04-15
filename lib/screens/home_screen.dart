@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/generated_pick.dart';
@@ -204,26 +206,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 24),
 
+            // ── Luck label + countdown ────────────────────────────
+            _LuckBar(lottery: _selectedLottery),
+            const SizedBox(height: 12),
+
             // ── Generate buttons ──────────────────────────────────
-            FilledButton.icon(
+            _GradientButton(
               onPressed: _isLoading ? null : _generate,
-              icon: _isLoading
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
-                    )
-                  : const Icon(Icons.casino_rounded),
-              label: Text(
-                _isLoading ? 'Generating…' : 'Try My Luck',
-                style: const TextStyle(fontSize: 16),
-              ),
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
-              ),
+              isLoading: _isLoading,
             ),
             const SizedBox(height: 10),
             OutlinedButton.icon(
@@ -300,6 +290,155 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
+    );
+  }
+}
+
+// ── Luck bar (daily luck % + draw countdown) ─────────────────────────────────
+
+class _LuckBar extends StatelessWidget {
+  final Lottery lottery;
+  const _LuckBar({required this.lottery});
+
+  /// Stable daily value seeded by calendar date (65–95 range).
+  int get _luckPct {
+    final d = DateTime.now().toLocal();
+    final seed = d.year * 10000 + d.month * 100 + d.day;
+    return 65 + Random(seed).nextInt(31);
+  }
+
+  /// Next draw date for known AU lotteries (AEST = UTC+10).
+  String _nextDraw() {
+    final drawWeekday = switch (lottery.id) {
+      'au_powerball' => DateTime.thursday,
+      'au_ozlotto'   => DateTime.tuesday,
+      'au_saturday'  => DateTime.saturday,
+      _              => null,
+    };
+    if (drawWeekday == null) return '';
+
+    final now = DateTime.now().toUtc().add(const Duration(hours: 10));
+    var next = now;
+    // Advance until we hit the correct weekday
+    while (next.weekday != drawWeekday) {
+      next = next.add(const Duration(days: 1));
+    }
+    // Draw is at 20:30 AEST; if today is draw day but past 20:30, go to next week
+    if (next.day == now.day &&
+        (now.hour > 20 || (now.hour == 20 && now.minute >= 30))) {
+      next = next.add(const Duration(days: 7));
+    }
+
+    final diff = next.difference(now);
+    if (diff.inDays >= 2) return 'Next draw in ${diff.inDays}d';
+    if (diff.inDays == 1) return 'Next draw tomorrow';
+    if (diff.inHours >= 1) return 'Next draw in ${diff.inHours}h';
+    return 'Draw today!';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final countdown = _nextDraw();
+    return Row(
+      children: [
+        Text(
+          '🍀 Today\'s luck: $_luckPct%',
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: theme.colorScheme.primary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        if (countdown.isNotEmpty) ...[
+          const Spacer(),
+          Text(
+            '⏳ $countdown',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurface.withAlpha(130),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+// ── Gradient Try My Luck button ───────────────────────────────────────────────
+
+class _GradientButton extends StatefulWidget {
+  final VoidCallback? onPressed;
+  final bool isLoading;
+  const _GradientButton({required this.onPressed, required this.isLoading});
+
+  @override
+  State<_GradientButton> createState() => _GradientButtonState();
+}
+
+class _GradientButtonState extends State<_GradientButton> {
+  double _scale = 1.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _scale = 0.96),
+      onTapUp: (_) => setState(() => _scale = 1.0),
+      onTapCancel: () => setState(() => _scale = 1.0),
+      onTap: widget.onPressed == null
+          ? null
+          : () {
+              HapticFeedback.lightImpact();
+              widget.onPressed!();
+            },
+      child: AnimatedScale(
+        scale: _scale,
+        duration: const Duration(milliseconds: 100),
+        child: Container(
+          width: double.infinity,
+          height: 54,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            gradient: widget.onPressed == null
+                ? null
+                : const LinearGradient(
+                    colors: [Color(0xFF7B1FA2), Color(0xFF4A148C)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+            color: widget.onPressed == null ? Colors.grey.shade300 : null,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: Center(
+              child: widget.isLoading
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2.5, color: Colors.white),
+                    )
+                  : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.casino_rounded,
+                            color: Colors.white, size: 20),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Try My Luck',
+                          style: TextStyle(
+                            color: widget.onPressed == null
+                                ? Colors.grey.shade600
+                                : Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
