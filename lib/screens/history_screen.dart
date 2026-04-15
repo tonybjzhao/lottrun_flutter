@@ -33,7 +33,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     if (kShowHistoryBannerAd) {
       _bannerAd = BannerAd(
-        adUnitId: 'ca-app-pub-3940256099942544/2934735716', // test banner ad unit ID
+        adUnitId: 'ca-app-pub-9718685783142362/2914534027',
         size: AdSize.banner,
         request: const AdRequest(),
         listener: BannerAdListener(
