@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:csv/csv.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
+import '../models/lottery_history_result.dart';
 
 class LotteryHistoryCsvService {
   LotteryHistoryCsvService._();
@@ -18,21 +20,69 @@ class LotteryHistoryCsvService {
     // Powerball can be added later once the public CSV is available.
   };
 
-  Future<List<LotteryDraw>> fetchDraws(Lottery lottery) async {
+  static const Map<String, String> _cacheKeys = {
+    'au_ozlotto': 'cache_oz_lotto_csv',
+    'au_saturday': 'cache_saturday_lotto_csv',
+  };
+
+  Future<LotteryHistoryResult> fetchDraws(Lottery lottery) async {
     final baseUrl = _csvUrls[lottery.id];
     if (baseUrl == null) {
       throw Exception('No remote CSV configured for ${lottery.name}.');
     }
 
-    final uri = Uri.parse(
-      '$baseUrl?v=${DateTime.now().millisecondsSinceEpoch}',
-    );
-    final response = await http.get(uri);
-    if (response.statusCode != 200) {
-      throw Exception('Failed to load history CSV (${response.statusCode}).');
-    }
+    final prefs = await SharedPreferences.getInstance();
+    final cacheKey = _cacheKeys[lottery.id];
+    final updatedAtKey = cacheKey == null ? null : '${cacheKey}_updated_at';
+    try {
+      final uri = Uri.parse(
+        '$baseUrl?v=${DateTime.now().millisecondsSinceEpoch}',
+      );
+      final response = await http
+          .get(uri)
+          .timeout(const Duration(seconds: 12));
+      if (response.statusCode != 200) {
+        throw Exception('Failed to load history CSV (${response.statusCode}).');
+      }
 
-    final csvString = utf8.decode(response.bodyBytes);
+      final csvString = utf8.decode(response.bodyBytes);
+      final draws = _parseDraws(csvString, lottery);
+
+      if (cacheKey != null) {
+        await prefs.setString(cacheKey, csvString);
+        await prefs.setString(updatedAtKey!, DateTime.now().toIso8601String());
+      }
+
+      return LotteryHistoryResult(
+        draws: draws,
+        source: LotteryHistorySource.network,
+        loadedAt: DateTime.now(),
+      );
+    } catch (_) {
+      if (cacheKey == null) {
+        rethrow;
+      }
+
+      final cachedCsv = prefs.getString(cacheKey);
+      if (cachedCsv == null || cachedCsv.trim().isEmpty) {
+        throw Exception('No internet connection and no saved lottery history yet.');
+      }
+
+      try {
+        final draws = _parseDraws(cachedCsv, lottery);
+        final loadedAtText = prefs.getString(updatedAtKey!);
+        return LotteryHistoryResult(
+          draws: draws,
+          source: LotteryHistorySource.cache,
+          loadedAt: loadedAtText == null ? null : DateTime.tryParse(loadedAtText),
+        );
+      } catch (_) {
+        throw Exception('No internet connection and no saved lottery history yet.');
+      }
+    }
+  }
+
+  List<LotteryDraw> _parseDraws(String csvString, Lottery lottery) {
     final rows = const CsvToListConverter(
       shouldParseNumbers: false,
       eol: '\n',
