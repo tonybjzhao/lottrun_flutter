@@ -299,53 +299,67 @@ class _DrawTile extends StatelessWidget {
 
   const _DrawTile({required this.draw, required this.lottery});
 
+  static const _ballSize = 30.0;
+  static const _ballSpacing = 5.0;
+  static const _rowSplit = 5; // first N main numbers on row 1
+
+  Widget _ballRow(List<int> numbers, {bool bonus = false}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: numbers.map((n) => Padding(
+        padding: const EdgeInsets.only(right: _ballSpacing),
+        child: LottoBall(number: n, isBonus: bonus, size: _ballSize),
+      )).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final dateStr = DateFormat('d MMM yy').format(draw.drawDate);
 
+    final row1 = draw.mainNumbers.take(_rowSplit).toList();
+    final row2 = draw.mainNumbers.skip(_rowSplit).toList();
+    final bonus = draw.bonusNumbers ?? [];
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Date column — fixed width so balls align across rows
+          // ── Date column ───────────────────────────────────
           SizedBox(
-            width: 82,
-            child: Text(
-              dateStr,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha(150),
-                fontWeight: FontWeight.w600,
+            width: 72,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 7),
+              child: Text(
+                dateStr,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withAlpha(150),
+                  fontWeight: FontWeight.w600,
+                ),
+                maxLines: 1,
               ),
-              maxLines: 1,
             ),
           ),
-          // Balls — horizontally scrollable so long draws never wrap
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  ...draw.mainNumbers.map(
-                    (n) => Padding(
-                      padding: const EdgeInsets.only(right: 5),
-                      child: LottoBall(number: n, size: 30),
-                    ),
-                  ),
-                  if (draw.bonusNumbers != null &&
-                      draw.bonusNumbers!.isNotEmpty) ...[
-                    const SizedBox(width: 8),
-                    ...draw.bonusNumbers!.map(
-                      (n) => Padding(
-                        padding: const EdgeInsets.only(right: 5),
-                        child: LottoBall(number: n, isBonus: true, size: 30),
-                      ),
-                    ),
+          // ── Ball rows ─────────────────────────────────────
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _ballRow(row1),
+              if (row2.isNotEmpty || bonus.isNotEmpty) ...[
+                const SizedBox(height: 5),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (row2.isNotEmpty) _ballRow(row2),
+                    if (row2.isNotEmpty && bonus.isNotEmpty)
+                      const SizedBox(width: 6),
+                    if (bonus.isNotEmpty) _ballRow(bonus, bonus: true),
                   ],
-                ],
-              ),
-            ),
+                ),
+              ],
+            ],
           ),
         ],
       ),
