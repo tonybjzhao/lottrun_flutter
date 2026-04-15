@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import '../data/seed_lotteries.dart';
-import '../services/lottery_service.dart';
+import '../services/lottery_history_csv_service.dart';
 import '../widgets/lotto_ball.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -17,21 +17,31 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   late Lottery _lottery;
-  late List<LotteryDraw> _draws;
+  late Future<List<LotteryDraw>> _drawsFuture;
 
   @override
   void initState() {
     super.initState();
     _lottery = widget.lottery;
-    _draws = LotteryService.instance.getDraws(_lottery.id);
+    _drawsFuture = _loadDraws(_lottery);
   }
 
   void _onLotteryChanged(Lottery? l) {
     if (l == null) return;
     setState(() {
       _lottery = l;
-      _draws = LotteryService.instance.getDraws(l.id);
+      _drawsFuture = _loadDraws(l);
     });
+  }
+
+  Future<List<LotteryDraw>> _loadDraws(Lottery lottery) {
+    return LotteryHistoryCsvService.instance.fetchDraws(lottery);
+  }
+
+  Future<void> _refresh() async {
+    final future = _loadDraws(_lottery);
+    setState(() => _drawsFuture = future);
+    await future;
   }
 
   @override
@@ -74,15 +84,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
           // ── Draw count badge ────────────────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: Row(
-              children: [
-                Text(
-                  '${_draws.length} draws',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withAlpha(120),
+            child: FutureBuilder<List<LotteryDraw>>(
+              future: _drawsFuture,
+              builder: (context, snapshot) => Row(
+                children: [
+                  Text(
+                    snapshot.hasData ? '${snapshot.data!.length} draws' : 'Loading...',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withAlpha(120),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
 
@@ -90,18 +103,37 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
           // ── Draw list ───────────────────────────────────────────
           Expanded(
-            child: _draws.isEmpty
-                ? _emptyState(theme)
-                : ListView.separated(
+            child: FutureBuilder<List<LotteryDraw>>(
+              future: _drawsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return _errorState(theme, snapshot.error.toString());
+                }
+
+                final draws = snapshot.data ?? const <LotteryDraw>[];
+                if (draws.isEmpty) {
+                  return _emptyState(theme);
+                }
+
+                return RefreshIndicator(
+                  onRefresh: _refresh,
+                  child: ListView.separated(
                     padding: const EdgeInsets.only(bottom: 16),
-                    itemCount: _draws.length,
+                    itemCount: draws.length,
                     separatorBuilder: (context, index) =>
                         const Divider(height: 1, indent: 16, endIndent: 16),
                     itemBuilder: (context, index) {
-                      final draw = _draws[index];
+                      final draw = draws[index];
                       return _DrawTile(draw: draw, lottery: _lottery);
                     },
                   ),
+                );
+              },
+            ),
           ),
 
           // ── Ad banner placeholder ───────────────────────────────
@@ -137,6 +169,42 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _errorState(ThemeData theme, String message) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_rounded,
+                size: 48, color: theme.colorScheme.error.withAlpha(180)),
+            const SizedBox(height: 12),
+            Text(
+              'Failed to load history.',
+              style: theme.textTheme.titleSmall,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withAlpha(140),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: () {
+                setState(() => _drawsFuture = _loadDraws(_lottery));
+              },
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
       ),
     );
   }
