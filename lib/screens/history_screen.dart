@@ -180,11 +180,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
           // ── Ad banner ──────────────────────────────────────────
           if (kShowHistoryBannerAd)
-            SizedBox(
-              height: 52,
-              child: _isBannerAdLoaded && _bannerAd != null
-                  ? AdWidget(ad: _bannerAd!)
-                  : Container(color: theme.colorScheme.surfaceContainerHighest),
+            SafeArea(
+              top: false,
+              child: SizedBox(
+                height: 52,
+                child: _isBannerAdLoaded && _bannerAd != null
+                    ? AdWidget(ad: _bannerAd!)
+                    : Container(color: theme.colorScheme.surfaceContainerHighest),
+              ),
             ),
         ],
       ),
