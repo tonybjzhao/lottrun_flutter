@@ -32,6 +32,9 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+powerball_5y_backup.csv
+oz_lotto_5y_backup.csv
+saturday_lotto_5y_backup.csv
 
 # Symbolication related
 app.*.symbols

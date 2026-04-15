@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../feature_flags.dart';
 import 'package:intl/intl.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
@@ -20,11 +22,31 @@ class _HistoryScreenState extends State<HistoryScreen> {
   late Lottery _lottery;
   late Future<LotteryHistoryResult> _historyFuture;
 
+  BannerAd? _bannerAd;
+  bool _isBannerAdLoaded = false;
+
   @override
   void initState() {
     super.initState();
     _lottery = widget.lottery;
     _historyFuture = _loadDraws(_lottery);
+
+    if (kShowHistoryBannerAd) {
+      _bannerAd = BannerAd(
+        adUnitId: 'ca-app-pub-3940256099942544/2934735716', // test banner ad unit ID
+        size: AdSize.banner,
+        request: const AdRequest(),
+        listener: BannerAdListener(
+          onAdLoaded: (ad) {
+            if (mounted) setState(() => _isBannerAdLoaded = true);
+          },
+          onAdFailedToLoad: (ad, error) {
+            ad.dispose();
+            if (mounted) setState(() => _isBannerAdLoaded = false);
+          },
+        ),
+      )..load();
+    }
   }
 
   void _onLotteryChanged(Lottery? l) {
@@ -37,6 +59,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Future<LotteryHistoryResult> _loadDraws(Lottery lottery) {
     return LotteryHistoryCsvService.instance.fetchDraws(lottery);
+  }
+
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
   }
 
   Future<void> _refresh() async {
@@ -123,10 +152,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   return _emptyState(theme);
                 }
 
+                // Add bottom padding for banner ad if enabled and loaded
+                final double bottomPadding = (kShowHistoryBannerAd && _isBannerAdLoaded)
+                    ? 52.0
+                    : 0.0;
+
                 return RefreshIndicator(
                   onRefresh: _refresh,
                   child: ListView.separated(
-                    padding: const EdgeInsets.only(bottom: 16),
+                    padding: EdgeInsets.only(bottom: 16 + bottomPadding),
                     itemCount: draws.length + 1,
                     separatorBuilder: (context, index) =>
                         const Divider(height: 1, indent: 16, endIndent: 16),
@@ -144,18 +178,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
 
-          // ── Ad banner placeholder ───────────────────────────────
-          Container(
-            height: 52,
-            color: theme.colorScheme.surfaceContainerHighest,
-            alignment: Alignment.center,
-            child: Text(
-              'Ad Banner Placeholder',
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha(80),
-              ),
+          // ── Ad banner ──────────────────────────────────────────
+          if (kShowHistoryBannerAd)
+            SizedBox(
+              height: 52,
+              child: _isBannerAdLoaded && _bannerAd != null
+                  ? AdWidget(ad: _bannerAd!)
+                  : Container(color: theme.colorScheme.surfaceContainerHighest),
             ),
-          ),
         ],
       ),
     );
@@ -268,31 +298,50 @@ class _DrawTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final dateStr = DateFormat('d MMM yyyy').format(draw.drawDate);
+    final dateStr = DateFormat('d MMM yy').format(draw.drawDate);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            dateStr,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurface.withAlpha(140),
-              fontWeight: FontWeight.w600,
+          // Date column — fixed width so balls align across rows
+          SizedBox(
+            width: 82,
+            child: Text(
+              dateStr,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurface.withAlpha(150),
+                fontWeight: FontWeight.w600,
+              ),
+              maxLines: 1,
             ),
           ),
-          const SizedBox(height: 6),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: [
-              ...draw.mainNumbers
-                  .map((n) => LottoBall(number: n, size: 36)),
-              if (draw.bonusNumbers != null)
-                ...draw.bonusNumbers!
-                    .map((n) => LottoBall(number: n, isBonus: true, size: 36)),
-            ],
+          // Balls — horizontally scrollable so long draws never wrap
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  ...draw.mainNumbers.map(
+                    (n) => Padding(
+                      padding: const EdgeInsets.only(right: 5),
+                      child: LottoBall(number: n, size: 30),
+                    ),
+                  ),
+                  if (draw.bonusNumbers != null &&
+                      draw.bonusNumbers!.isNotEmpty) ...[
+                    const SizedBox(width: 8),
+                    ...draw.bonusNumbers!.map(
+                      (n) => Padding(
+                        padding: const EdgeInsets.only(right: 5),
+                        child: LottoBall(number: n, isBonus: true, size: 30),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
         ],
       ),

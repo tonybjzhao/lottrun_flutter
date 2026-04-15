@@ -514,16 +514,19 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
           ),
 
           // ── Copy All button ─────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
-            child: FilledButton.icon(
-              onPressed: _copyAll,
-              icon: const Icon(Icons.copy_all_rounded, size: 18),
-              label: const Text('Copy All Picks'),
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+          SafeArea(
+            minimum: const EdgeInsets.only(bottom: 16),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: FilledButton.icon(
+                onPressed: _copyAll,
+                icon: const Icon(Icons.copy_all_rounded, size: 18),
+                label: const Text('Copy All Picks'),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
               ),
             ),
           ),
