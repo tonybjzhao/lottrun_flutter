@@ -185,49 +185,52 @@ class ResultPanel extends StatelessWidget {
             ),
 
             // ── Actions ──────────────────────────────────────────
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
+            Text(
+              timeStr,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurface.withAlpha(80),
+              ),
+            ),
+            const SizedBox(height: 8),
             Row(
               children: [
-                Text(
-                  timeStr,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withAlpha(80),
-                  ),
-                ),
-                const Spacer(),
-                OutlinedButton.icon(
-                  onPressed: () => _copy(context),
-                  icon: const Icon(Icons.copy_rounded, size: 15),
-                  label: const Text('Copy'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 6),
-                    textStyle: const TextStyle(fontSize: 13),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _copy(context),
+                    icon: const Icon(Icons.copy_rounded, size: 15),
+                    label: const Text('Copy'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      textStyle: const TextStyle(fontSize: 13),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 6),
-                OutlinedButton.icon(
-                  onPressed: _share,
-                  icon: const Icon(Icons.share_rounded, size: 15),
-                  label: const Text('Share'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 6),
-                    textStyle: const TextStyle(fontSize: 13),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _share,
+                    icon: const Icon(Icons.share_rounded, size: 15),
+                    label: const Text('Share'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      textStyle: const TextStyle(fontSize: 13),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 6),
-                OutlinedButton.icon(
-                  onPressed: isSaved ? null : onSave,
-                  icon: Icon(
-                    isSaved ? Icons.check : Icons.bookmark_outline,
-                    size: 15,
-                  ),
-                  label: Text(isSaved ? 'Saved' : 'Save'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 6),
-                    textStyle: const TextStyle(fontSize: 13),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: isSaved ? null : onSave,
+                    icon: Icon(
+                      isSaved ? Icons.check : Icons.bookmark_outline,
+                      size: 15,
+                    ),
+                    label: Text(isSaved ? 'Saved' : 'Save'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      textStyle: const TextStyle(fontSize: 13),
+                    ),
                   ),
                 ),
               ],
