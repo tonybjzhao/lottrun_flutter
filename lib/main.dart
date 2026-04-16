@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -18,4 +19,7 @@ Future<void> main() async {
   AnalyticsService.init(firebaseInit);
   unawaited(MobileAds.instance.initialize());
   runApp(const LottFunApp());
+  // Temp: confirm Firebase actually finished initializing.
+  firebaseInit.then((_) => dev.log('🔥 Firebase initialized OK'))
+              .catchError((e) => dev.log('🔥 Firebase init FAILED: $e'));
 }
