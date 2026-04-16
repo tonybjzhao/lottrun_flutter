@@ -6,10 +6,9 @@ import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  // Fire-and-forget — do not await; avoids blocking app startup on iOS.
+  // Fire-and-forget — do not await either; awaiting Firebase.initializeApp
+  // on iOS blocks the main isolate and causes a white screen hang.
+  Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   MobileAds.instance.initialize();
   runApp(const LottFunApp());
 }
