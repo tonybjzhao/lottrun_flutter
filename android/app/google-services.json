@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "252612268699",
+    "project_id": "lottfun",
+    "storage_bucket": "lottfun.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:252612268699:android:43e677f6aef668bd122c3e",
+        "android_client_info": {
+          "package_name": "com.in5km.lottfun"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5ix00sBgpdGXUN3q_F5Qo4qXbQnm3FRQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
