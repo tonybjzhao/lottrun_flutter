@@ -26,11 +26,11 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCE2x6DkClgweuMsduJm5H-YOGVA6SUhj4',
-    appId: '1:148288973474:ios:77effc1c4258d5316185fb',
-    messagingSenderId: '148288973474',
-    projectId: 'ready5km',
-    storageBucket: 'ready5km.firebasestorage.app',
-    iosBundleId: 'com.in5km.ios',
+    apiKey: 'AIzaSyBy-LLqviaFW7QcHDLSLNwnTHPg7u3bqRI',
+    appId: '1:252612268699:ios:1d28c520038499c2122c3e',
+    messagingSenderId: '252612268699',
+    projectId: 'lottfun',
+    storageBucket: 'lottfun.firebasestorage.app',
+    iosBundleId: 'com.in5km.lottfun',
   );
 }
