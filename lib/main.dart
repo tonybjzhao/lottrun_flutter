@@ -10,15 +10,26 @@ import 'services/analytics_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // AppDelegate no longer calls FirebaseApp.configure() — Dart owns init.
-  // Guard against hot-reload re-entry (Dart restarts but native layer persists).
-  final firebaseInit = Firebase.apps.isNotEmpty
-      ? Future.value(Firebase.app())
-      : Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  AnalyticsService.init(firebaseInit);
+  AnalyticsService.init(_initFirebase());
   unawaited(MobileAds.instance.initialize());
   runApp(const LottFunApp());
-  // Temp: confirm Firebase actually finished initializing.
-  firebaseInit.then((_) => dev.log('🔥 Firebase initialized OK'))
-              .catchError((e) => dev.log('🔥 Firebase init FAILED: $e'));
+}
+
+/// Initializes Firebase exactly once across all launch scenarios:
+/// - fresh install, hot restart, and cases where AppDelegate or another
+///   plugin has already initialized the native layer.
+Future<FirebaseApp> _initFirebase() async {
+  try {
+    return await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } on FirebaseException catch (e) {
+    if (e.code == 'duplicate-app') {
+      // Native Firebase already running (hot restart, or prior init).
+      dev.log('🔥 Firebase already initialized — reusing existing app');
+      return Firebase.app();
+    }
+    dev.log('🔥 Firebase init FAILED: $e');
+    rethrow;
+  }
 }
