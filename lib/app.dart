@@ -1,7 +1,5 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
-import 'services/analytics_service.dart';
 
 class LottFunApp extends StatelessWidget {
   const LottFunApp({super.key});
@@ -29,9 +27,6 @@ class LottFunApp extends StatelessWidget {
           ),
         ),
       ),
-      navigatorObservers: [
-        FirebaseAnalyticsObserver(analytics: AnalyticsService.instance),
-      ],
       home: const HomeScreen(),
     );
   }
