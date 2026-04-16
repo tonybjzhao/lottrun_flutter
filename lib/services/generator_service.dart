@@ -15,9 +15,13 @@ class GeneratorService {
     required PlayStyle style,
     required List<LotteryDraw> history,
   }) {
-    final main = _generateMain(lottery, style, history);
+    // Sort newest-first so recency weights are applied correctly.
+    final sorted = [...history]
+      ..sort((a, b) => b.drawDate.compareTo(a.drawDate));
+
+    final main = _generateMain(lottery, style, sorted);
     final bonus = lottery.hasBonus
-        ? _generateBonus(lottery, style, history, exclude: main)
+        ? _generateBonus(lottery, style, sorted, exclude: main)
         : null;
     return GeneratedPick(
       lotteryId: lottery.id,
@@ -33,19 +37,19 @@ class GeneratorService {
   List<int> _generateMain(
     Lottery lottery,
     PlayStyle style,
-    List<LotteryDraw> history,
+    List<LotteryDraw> history, // newest-first
   ) {
     final allMain = history.map((d) => d.mainNumbers).toList();
     switch (style) {
       case PlayStyle.random:
         return _pickRandom(lottery.mainMin, lottery.mainMax, lottery.mainCount);
       case PlayStyle.hot:
-        return _pickWeighted(
+        return _pickByScore(
           lottery.mainMin, lottery.mainMax, lottery.mainCount, allMain,
           favourHigh: true,
         );
       case PlayStyle.cold:
-        return _pickWeighted(
+        return _pickByScore(
           lottery.mainMin, lottery.mainMax, lottery.mainCount, allMain,
           favourHigh: false,
         );
@@ -70,36 +74,76 @@ class GeneratorService {
     final min = lottery.bonusMin!;
     final max = lottery.bonusMax!;
 
-    List<int> result;
     switch (style) {
       case PlayStyle.random:
-        result = _pickRandom(min, max, count, exclude: exclude);
+        return _pickRandom(min, max, count, exclude: exclude);
       case PlayStyle.hot:
-        result = allBonus.isEmpty
+        return allBonus.isEmpty
             ? _pickRandom(min, max, count, exclude: exclude)
-            : _pickWeighted(min, max, count, allBonus,
+            : _pickByScore(min, max, count, allBonus,
                 favourHigh: true, exclude: exclude);
       case PlayStyle.cold:
-        result = allBonus.isEmpty
+        return allBonus.isEmpty
             ? _pickRandom(min, max, count, exclude: exclude)
-            : _pickWeighted(min, max, count, allBonus,
+            : _pickByScore(min, max, count, allBonus,
                 favourHigh: false, exclude: exclude);
       case PlayStyle.balanced:
-        result = _pickRandom(min, max, count, exclude: exclude);
+        return _pickRandom(min, max, count, exclude: exclude);
     }
-    return result;
+  }
+
+  // ── Recency-weighted scoring ──────────────────────────────────────────────
+  //
+  // Draws are already sorted newest-first.
+  // Window tiers:
+  //   index  0–11  → 70% of total signal  ("recent trend")
+  //   index 12–51  → 20%                  ("medium term")
+  //   index 52+    → 10%                  ("background")
+  //
+  // Each draw within its tier contributes equally to that tier's share.
+
+  Map<int, double> _scoreNumbers(
+    int min,
+    int max,
+    List<List<int>> history, // newest-first
+  ) {
+    final scores = {for (var i = min; i <= max; i++) i: 0.0};
+    if (history.isEmpty) return scores;
+
+    final n1 = history.length.clamp(0, 12);
+    final n2 = (history.length - 12).clamp(0, 40);
+    final n3 = (history.length - 52).clamp(0, history.length);
+
+    for (var i = 0; i < history.length; i++) {
+      final double w;
+      if (i < 12) {
+        w = n1 > 0 ? 0.70 / n1 : 0.0;
+      } else if (i < 52) {
+        w = n2 > 0 ? 0.20 / n2 : 0.0;
+      } else {
+        w = n3 > 0 ? 0.10 / n3 : 0.0;
+      }
+      for (final n in history[i]) {
+        if (scores.containsKey(n)) scores[n] = scores[n]! + w;
+      }
+    }
+    return scores;
   }
 
   // ── Strategies ───────────────────────────────────────────────────────────
 
-  List<int> _pickRandom(int min, int max, int count, {List<int> exclude = const []}) {
+  List<int> _pickRandom(int min, int max, int count,
+      {List<int> exclude = const []}) {
     final pool = [for (var i = min; i <= max; i++) i]
       ..removeWhere(exclude.contains)
       ..shuffle(_rng);
     return (pool.take(count).toList()..sort());
   }
 
-  List<int> _pickWeighted(
+  /// Pick numbers biased by recency-weighted score.
+  /// [favourHigh]=true → hot (high scores preferred);
+  /// [favourHigh]=false → cold (low scores preferred).
+  List<int> _pickByScore(
     int min,
     int max,
     int count,
@@ -107,22 +151,17 @@ class GeneratorService {
     required bool favourHigh,
     List<int> exclude = const [],
   }) {
-    // Build frequency map
-    final freq = {for (var i = min; i <= max; i++) i: 0};
-    for (final draw in history) {
-      for (final n in draw) {
-        if (freq.containsKey(n)) freq[n] = freq[n]! + 1;
-      }
-    }
-    freq.removeWhere((k, _) => exclude.contains(k));
+    final scores = _scoreNumbers(min, max, history);
+    scores.removeWhere((k, _) => exclude.contains(k));
 
-    // Sort by frequency
-    final sorted = freq.entries.toList()
+    // Sort: hot wants highest scores first, cold wants lowest
+    final sorted = scores.entries.toList()
       ..sort((a, b) => favourHigh
           ? b.value.compareTo(a.value)
           : a.value.compareTo(b.value));
 
-    // Build weighted pool: rank 1 gets weight = sorted.length, last gets weight = 1
+    // Build weighted pool: rank 1 gets weight = sorted.length, last gets 1.
+    // This gives a soft bias — even rank-1 can lose to a lucky lower-rank pick.
     final pool = <int>[];
     for (var i = 0; i < sorted.length; i++) {
       final weight = sorted.length - i;
@@ -140,13 +179,10 @@ class GeneratorService {
       }
     }
 
-    // Fallback if pool was too small (shouldn't happen with valid lottery config)
     if (result.length < count) {
-      final fallback = _pickRandom(min, max, count - result.length,
-          exclude: [...exclude, ...result]);
-      result.addAll(fallback);
+      result.addAll(_pickRandom(min, max, count - result.length,
+          exclude: [...exclude, ...result]));
     }
-
     return result..sort();
   }
 
@@ -165,9 +201,7 @@ class GeneratorService {
           if (!result.contains(n)) n,
       ];
       if (candidates.isEmpty) {
-        // bucket exhausted — fall back to any remaining number
-        final fallback = _pickRandom(min, max, 1, exclude: result);
-        result.addAll(fallback);
+        result.addAll(_pickRandom(min, max, 1, exclude: result));
       } else {
         result.add(candidates[_rng.nextInt(candidates.length)]);
       }
