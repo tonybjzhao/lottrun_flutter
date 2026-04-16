@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import '../models/lottery.dart';
 import '../data/seed_lotteries.dart';
 import '../services/generator_service.dart';
 import '../services/lottery_service.dart';
+import '../services/analytics_service.dart';
 import '../services/local_storage_service.dart';
 import '../widgets/disclaimer_card.dart';
 import '../widgets/lotto_ball.dart';
@@ -97,6 +99,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     await LocalStorageService.instance.saveLastLotteryId(_selectedLottery.id);
     await LocalStorageService.instance.saveLastStyle(_selectedStyle);
+    unawaited(AnalyticsService.logGenerateNumbers(
+      lottery: _selectedLottery.id,
+      strategy: _selectedStyle.name,
+    ));
 
     if (!mounted) return;
     HapticFeedback.lightImpact();
@@ -113,6 +119,10 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_pick == null) return;
     HapticFeedback.lightImpact();
     await LocalStorageService.instance.saveLastPick(_pick!);
+    unawaited(AnalyticsService.logNumbersSaved(
+      lottery: _selectedLottery.id,
+      strategy: _selectedStyle.name,
+    ));
     if (!mounted) return;
     setState(() => _isSaved = true);
     if (mounted) {
@@ -195,6 +205,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   }).toList(),
                   onChanged: (l) {
                     if (l == null) return;
+                    unawaited(AnalyticsService.logLotteryChanged(
+                      fromLottery: _selectedLottery.id,
+                      toLottery: l.id,
+                    ));
                     setState(() {
                       _selectedLottery = l;
                       _pick = null;
@@ -211,7 +225,13 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 8),
             StyleChipGroup(
               selected: _selectedStyle,
-              onChanged: (s) => setState(() => _selectedStyle = s),
+              onChanged: (s) {
+                unawaited(AnalyticsService.logPickStrategySelected(
+                  strategy: s.name,
+                  lottery: _selectedLottery.id,
+                ));
+                setState(() => _selectedStyle = s);
+              },
             ),
             const SizedBox(height: 24),
 

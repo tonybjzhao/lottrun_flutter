@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../admob_ids.dart';
 import '../feature_flags.dart';
+import '../services/analytics_service.dart';
 import 'package:intl/intl.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
@@ -31,6 +34,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     super.initState();
     _lottery = widget.lottery;
     _historyFuture = _loadDraws(_lottery);
+    unawaited(AnalyticsService.logHistoryOpened(lottery: _lottery.id));
 
     if (kShowHistoryBannerAd) {
       _bannerAd = BannerAd(
