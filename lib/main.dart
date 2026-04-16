@@ -10,12 +10,11 @@ import 'services/analytics_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Start Firebase in the background — never block runApp() on iOS.
-  // AnalyticsService.init() stores the future and awaits it internally
-  // before every log call, so no event ever fires before Firebase is ready.
-  final firebaseInit = Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // Guard against duplicate-app on hot reload: native Firebase persists
+  // across Dart restarts, so only call initializeApp() if not yet done.
+  final firebaseInit = Firebase.apps.isNotEmpty
+      ? Future.value(Firebase.app())
+      : Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   AnalyticsService.init(firebaseInit);
   unawaited(MobileAds.instance.initialize());
   runApp(const LottFunApp());
