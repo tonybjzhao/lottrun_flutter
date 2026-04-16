@@ -1,4 +1,3 @@
-import FirebaseCore
 import Flutter
 import UIKit
 
@@ -8,7 +7,9 @@ import UIKit
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    FirebaseApp.configure()
+    // Firebase is initialized by Dart via Firebase.initializeApp() + firebase_options.dart.
+    // Do NOT call FirebaseApp.configure() here — that would create a duplicate native app
+    // and cause [core/duplicate-app] every time the Dart engine initializes.
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 

@@ -10,8 +10,8 @@ import 'services/analytics_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Guard against duplicate-app on hot reload: native Firebase persists
-  // across Dart restarts, so only call initializeApp() if not yet done.
+  // AppDelegate no longer calls FirebaseApp.configure() — Dart owns init.
+  // Guard against hot-reload re-entry (Dart restarts but native layer persists).
   final firebaseInit = Firebase.apps.isNotEmpty
       ? Future.value(Firebase.app())
       : Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
