@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer' as dev;
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +14,10 @@ Future<void> main() async {
   runApp(const LottFunApp());
 }
 
-/// Initializes Firebase exactly once across all launch scenarios:
-/// - fresh install, hot restart, and cases where AppDelegate or another
-///   plugin has already initialized the native layer.
+/// Initializes Firebase exactly once.
+/// AppDelegate.configure() runs first (native/synchronous from plist),
+/// so Dart's initializeApp() will always see duplicate-app and we return
+/// the already-running app. The try-catch also covers hot-restart re-entry.
 Future<FirebaseApp> _initFirebase() async {
   try {
     return await Firebase.initializeApp(
@@ -25,11 +25,12 @@ Future<FirebaseApp> _initFirebase() async {
     );
   } on FirebaseException catch (e) {
     if (e.code == 'duplicate-app') {
-      // Native Firebase already running (hot restart, or prior init).
-      dev.log('🔥 Firebase already initialized — reusing existing app');
+      // ignore: avoid_print
+      print('🔥 Firebase: reusing native app (duplicate-app caught)');
       return Firebase.app();
     }
-    dev.log('🔥 Firebase init FAILED: $e');
+    // ignore: avoid_print
+    print('🔥 Firebase init FAILED: $e');
     rethrow;
   }
 }
