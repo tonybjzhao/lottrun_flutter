@@ -25,13 +25,12 @@ class DefaultFirebaseOptions {
     storageBucket: 'lottfun.firebasestorage.app',
   );
 
-  // TODO: replace with real iOS values from GoogleService-Info.plist
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'REPLACE_WITH_IOS_API_KEY',
-    appId: 'REPLACE_WITH_IOS_APP_ID',
-    messagingSenderId: '252612268699',
-    projectId: 'lottfun',
-    storageBucket: 'lottfun.firebasestorage.app',
-    iosBundleId: 'com.in5km.lottfun',
+    apiKey: 'AIzaSyCE2x6DkClgweuMsduJm5H-YOGVA6SUhj4',
+    appId: '1:148288973474:ios:77effc1c4258d5316185fb',
+    messagingSenderId: '148288973474',
+    projectId: 'ready5km',
+    storageBucket: 'ready5km.firebasestorage.app',
+    iosBundleId: 'com.in5km.ios',
   );
 }
