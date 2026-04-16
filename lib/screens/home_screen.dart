@@ -101,7 +101,9 @@ class _HomeScreenState extends State<HomeScreen> {
     await LocalStorageService.instance.saveLastStyle(_selectedStyle);
     unawaited(AnalyticsService.logGenerateNumbers(
       lottery: _selectedLottery.id,
-      strategy: _selectedStyle.name,
+      strategy: _selectedStyle.analyticsName,
+      pickCount: 1,
+      source: 'home',
     ));
 
     if (!mounted) return;
@@ -121,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await LocalStorageService.instance.saveLastPick(_pick!);
     unawaited(AnalyticsService.logNumbersSaved(
       lottery: _selectedLottery.id,
-      strategy: _selectedStyle.name,
+      strategy: _selectedStyle.analyticsName,
     ));
     if (!mounted) return;
     setState(() => _isSaved = true);
@@ -227,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
               selected: _selectedStyle,
               onChanged: (s) {
                 unawaited(AnalyticsService.logPickStrategySelected(
-                  strategy: s.name,
+                  strategy: s.analyticsName,
                   lottery: _selectedLottery.id,
                 ));
                 setState(() => _selectedStyle = s);
@@ -525,6 +527,12 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
     );
     _picks = _generatePicks();
     _animController.forward();
+    unawaited(AnalyticsService.logGenerateNumbers(
+      lottery: widget.lottery.id,
+      strategy: widget.style.analyticsName,
+      pickCount: 3,
+      source: 'three_picks',
+    ));
   }
 
   @override
@@ -583,6 +591,12 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
       _picks = _generatePicks();
       _isRegenerating = false;
     });
+    unawaited(AnalyticsService.logGenerateNumbers(
+      lottery: widget.lottery.id,
+      strategy: widget.style.analyticsName,
+      pickCount: 3,
+      source: 'three_picks',
+    ));
     _animController
       ..reset()
       ..forward();

@@ -45,6 +45,21 @@ enum PlayStyle {
     }
   }
 
+  /// Stable lowercase_underscore value for analytics.
+  /// Never change these once shipped — reports depend on them.
+  String get analyticsName {
+    switch (this) {
+      case PlayStyle.balanced:
+        return 'balanced';
+      case PlayStyle.hot:
+        return 'hot';
+      case PlayStyle.cold:
+        return 'cold';
+      case PlayStyle.random:
+        return 'random';
+    }
+  }
+
   String get description {
     switch (this) {
       case PlayStyle.balanced:

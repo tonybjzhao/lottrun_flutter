@@ -11,14 +11,22 @@ class AnalyticsService {
 
   // ── Core events ──────────────────────────────────────────────────────────────
 
-  /// Fired every time the user taps "Try My Luck" and a pick is produced.
+  /// Fired every time a pick is produced.
+  /// [source] is stable: 'home' | 'three_picks'
   static Future<void> logGenerateNumbers({
     required String lottery,
     required String strategy,
+    required int pickCount,
+    required String source,
   }) =>
       _analytics.logEvent(
         name: 'generate_numbers',
-        parameters: {'lottery': lottery, 'strategy': strategy},
+        parameters: {
+          'lottery': lottery,
+          'strategy': strategy,
+          'pick_count': pickCount,
+          'source': source,
+        },
       );
 
   /// Fired when the user switches play style (Balanced / Hot / Cold / Random).
