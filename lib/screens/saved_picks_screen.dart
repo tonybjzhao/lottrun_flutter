@@ -28,6 +28,28 @@ String _countryName(String code) => switch (code) {
 
 const _countryOrder = ['US', 'AU', 'OTHER'];
 
+// ── Stats model ───────────────────────────────────────────────────────────────
+
+class _PickStats {
+  final int resolvedCount;
+  final int bestMain;
+  final int bestBonus;
+  final String bestLotteryId;
+  final int totalHits;
+  final int luckScore;
+
+  const _PickStats({
+    required this.resolvedCount,
+    required this.bestMain,
+    required this.bestBonus,
+    required this.bestLotteryId,
+    required this.totalHits,
+    required this.luckScore,
+  });
+
+  bool get hasAnyResult => resolvedCount > 0;
+}
+
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 class SavedPicksScreen extends StatefulWidget {
@@ -171,6 +193,40 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
     });
   }
 
+  _PickStats _computeStats() {
+    int resolvedCount = 0;
+    int bestMain = 0;
+    int bestBonus = 0;
+    String bestLotteryId = '';
+    int totalHits = 0;
+
+    for (final pick in _picks) {
+      final draws = LotteryService.instance.getDraws(pick.lotteryId);
+      final result = checkPickResult(pick, draws);
+      if (result == null || result.isPending) continue;
+      resolvedCount++;
+      totalHits += result.matchedMain + result.matchedBonus;
+      if (result.score > bestMain * 2 + bestBonus) {
+        bestMain = result.matchedMain;
+        bestBonus = result.matchedBonus;
+        bestLotteryId = pick.lotteryId;
+      }
+    }
+
+    // Luck score: base 50, rises with hits and best match, capped at 99
+    final luckScore =
+        (50 + totalHits * 2 + bestMain * 3 + bestBonus * 5).clamp(50, 99);
+
+    return _PickStats(
+      resolvedCount: resolvedCount,
+      bestMain: bestMain,
+      bestBonus: bestBonus,
+      bestLotteryId: bestLotteryId,
+      totalHits: totalHits,
+      luckScore: luckScore,
+    );
+  }
+
   String? _bestPickId() {
     int bestScore = 0;
     String? bestId;
@@ -190,8 +246,17 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
     final grouped = _groupByCountry();
     final sections = _countryOrder.where(grouped.containsKey).toList();
     final bestId = _bestPickId();
+    final stats = _computeStats();
 
     final items = <Widget>[];
+
+    // ── Stats card (only when results available) ────────────────────────────
+    if (stats.hasAnyResult) {
+      items.add(Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+        child: _StatsCard(stats: stats),
+      ));
+    }
 
     items.add(Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
@@ -233,6 +298,160 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
     return ListView(
       padding: const EdgeInsets.only(bottom: 24),
       children: items,
+    );
+  }
+}
+
+// ── Stats card ────────────────────────────────────────────────────────────────
+
+class _StatsCard extends StatelessWidget {
+  final _PickStats stats;
+
+  const _StatsCard({required this.stats});
+
+  String _bestText(BuildContext context) {
+    if (stats.bestMain == 0 && stats.bestBonus == 0) return 'None yet';
+    final bonus = stats.bestBonus > 0
+        ? ' + ${_bonusShort(stats.bestLotteryId)}'
+        : '';
+    return '${stats.bestMain}$bonus matched';
+  }
+
+  String _bonusShort(String lotteryId) => switch (lotteryId) {
+        'us_powerball'    => 'PB',
+        'us_megamillions' => 'MB',
+        'au_powerball'    => 'PB',
+        _                 => '+',
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            theme.colorScheme.primaryContainer.withAlpha(180),
+            theme.colorScheme.secondaryContainer.withAlpha(120),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.bar_chart_rounded,
+                  size: 14, color: theme.colorScheme.primary),
+              const SizedBox(width: 5),
+              Text(
+                'Your Stats',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${stats.resolvedCount} result${stats.resolvedCount == 1 ? '' : 's'} checked',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withAlpha(110),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              _StatCell(
+                icon: '🏆',
+                value: _bestText(context),
+                label: 'Best Match',
+                theme: theme,
+              ),
+              _StatDivider(),
+              _StatCell(
+                icon: '🎯',
+                value: '${stats.totalHits}',
+                label: 'Total Hits',
+                theme: theme,
+              ),
+              _StatDivider(),
+              _StatCell(
+                icon: '🍀',
+                value: '${stats.luckScore}',
+                label: 'Luck Score',
+                theme: theme,
+                highlight: stats.luckScore >= 80,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatCell extends StatelessWidget {
+  final String icon;
+  final String value;
+  final String label;
+  final ThemeData theme;
+  final bool highlight;
+
+  const _StatCell({
+    required this.icon,
+    required this.value,
+    required this.label,
+    required this.theme,
+    this.highlight = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(icon, style: const TextStyle(fontSize: 20)),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+              color: highlight
+                  ? Colors.green.shade700
+                  : theme.colorScheme.onSurface,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurface.withAlpha(120),
+              fontSize: 10,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 1,
+      height: 44,
+      color: Theme.of(context).colorScheme.onSurface.withAlpha(30),
+      margin: const EdgeInsets.symmetric(horizontal: 4),
     );
   }
 }
