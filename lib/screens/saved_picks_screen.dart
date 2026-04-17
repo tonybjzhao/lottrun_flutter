@@ -9,6 +9,7 @@ import '../services/local_storage_service.dart';
 import '../services/lottery_service.dart';
 import '../services/pick_result_service.dart';
 import '../widgets/ball_row.dart';
+import '../widgets/lotto_ball.dart';
 import '../widgets/pick_share_card.dart';
 
 // Country helpers ──────────────────────────────────────────────────────────────
@@ -170,13 +171,28 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
     });
   }
 
+  String? _bestPickId() {
+    int bestScore = 0;
+    String? bestId;
+    for (final pick in _picks) {
+      final draws = LotteryService.instance.getDraws(pick.lotteryId);
+      final result = checkPickResult(pick, draws);
+      if (result == null || result.isPending) continue;
+      if (result.score > bestScore) {
+        bestScore = result.score;
+        bestId = pick.id;
+      }
+    }
+    return bestScore > 0 ? bestId : null;
+  }
+
   Widget _buildGroupedList(ThemeData theme) {
     final grouped = _groupByCountry();
     final sections = _countryOrder.where(grouped.containsKey).toList();
+    final bestId = _bestPickId();
 
     final items = <Widget>[];
 
-    // "Pending first" indicator
     items.add(Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       child: Row(
@@ -206,6 +222,7 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: _PickItem(
             pick: pick,
+            isBest: pick.id == bestId,
             onDelete: () => _delete(pick),
             onTap: () => Navigator.pop(context, pick),
           ),
@@ -270,28 +287,46 @@ class _PickItem extends StatefulWidget {
   final GeneratedPick pick;
   final VoidCallback onDelete;
   final VoidCallback onTap;
+  final bool isBest;
 
   const _PickItem({
     required this.pick,
     required this.onDelete,
     required this.onTap,
+    this.isBest = false,
   });
 
   @override
   State<_PickItem> createState() => _PickItemState();
 }
 
-class _PickItemState extends State<_PickItem> {
+class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixin {
   final _shareCardKey = GlobalKey();
   late final List<LotteryDraw> _draws;
+  late final PickMatchResult? _result;
+  AnimationController? _revealCtrl;
 
   @override
   void initState() {
     super.initState();
     _draws = LotteryService.instance.getDraws(widget.pick.lotteryId);
+    _result = checkPickResult(widget.pick, _draws);
+    if (_result != null && !_result.isPending) {
+      _revealCtrl = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 800),
+      );
+      Future.delayed(const Duration(milliseconds: 450), () {
+        if (mounted) _revealCtrl?.forward();
+      });
+    }
   }
 
-  PickMatchResult? get _result => checkPickResult(widget.pick, _draws);
+  @override
+  void dispose() {
+    _revealCtrl?.dispose();
+    super.dispose();
+  }
 
   Lottery? get _lottery =>
       LotteryService.instance.getLotteryById(widget.pick.lotteryId);
@@ -328,61 +363,211 @@ class _PickItemState extends State<_PickItem> {
     await sharePickCard(repaintKey: _shareCardKey, btnContext: btnCtx);
   }
 
-  Widget _buildResultChip(ThemeData theme) {
-    final result = _result!;
+  // ── Result section ────────────────────────────────────────────────────────
+
+  Widget _buildResultSection(ThemeData theme, PickMatchResult result) {
     if (result.isPending) {
-      final label = widget.pick.drawLabel != null
-          ? 'Pending · ${widget.pick.drawLabel}'
-          : 'Pending';
-      return _chip(
-        theme: theme,
-        icon: '⏳',
-        text: label,
-        bg: theme.colorScheme.surfaceContainerHighest,
-        fg: theme.colorScheme.onSurfaceVariant,
-        bold: false,
+      return Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: _pendingChip(theme),
       );
     }
-    final summary = result.summary(widget.pick.lotteryId);
-    final isGood = result.matchedMain >= 3 || result.matchedBonus > 0;
-    return _chip(
-      theme: theme,
-      icon: isGood ? '🎯' : '📋',
-      text: summary,
-      bg: isGood
-          ? theme.colorScheme.primaryContainer
-          : theme.colorScheme.surfaceContainerHighest,
-      fg: isGood
-          ? theme.colorScheme.onPrimaryContainer
-          : theme.colorScheme.onSurfaceVariant,
-      bold: isGood,
+
+    final ctrl = _revealCtrl;
+    final matchedMain = result.matchedMainNumbers.toSet();
+    final matchedBonus = result.matchedBonusNumbers.toSet();
+    final totalMatched = result.matchedMainNumbers.length + result.matchedBonusNumbers.length;
+
+    // Dim animation: non-matched balls fade to 0.4 over first 35% of ctrl
+    final dimAnim = ctrl != null
+        ? CurvedAnimation(
+            parent: ctrl,
+            curve: const Interval(0.0, 0.35, curve: Curves.easeOut),
+          )
+        : null;
+
+    // Staggered bounce per matched ball
+    int matchIdx = 0;
+    Animation<double> nextMatchAnim() {
+      final i = matchIdx++;
+      final step = 0.55 / totalMatched.clamp(1, 99);
+      final start = i * step * 0.75;
+      final end = (start + step + 0.25).clamp(0.0, 1.0);
+      return CurvedAnimation(
+        parent: ctrl!,
+        curve: Interval(start, end, curve: Curves.elasticOut),
+      );
+    }
+
+    Widget wrappedBall(int n, bool isBonus) {
+      final isMatched = isBonus ? matchedBonus.contains(n) : matchedMain.contains(n);
+      final ball = LottoBall(number: n, isBonus: isBonus, isMatched: isMatched, size: 36);
+      if (ctrl == null) return ball;
+      if (isMatched) {
+        final anim = nextMatchAnim();
+        return AnimatedBuilder(
+          animation: anim,
+          builder: (_, child) => Transform.scale(
+            scale: (0.5 + 0.5 * anim.value).clamp(0.0, 1.5),
+            child: child,
+          ),
+          child: ball,
+        );
+      } else {
+        return AnimatedBuilder(
+          animation: dimAnim!,
+          builder: (_, child) =>
+              Opacity(opacity: (1.0 - 0.6 * dimAnim.value).clamp(0.4, 1.0), child: child),
+          child: ball,
+        );
+      }
+    }
+
+    final mainNums = widget.pick.mainNumbers;
+    final bonusNums = widget.pick.bonusNumbers ?? [];
+    final bLabel = bonusLabelForLottery(widget.pick.lotteryId);
+
+    final textAnim = ctrl != null
+        ? CurvedAnimation(
+            parent: ctrl,
+            curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
+          )
+        : null;
+
+    String? drawLine;
+    if (result.drawMainNumbers.isNotEmpty) {
+      final datePart = result.drawDate != null
+          ? ' (${DateFormat('d MMM').format(result.drawDate!.toLocal())})'
+          : '';
+      final mainStr = result.drawMainNumbers.join(' · ');
+      final bonusStr = result.drawBonusNumbers?.isNotEmpty == true
+          ? '  ·  ${result.drawBonusNumbers!.join(' · ')}'
+          : '';
+      drawLine = 'Draw$datePart: $mainStr$bonusStr';
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Divider(height: 18),
+
+        // ── Emotional headline ──────────────────────────────
+        if (textAnim != null)
+          AnimatedBuilder(
+            animation: textAnim,
+            builder: (_, child) => Opacity(opacity: textAnim.value, child: child!),
+            child: _emotionalRow(theme, result),
+          )
+        else
+          _emotionalRow(theme, result),
+
+        const SizedBox(height: 10),
+
+        // ── Highlighted pick balls ──────────────────────────
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                for (var i = 0; i < mainNums.length; i++) ...[
+                  wrappedBall(mainNums[i], false),
+                  if (i < mainNums.length - 1 || bonusNums.isNotEmpty)
+                    const SizedBox(width: 6),
+                ],
+                if (bonusNums.isNotEmpty && bLabel != null) ...[
+                  Text(
+                    bLabel,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: const Color(0xFFD32F2F),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                ],
+                for (var i = 0; i < bonusNums.length; i++) ...[
+                  wrappedBall(bonusNums[i], true),
+                  if (i < bonusNums.length - 1) const SizedBox(width: 6),
+                ],
+              ],
+            ),
+          ),
+        ),
+
+        // ── Draw result line ────────────────────────────────
+        if (drawLine != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            drawLine,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurface.withAlpha(90),
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ],
     );
   }
 
-  Widget _chip({
-    required ThemeData theme,
-    required String icon,
-    required String text,
-    required Color bg,
-    required Color fg,
-    required bool bold,
-  }) =>
-      Container(
+  Widget _emotionalRow(ThemeData theme, PickMatchResult result) {
+    final isGood = result.matchedMain >= 3 || result.matchedBonus > 0;
+    final isGreat = result.matchedMain >= 4;
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            result.emotionalText(widget.pick.lotteryId),
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: isGreat
+                  ? Colors.green.shade700
+                  : isGood
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface.withAlpha(140),
+              fontWeight: isGood ? FontWeight.w700 : FontWeight.normal,
+            ),
+          ),
+        ),
+        if (widget.isBest) ...[
+          const SizedBox(width: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+            decoration: BoxDecoration(
+              color: Colors.amber.shade100,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              '🏆 Best',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: Colors.amber.shade900,
+                fontWeight: FontWeight.w800,
+                fontSize: 10,
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _pendingChip(ThemeData theme) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-          color: bg,
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(icon, style: const TextStyle(fontSize: 11)),
+            const Text('⏳', style: TextStyle(fontSize: 11)),
             const SizedBox(width: 4),
             Text(
-              text,
+              widget.pick.drawLabel != null
+                  ? 'Pending · ${widget.pick.drawLabel}'
+                  : 'Pending',
               style: theme.textTheme.labelSmall?.copyWith(
-                color: fg,
-                fontWeight: bold ? FontWeight.w700 : FontWeight.normal,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -396,6 +581,8 @@ class _PickItemState extends State<_PickItem> {
         DateFormat('d MMM yyyy · HH:mm').format(widget.pick.createdAt.toLocal());
     final bonusNums = widget.pick.bonusNumbers ?? [];
     final lottery = _lottery;
+    final result = _result;
+    final hasResolvedResult = result != null && !result.isPending;
 
     return Stack(
       children: [
@@ -487,20 +674,19 @@ class _PickItemState extends State<_PickItem> {
 
                   const SizedBox(height: 10),
 
-                  // ── Balls ───────────────────────────────────────────
-                  BallRow(
-                    mainNumbers: widget.pick.mainNumbers,
-                    bonusNumbers: bonusNums,
-                    bonusLabel: bonusLabelForLottery(widget.pick.lotteryId),
-                    ballSize: 36,
-                    spacing: 6,
-                  ),
+                  // ── Balls: normal row OR animated highlighted result ─
+                  if (!hasResolvedResult)
+                    BallRow(
+                      mainNumbers: widget.pick.mainNumbers,
+                      bonusNumbers: bonusNums,
+                      bonusLabel: bonusLabelForLottery(widget.pick.lotteryId),
+                      ballSize: 36,
+                      spacing: 6,
+                    ),
 
-                  // ── Result chip ─────────────────────────────────────
-                  if (_result != null) ...[
-                    const SizedBox(height: 8),
-                    _buildResultChip(theme),
-                  ],
+                  // ── Result section (pending chip / animated result) ──
+                  if (result != null)
+                    _buildResultSection(theme, result),
 
                   const SizedBox(height: 10),
 
