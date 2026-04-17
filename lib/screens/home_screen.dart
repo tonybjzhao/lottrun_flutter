@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../widgets/ball_row.dart';
 import '../widgets/pick_share_card.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery.dart';
@@ -1184,46 +1185,39 @@ class _CompactPickBannerState extends State<_CompactPickBanner>
                     // ── Staggered balls ─────────────────────────
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          for (var i = 0; i < mainNums.length; i++)
-                            Padding(
-                              padding: const EdgeInsets.only(right: 6),
-                              child: AnimatedBuilder(
+                      physics: const BouncingScrollPhysics(),
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 4),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            for (var i = 0; i < mainNums.length; i++) ...[
+                              AnimatedBuilder(
                                 animation: _ballAnim(i, total),
                                 builder: (_, child) => Transform.scale(
-                                  scale: _ballAnim(i, total)
-                                      .value
-                                      .clamp(0.0, 1.0),
+                                  scale: _ballAnim(i, total).value.clamp(0.0, 1.0),
                                   child: child,
                                 ),
-                                child: LottoBall(
-                                    number: mainNums[i], size: 38),
+                                child: LottoBall(number: mainNums[i], size: 38),
                               ),
-                            ),
-                          if (bonusNums.isNotEmpty) ...[
-                            const SizedBox(width: 8),
-                            for (var i = 0; i < bonusNums.length; i++)
-                              Padding(
-                                padding: const EdgeInsets.only(right: 6),
-                                child: AnimatedBuilder(
-                                  animation:
-                                      _ballAnim(mainNums.length + i, total),
+                              SizedBox(width: i < mainNums.length - 1 || bonusNums.isNotEmpty ? 6 : 0),
+                            ],
+                            if (bonusNums.isNotEmpty) ...[
+                              const SizedBox(width: 2),
+                              for (var i = 0; i < bonusNums.length; i++) ...[
+                                AnimatedBuilder(
+                                  animation: _ballAnim(mainNums.length + i, total),
                                   builder: (_, child) => Transform.scale(
-                                    scale: _ballAnim(
-                                            mainNums.length + i, total)
-                                        .value
-                                        .clamp(0.0, 1.0),
+                                    scale: _ballAnim(mainNums.length + i, total).value.clamp(0.0, 1.0),
                                     child: child,
                                   ),
-                                  child: LottoBall(
-                                      number: bonusNums[i],
-                                      isBonus: true,
-                                      size: 38),
+                                  child: LottoBall(number: bonusNums[i], isBonus: true, size: 38),
                                 ),
-                              ),
+                                if (i < bonusNums.length - 1) const SizedBox(width: 6),
+                              ],
+                            ],
                           ],
-                        ],
+                        ),
                       ),
                     ),
                   ],
@@ -1330,16 +1324,12 @@ class _MiniPickCardState extends State<_MiniPickCard> {
                 ),
                 const SizedBox(height: 10),
                 // ── Balls ────────────────────────────────────────
-                Wrap(
+                BallRow(
+                  mainNumbers: widget.pick.mainNumbers,
+                  bonusNumbers: widget.pick.bonusNumbers ?? [],
+                  bonusLabel: bonusLabelForLottery(widget.lottery.id),
+                  ballSize: 38,
                   spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    ...widget.pick.mainNumbers
-                        .map((n) => LottoBall(number: n, size: 38)),
-                    if (widget.pick.bonusNumbers != null)
-                      ...widget.pick.bonusNumbers!.map(
-                          (n) => LottoBall(number: n, isBonus: true, size: 38)),
-                  ],
                 ),
                 const SizedBox(height: 10),
                 // ── Equal-weight actions ─────────────────────────

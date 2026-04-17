@@ -223,40 +223,38 @@ class _ResultPanelState extends State<ResultPanel>
             ),
             const SizedBox(height: 16),
 
-            // ── Main balls (staggered pop-in) ──────────────────
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (var i = 0; i < mainNums.length; i++)
-                  _animBall(mainNums[i], false, i, total),
-              ],
-            ),
-
-            // ── Bonus ball ─────────────────────────────────────
-            if (bonusNums.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'Powerball',
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: const Color(0xFFD32F2F),
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  for (var i = 0; i < bonusNums.length; i++)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: _animBall(
-                          bonusNums[i], true, mainNums.length + i, total),
-                    ),
-                ],
+            // ── Balls (staggered pop-in, horizontal scroll) ────
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.only(right: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    for (var i = 0; i < mainNums.length; i++) ...[
+                      _animBall(mainNums[i], false, i, total),
+                      SizedBox(width: i < mainNums.length - 1 || bonusNums.isNotEmpty ? 8 : 0),
+                    ],
+                    if (bonusNums.isNotEmpty) ...[
+                      Text(
+                        _bonusLabel(),
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: const Color(0xFFD32F2F),
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      for (var i = 0; i < bonusNums.length; i++) ...[
+                        _animBall(bonusNums[i], true, mainNums.length + i, total),
+                        if (i < bonusNums.length - 1) const SizedBox(width: 8),
+                      ],
+                    ],
+                  ],
+                ),
               ),
-            ],
+            ),
 
             // ── Match check ────────────────────────────────────
             if (matchRow != null) ...[
