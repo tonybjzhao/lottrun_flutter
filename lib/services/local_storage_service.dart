@@ -12,6 +12,7 @@ class LocalStorageService {
   static const _keyPick = 'last_pick';
   static const _keyStreakDate = 'streak_date';
   static const _keyStreakCount = 'streak_count';
+  static const _keySavedPicks = 'saved_picks';
 
   Future<String?> getLastLotteryId() async {
     final prefs = await SharedPreferences.getInstance();
@@ -86,6 +87,56 @@ class LocalStorageService {
 
   String _dateKey(DateTime d) =>
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  // ── Saved picks list ────────────────────────────────────────────────────────
+
+  static Map<String, dynamic> _pickToMap(GeneratedPick pick) => {
+        'lotteryId': pick.lotteryId,
+        'style': pick.style.name,
+        'mainNumbers': pick.mainNumbers,
+        'bonusNumbers': pick.bonusNumbers,
+        'createdAt': pick.createdAt.toIso8601String(),
+      };
+
+  static GeneratedPick _pickFromMap(Map<String, dynamic> map) => GeneratedPick(
+        lotteryId: map['lotteryId'] as String,
+        style: PlayStyle.values.firstWhere(
+          (s) => s.name == map['style'],
+          orElse: () => PlayStyle.balanced,
+        ),
+        mainNumbers: List<int>.from(map['mainNumbers'] as List),
+        bonusNumbers: map['bonusNumbers'] != null
+            ? List<int>.from(map['bonusNumbers'] as List)
+            : null,
+        createdAt: DateTime.parse(map['createdAt'] as String),
+      );
+
+  Future<List<GeneratedPick>> getSavedPicks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getStringList(_keySavedPicks) ?? [];
+    final picks = <GeneratedPick>[];
+    for (final s in raw) {
+      try {
+        picks.add(_pickFromMap(jsonDecode(s) as Map<String, dynamic>));
+      } catch (_) {}
+    }
+    return picks;
+  }
+
+  Future<void> savePickToHistory(GeneratedPick pick) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getStringList(_keySavedPicks) ?? [];
+    raw.insert(0, jsonEncode(_pickToMap(pick)));
+    await prefs.setStringList(_keySavedPicks, raw);
+  }
+
+  Future<void> deleteSavedPickAt(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getStringList(_keySavedPicks) ?? [];
+    if (index < 0 || index >= raw.length) return;
+    raw.removeAt(index);
+    await prefs.setStringList(_keySavedPicks, raw);
+  }
 
   Future<void> saveLastPick(GeneratedPick pick) async {
     final prefs = await SharedPreferences.getInstance();

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:share_plus/share_plus.dart';
 import '../widgets/pick_share_card.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery.dart';
@@ -16,6 +15,7 @@ import '../widgets/lotto_ball.dart';
 import '../widgets/result_panel.dart';
 import '../widgets/style_chip_group.dart';
 import 'history_screen.dart';
+import 'saved_picks_screen.dart';
 
 // ── Home screen ───────────────────────────────────────────────────────────────
 
@@ -165,21 +165,29 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _savePick() async {
     if (_pick == null) return;
     HapticFeedback.lightImpact();
-    await LocalStorageService.instance.saveLastPick(_pick!);
+    await Future.wait([
+      LocalStorageService.instance.saveLastPick(_pick!),
+      LocalStorageService.instance.savePickToHistory(_pick!),
+    ]);
     unawaited(AnalyticsService.logNumbersSaved(
       lottery: _selectedLottery.id,
       strategy: _selectedStyle.analyticsName,
     ));
     if (!mounted) return;
     setState(() => _isSaved = true);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Pick saved locally.'),
-          duration: Duration(seconds: 2),
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Saved to Saved Picks'),
+        duration: const Duration(seconds: 3),
+        action: SnackBarAction(
+          label: 'View',
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const SavedPicksScreen()),
+          ),
         ),
-      );
-    }
+      ),
+    );
   }
 
   @override
@@ -225,6 +233,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SavedPicksScreen()),
+            ),
+            icon: const Icon(Icons.bookmark_rounded),
+            tooltip: 'Saved Picks',
+          ),
           IconButton(
             onPressed: () => Navigator.push(
               context,
@@ -702,6 +718,8 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
   late List<GeneratedPick> _picks;
   late AnimationController _animController;
   bool _isRegenerating = false;
+  List<bool> _savedStates = [false, false, false];
+  final List<GlobalKey> _shareKeys = List.generate(3, (_) => GlobalKey());
 
   /// Use different history windows per pick so each pick has a different
   /// frequency distribution → naturally diverse results.
@@ -779,6 +797,7 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
     setState(() {
       _picks = _generatePicks();
       _isRegenerating = false;
+      _savedStates = [false, false, false];
     });
     unawaited(AnalyticsService.logGenerateNumbers(
       lottery: widget.lottery.id,
@@ -791,33 +810,23 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
       ..forward();
   }
 
-  String _buildCopyAll() {
-    final lines = <String>[
-      'LottoRun AI ·${widget.style.label} · ${widget.lottery.name}',
-    ];
-    for (var i = 0; i < _picks.length; i++) {
-      final p = _picks[i];
-      final main = p.mainNumbers.join('  ');
-      final bonus = (p.bonusNumbers != null && p.bonusNumbers!.isNotEmpty)
-          ? '  |  PB ${p.bonusNumbers!.join(' ')}'
-          : '';
-      lines.add('Pick ${i + 1}: $main$bonus');
-    }
-    lines.add('Generated for fun — LottoRun AI');
-    return lines.join('\n');
+
+  Future<void> _saveAll() async {
+    HapticFeedback.lightImpact();
+    await Future.wait(_picks.map(LocalStorageService.instance.savePickToHistory));
+    if (!mounted) return;
+    setState(() => _savedStates = [true, true, true]);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('All 3 picks saved'),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
-  Future<void> _copyAll() async {
+  Future<void> _shareAll(BuildContext btnCtx) async {
     HapticFeedback.lightImpact();
-    await Clipboard.setData(ClipboardData(text: _buildCopyAll()));
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Copied! Good luck 🍀'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
+    await sharePickCards(repaintKeys: _shareKeys, btnContext: btnCtx);
   }
 
   Animation<double> _cardAnimation(int index) {
@@ -927,26 +936,62 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
                       'Mix of hot, cold, and random',
                     ][i],
                     lottery: widget.lottery,
+                    shareCardKey: _shareKeys[i],
+                    isSaved: _savedStates[i],
+                    onSave: () async {
+                      HapticFeedback.lightImpact();
+                      final messenger = ScaffoldMessenger.of(context);
+                      await LocalStorageService.instance.savePickToHistory(_picks[i]);
+                      if (!mounted) return;
+                      setState(() => _savedStates[i] = true);
+                      messenger.showSnackBar(
+                        const SnackBar(
+                          content: Text('Pick saved'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    },
                   ),
                 );
               },
             ),
           ),
 
-          // ── Copy All button ─────────────────────────────────────
+          // ── Footer actions ──────────────────────────────────────
           SafeArea(
             minimum: const EdgeInsets.only(bottom: 16),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-              child: FilledButton.icon(
-                onPressed: _copyAll,
-                icon: const Icon(Icons.copy_all_rounded, size: 18),
-                label: const Text('Copy All Picks'),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 48),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _savedStates.every((s) => s) ? null : _saveAll,
+                      icon: const Icon(Icons.bookmark_rounded, size: 18),
+                      label: const Text('Save All'),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(0, 48),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Builder(
+                      builder: (btnCtx) => FilledButton.icon(
+                        onPressed: () => _shareAll(btnCtx),
+                        icon: const Icon(Icons.share_rounded, size: 18),
+                        label: const Text('Share All'),
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size(0, 48),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -1149,120 +1194,150 @@ class _CompactPickBannerState extends State<_CompactPickBanner>
 
 // ── Mini pick card ────────────────────────────────────────────────────────────
 
-class _MiniPickCard extends StatelessWidget {
+class _MiniPickCard extends StatefulWidget {
   final GeneratedPick pick;
   final String label;
   final String microcopy;
   final Lottery lottery;
+  final bool isSaved;
+  final VoidCallback onSave;
+  final GlobalKey shareCardKey;
 
   const _MiniPickCard({
     required this.pick,
     required this.label,
     required this.microcopy,
     required this.lottery,
+    required this.isSaved,
+    required this.onSave,
+    required this.shareCardKey,
   });
 
-  String _buildShareText() {
-    final main = pick.mainNumbers.join('  ');
-    final bonus = (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
-        ? ' + ${pick.bonusNumbers!.join(' ')}'
+  @override
+  State<_MiniPickCard> createState() => _MiniPickCardState();
+}
+
+class _MiniPickCardState extends State<_MiniPickCard> {
+  GlobalKey get _shareCardKey => widget.shareCardKey;
+
+  String _buildCopyText() {
+    final main = widget.pick.mainNumbers.join('  ');
+    final bonus = (widget.pick.bonusNumbers != null && widget.pick.bonusNumbers!.isNotEmpty)
+        ? ' + ${widget.pick.bonusNumbers!.join(' ')}'
         : '';
-    return '$label\n${lottery.name}: $main$bonus\nGenerated for fun — LottoRun AI 🎯';
+    return '${widget.label}\n${widget.lottery.name}: $main$bonus\nGenerated for fun — LottoRun AI 🎯';
   }
 
   Future<void> _copy(BuildContext context) async {
     HapticFeedback.lightImpact();
-    await Clipboard.setData(ClipboardData(text: _buildShareText()));
+    await Clipboard.setData(ClipboardData(text: _buildCopyText()));
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$label copied to clipboard.'),
+          content: Text('${widget.label} copied to clipboard.'),
           duration: const Duration(seconds: 2),
         ),
       );
     }
   }
 
-  Future<void> _share(BuildContext btnContext) async {
+  Future<void> _shareCard(BuildContext btnCtx) async {
     HapticFeedback.lightImpact();
-    final box = btnContext.findRenderObject() as RenderBox?;
-    final origin = box == null
-        ? null
-        : box.localToGlobal(Offset.zero) & box.size;
-    await Share.share(_buildShareText(), sharePositionOrigin: origin);
+    await sharePickCard(repaintKey: _shareCardKey, btnContext: btnCtx);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        label,
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        microcopy,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withAlpha(110),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                TextButton.icon(
-                  onPressed: () => _copy(context),
-                  icon: const Icon(Icons.copy_rounded, size: 14),
-                  label: const Text('Copy'),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
-                    textStyle: const TextStyle(fontSize: 12),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                ),
-                Builder(
-                  builder: (btnCtx) => IconButton(
-                    onPressed: () => _share(btnCtx),
-                    icon: const Icon(Icons.share_rounded, size: 18),
-                    tooltip: 'Share',
-                    visualDensity: VisualDensity.compact,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                ...pick.mainNumbers
-                    .map((n) => LottoBall(number: n, size: 38)),
-                if (pick.bonusNumbers != null)
-                  ...pick.bonusNumbers!.map(
-                      (n) => LottoBall(number: n, isBonus: true, size: 38)),
-              ],
-            ),
-          ],
+    return Stack(
+      children: [
+        Positioned(
+          left: -10000,
+          top: 0,
+          width: 360,
+          child: RepaintBoundary(
+            key: _shareCardKey,
+            child: PickShareCard(pick: widget.pick, lottery: widget.lottery),
+          ),
         ),
-      ),
+        Card(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          elevation: 1,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.label,
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            widget.microcopy,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurface.withAlpha(110),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () => _copy(context),
+                      icon: const Icon(Icons.copy_rounded, size: 14),
+                      label: const Text('Copy'),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        textStyle: const TextStyle(fontSize: 12),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                    Builder(
+                      builder: (btnCtx) => IconButton(
+                        onPressed: () => _shareCard(btnCtx),
+                        icon: const Icon(Icons.share_rounded, size: 18),
+                        tooltip: 'Share',
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: widget.isSaved ? null : widget.onSave,
+                      icon: Icon(
+                        widget.isSaved ? Icons.bookmark : Icons.bookmark_outline_rounded,
+                        size: 18,
+                      ),
+                      tooltip: widget.isSaved ? 'Saved' : 'Save',
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    ...widget.pick.mainNumbers
+                        .map((n) => LottoBall(number: n, size: 38)),
+                    if (widget.pick.bonusNumbers != null)
+                      ...widget.pick.bonusNumbers!.map(
+                          (n) => LottoBall(number: n, isBonus: true, size: 38)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
