@@ -36,7 +36,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     _historyFuture = _loadDraws(_lottery);
     unawaited(AnalyticsService.logHistoryOpened(lottery: _lottery.id));
 
-    if (kShowHistoryBannerAd) {
+    if (kShowHistoryBannerAd && !kIsSimulatorOrEmulator) {
       _bannerAd = BannerAd(
         adUnitId: AdMobIds.historyBanner,
         size: AdSize.banner,
@@ -158,7 +158,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 }
 
                 // Add bottom padding for banner ad if enabled and loaded
-                final double bottomPadding = (kShowHistoryBannerAd && _isBannerAdLoaded)
+                final double bottomPadding = (kShowHistoryBannerAd && !kIsSimulatorOrEmulator && _isBannerAdLoaded)
                     ? 52.0
                     : 0.0;
 
@@ -184,7 +184,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
 
           // ── Ad banner ──────────────────────────────────────────
-          if (kShowHistoryBannerAd && _isBannerAdLoaded && _bannerAd != null)
+          if (kShowHistoryBannerAd && !kIsSimulatorOrEmulator && _isBannerAdLoaded && _bannerAd != null)
             SafeArea(
               top: false,
               child: SizedBox(
