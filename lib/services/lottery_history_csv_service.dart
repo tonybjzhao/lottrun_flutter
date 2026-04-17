@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import '../models/lottery_history_result.dart';
+import 'lottery_service.dart';
 
 class LotteryHistoryCsvService {
   LotteryHistoryCsvService._();
@@ -72,21 +73,31 @@ class LotteryHistoryCsvService {
       }
 
       final cachedCsv = prefs.getString(cacheKey);
-      if (cachedCsv == null || cachedCsv.trim().isEmpty) {
-        throw Exception('No internet connection and no saved lottery history yet.');
+      if (cachedCsv != null && cachedCsv.trim().isNotEmpty) {
+        try {
+          final draws = _parseDraws(cachedCsv, lottery);
+          final loadedAtText = prefs.getString(updatedAtKey!);
+          return LotteryHistoryResult(
+            draws: draws,
+            source: LotteryHistorySource.cache,
+            loadedAt: loadedAtText == null ? null : DateTime.tryParse(loadedAtText),
+          );
+        } catch (_) {
+          // cached CSV corrupt — fall through to seed data
+        }
       }
 
-      try {
-        final draws = _parseDraws(cachedCsv, lottery);
-        final loadedAtText = prefs.getString(updatedAtKey!);
+      // No network, no cache — fall back to bundled seed draws
+      final seedDraws = LotteryService.instance.getDraws(lottery.id);
+      if (seedDraws.isNotEmpty) {
         return LotteryHistoryResult(
-          draws: draws,
+          draws: seedDraws,
           source: LotteryHistorySource.cache,
-          loadedAt: loadedAtText == null ? null : DateTime.tryParse(loadedAtText),
+          loadedAt: null,
         );
-      } catch (_) {
-        throw Exception('No internet connection and no saved lottery history yet.');
       }
+
+      throw Exception('No internet connection and no saved lottery history yet.');
     }
   }
 
