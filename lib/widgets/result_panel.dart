@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:share_plus/share_plus.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import 'lotto_ball.dart';
+import 'pick_share_card.dart';
 
 class ResultPanel extends StatefulWidget {
   final GeneratedPick pick;
@@ -32,6 +32,7 @@ class ResultPanel extends StatefulWidget {
 class _ResultPanelState extends State<ResultPanel>
     with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
+  final _shareCardKey = GlobalKey();
 
   @override
   void initState() {
@@ -75,17 +76,6 @@ class _ResultPanelState extends State<ResultPanel>
 
   // ── Helpers ──────────────────────────────────────────────────────────────
 
-  String _buildShareText() {
-    final main = widget.pick.mainNumbers.join('  ');
-    final bonus =
-        (widget.pick.bonusNumbers != null && widget.pick.bonusNumbers!.isNotEmpty)
-            ? '\n+ Powerball: ${widget.pick.bonusNumbers!.join(' ')}'
-            : '';
-    return '${widget.pick.style.tagline} — ${widget.lottery.name}\n\n$main$bonus\n\n'
-        '${widget.pick.style.taglineSubtitle}\n'
-        'Generated for fun — LottFun 🎲';
-  }
-
   String _buildCopyText() {
     final main = widget.pick.mainNumbers.join('  ');
     final lines = <String>[
@@ -93,7 +83,7 @@ class _ResultPanelState extends State<ResultPanel>
       main,
       if (widget.pick.bonusNumbers != null && widget.pick.bonusNumbers!.isNotEmpty)
         'Powerball: ${widget.pick.bonusNumbers!.join(' ')}',
-      'Generated for fun — LottFun',
+      'Generated for fun — LottoRun AI',
     ];
     return lines.join('\n');
   }
@@ -111,9 +101,9 @@ class _ResultPanelState extends State<ResultPanel>
     }
   }
 
-  Future<void> _share() async {
+  Future<void> _shareCard(BuildContext btnCtx) async {
     HapticFeedback.lightImpact();
-    await Share.share(_buildShareText());
+    await sharePickCard(repaintKey: _shareCardKey, btnContext: btnCtx);
   }
 
   // ── Match check ──────────────────────────────────────────────────────────
@@ -170,7 +160,15 @@ class _ResultPanelState extends State<ResultPanel>
     final bonusNums = widget.pick.bonusNumbers ?? [];
     final total = mainNums.length + bonusNums.length;
 
-    return Card(
+    return Stack(
+      children: [
+        Offstage(
+          child: RepaintBoundary(
+            key: _shareCardKey,
+            child: PickShareCard(pick: widget.pick, lottery: widget.lottery),
+          ),
+        ),
+        Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 2,
       child: Padding(
@@ -291,13 +289,15 @@ class _ResultPanelState extends State<ResultPanel>
                 ),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _share,
-                    icon: const Icon(Icons.share_rounded, size: 15),
-                    label: const Text('Share'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      textStyle: const TextStyle(fontSize: 13),
+                  child: Builder(
+                    builder: (btnCtx) => OutlinedButton.icon(
+                      onPressed: () => _shareCard(btnCtx),
+                      icon: const Icon(Icons.share_rounded, size: 15),
+                      label: const Text('Share'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        textStyle: const TextStyle(fontSize: 13),
+                      ),
                     ),
                   ),
                 ),
@@ -321,6 +321,8 @@ class _ResultPanelState extends State<ResultPanel>
           ],
         ),
       ),
-    );
+    ), // Card
+      ],
+    ); // Stack
   }
 }

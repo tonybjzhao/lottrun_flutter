@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
+import '../widgets/pick_share_card.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery.dart';
 import '../data/seed_lotteries.dart';
@@ -36,12 +36,20 @@ class _HomeScreenState extends State<HomeScreen> {
   int _luckOffset = 0; // shifts ±10 each generate
   int _streak = 0;
   int _insightKey = 0; // cycles insight message on each generate
+  bool _showReadyFlash = false;
+  Timer? _flashTimer;
 
   @override
   void initState() {
     super.initState();
     _restorePrefs();
     _initStreak();
+  }
+
+  @override
+  void dispose() {
+    _flashTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _initStreak() async {
@@ -109,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ));
 
     if (!mounted) return;
-    HapticFeedback.lightImpact();
+    HapticFeedback.mediumImpact();
     setState(() {
       _pick = pick;
       _isSaved = false;
@@ -117,6 +125,12 @@ class _HomeScreenState extends State<HomeScreen> {
       _isPickExpanded = false;
       _luckOffset = Random().nextInt(21) - 10; // −10 to +10
       _insightKey++;
+      _showReadyFlash = true;
+    });
+
+    _flashTimer?.cancel();
+    _flashTimer = Timer(const Duration(milliseconds: 2500), () {
+      if (mounted) setState(() => _showReadyFlash = false);
     });
   }
 
@@ -312,23 +326,49 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // ── AI insight line ───────────────────────────────────
             AnimatedSwitcher(
-              duration: const Duration(milliseconds: 350),
+              duration: const Duration(milliseconds: 400),
+              transitionBuilder: (child, anim) => FadeTransition(
+                opacity: anim,
+                child: SlideTransition(
+                  position: Tween(
+                    begin: const Offset(0, 0.3),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: anim, curve: Curves.easeOutCubic)),
+                  child: child,
+                ),
+              ),
               child: _pick != null
                   ? Padding(
-                      key: ValueKey('insight-$_insightKey'),
+                      key: ValueKey(_showReadyFlash
+                          ? 'ready-$_insightKey'
+                          : 'insight-$_insightKey'),
                       padding: const EdgeInsets.only(bottom: 10),
                       child: Row(
                         children: [
-                          Icon(Icons.auto_awesome_rounded,
-                              size: 14,
-                              color: theme.colorScheme.primary.withAlpha(180)),
+                          Icon(
+                            _showReadyFlash
+                                ? Icons.check_circle_rounded
+                                : Icons.auto_awesome_rounded,
+                            size: 14,
+                            color: _showReadyFlash
+                                ? Colors.green.shade400
+                                : theme.colorScheme.primary.withAlpha(180),
+                          ),
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
-                              _insightText,
+                              _showReadyFlash
+                                  ? '✨ Your AI pick is ready'
+                                  : _insightText,
                               style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.primary.withAlpha(200),
+                                color: _showReadyFlash
+                                    ? Colors.green.shade400
+                                    : theme.colorScheme.primary.withAlpha(200),
                                 fontStyle: FontStyle.italic,
+                                fontWeight: _showReadyFlash
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
                               ),
                             ),
                           ),
@@ -390,6 +430,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       : _CompactPickBanner(
                           key: ValueKey(_pick!.createdAt),
                           pick: _pick!,
+                          lottery: _selectedLottery,
                           onExpand: () =>
                               setState(() => _isPickExpanded = true),
                         ),
@@ -917,123 +958,188 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
 
 // ── Compact pick banner (home screen lightweight preview) ─────────────────────
 
-class _CompactPickBanner extends StatelessWidget {
+class _CompactPickBanner extends StatefulWidget {
   final GeneratedPick pick;
+  final Lottery lottery;
   final VoidCallback onExpand;
 
   const _CompactPickBanner({
     super.key,
     required this.pick,
+    required this.lottery,
     required this.onExpand,
   });
 
-  String _buildShareText(Lottery? lottery) {
-    final name = lottery?.name ?? pick.lotteryId;
-    final main = pick.mainNumbers.join('  ');
-    final bonus = (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
-        ? ' + ${pick.bonusNumbers!.join(' ')}'
-        : '';
-    return 'My AI ${pick.style.tagline}\n$name: $main$bonus\nGenerated for fun — LottoRun AI 🎯';
+  @override
+  State<_CompactPickBanner> createState() => _CompactPickBannerState();
+}
+
+class _CompactPickBannerState extends State<_CompactPickBanner>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  final _shareCardKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    final total = widget.pick.mainNumbers.length +
+        (widget.pick.bonusNumbers?.length ?? 0);
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 280 + total * 80),
+    )..forward();
   }
 
-  Future<void> _share(BuildContext btnContext) async {
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  Animation<double> _ballAnim(int index, int total) {
+    final step = 0.6 / total;
+    final start = index * step;
+    final end = (start + 0.5).clamp(0.0, 1.0);
+    return CurvedAnimation(
+      parent: _ctrl,
+      curve: Interval(start, end, curve: Curves.elasticOut),
+    );
+  }
+
+  Future<void> _shareCard(BuildContext btnCtx) async {
     HapticFeedback.lightImpact();
-    final box = btnContext.findRenderObject() as RenderBox?;
-    final origin = box == null
-        ? null
-        : box.localToGlobal(Offset.zero) & box.size;
-    await Share.share(_buildShareText(null), sharePositionOrigin: origin);
+    await sharePickCard(repaintKey: _shareCardKey, btnContext: btnCtx);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final mainNums = widget.pick.mainNumbers;
+    final bonusNums = widget.pick.bonusNumbers ?? [];
+    final total = mainNums.length + bonusNums.length;
 
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOutCubic,
-      builder: (_, value, child) => Opacity(
-        opacity: value,
-        child: Transform.translate(
-          offset: Offset(0, 10 * (1 - value)),
-          child: child,
+    return Stack(
+      children: [
+        // ── Offstage share card (captured for PNG export) ──────
+        Offstage(
+          child: RepaintBoundary(
+            key: _shareCardKey,
+            child: PickShareCard(pick: widget.pick, lottery: widget.lottery),
+          ),
         ),
-      ),
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 1,
-        clipBehavior: Clip.hardEdge,
-        child: InkWell(
-          onTap: onExpand,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 10, 10, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── Label row ─────────────────────────────────
-                Row(
+
+        // ── Visible banner ─────────────────────────────────────
+        TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0.0, end: 1.0),
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
+          builder: (_, value, child) => Opacity(
+            opacity: value,
+            child: Transform.translate(
+              offset: Offset(0, 10 * (1 - value)),
+              child: child,
+            ),
+          ),
+          child: Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            elevation: 2,
+            shadowColor: theme.colorScheme.primary.withAlpha(40),
+            clipBehavior: Clip.hardEdge,
+            child: InkWell(
+              onTap: widget.onExpand,
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 10, 10, 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
-                        'AI Pick · ${pick.style.tagline}',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.2,
+                    // ── Label row ───────────────────────────────
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'AI Pick · ${widget.pick.style.tagline}',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
                         ),
-                      ),
+                        Builder(
+                          builder: (btnCtx) => TextButton.icon(
+                            onPressed: () => _shareCard(btnCtx),
+                            icon: const Icon(Icons.share_rounded, size: 14),
+                            label: const Text('Share'),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              textStyle: const TextStyle(fontSize: 12),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.expand_more_rounded,
+                          size: 18,
+                          color: theme.colorScheme.onSurface.withAlpha(100),
+                        ),
+                      ],
                     ),
-                    Builder(
-                      builder: (btnCtx) => IconButton(
-                        onPressed: () => _share(btnCtx),
-                        icon: const Icon(Icons.share_rounded, size: 16),
-                        tooltip: 'Share pick',
-                        visualDensity: VisualDensity.compact,
-                        color: theme.colorScheme.onSurface.withAlpha(120),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
+                    const SizedBox(height: 10),
+                    // ── Staggered balls ─────────────────────────
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          for (var i = 0; i < mainNums.length; i++)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 6),
+                              child: AnimatedBuilder(
+                                animation: _ballAnim(i, total),
+                                builder: (_, child) => Transform.scale(
+                                  scale: _ballAnim(i, total)
+                                      .value
+                                      .clamp(0.0, 1.0),
+                                  child: child,
+                                ),
+                                child: LottoBall(
+                                    number: mainNums[i], size: 38),
+                              ),
+                            ),
+                          if (bonusNums.isNotEmpty) ...[
+                            const SizedBox(width: 8),
+                            for (var i = 0; i < bonusNums.length; i++)
+                              Padding(
+                                padding: const EdgeInsets.only(right: 6),
+                                child: AnimatedBuilder(
+                                  animation:
+                                      _ballAnim(mainNums.length + i, total),
+                                  builder: (_, child) => Transform.scale(
+                                    scale: _ballAnim(
+                                            mainNums.length + i, total)
+                                        .value
+                                        .clamp(0.0, 1.0),
+                                    child: child,
+                                  ),
+                                  child: LottoBall(
+                                      number: bonusNums[i],
+                                      isBonus: true,
+                                      size: 38),
+                                ),
+                              ),
+                          ],
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 2),
-                    Icon(
-                      Icons.expand_more_rounded,
-                      size: 18,
-                      color: theme.colorScheme.onSurface.withAlpha(100),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                // ── Balls ──────────────────────────────────────
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      ...pick.mainNumbers.map(
-                        (n) => Padding(
-                          padding: const EdgeInsets.only(right: 5),
-                          child: LottoBall(number: n, size: 34),
-                        ),
-                      ),
-                      if (pick.bonusNumbers != null &&
-                          pick.bonusNumbers!.isNotEmpty) ...[
-                        const SizedBox(width: 6),
-                        ...pick.bonusNumbers!.map(
-                          (n) => Padding(
-                            padding: const EdgeInsets.only(right: 5),
-                            child: LottoBall(number: n, isBonus: true, size: 34),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }
