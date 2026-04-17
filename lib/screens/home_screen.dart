@@ -350,32 +350,63 @@ class _LuckBar extends StatelessWidget {
     return (base + luckOffset).clamp(50, 99);
   }
 
-  /// Next draw date for known AU lotteries (AEST = UTC+10).
+  /// Next draw countdown for AU (AEST UTC+10) and US (ET UTC-5) lotteries.
   String _nextDraw() {
-    final drawWeekday = switch (lottery.id) {
+    // AU: single weekday draw at 20:30 AEST
+    final auWeekday = switch (lottery.id) {
       'au_powerball' => DateTime.thursday,
       'au_ozlotto'   => DateTime.tuesday,
       'au_saturday'  => DateTime.saturday,
       _              => null,
     };
-    if (drawWeekday == null) return '';
-
-    final now = DateTime.now().toUtc().add(const Duration(hours: 10));
-    var next = now;
-    // Advance until we hit the correct weekday
-    while (next.weekday != drawWeekday) {
-      next = next.add(const Duration(days: 1));
+    if (auWeekday != null) {
+      final now = DateTime.now().toUtc().add(const Duration(hours: 10));
+      var next = now;
+      while (next.weekday != auWeekday) {
+        next = next.add(const Duration(days: 1));
+      }
+      if (next.day == now.day &&
+          (now.hour > 20 || (now.hour == 20 && now.minute >= 30))) {
+        next = next.add(const Duration(days: 7));
+      }
+      final diff = next.difference(now);
+      if (diff.inDays >= 2) return 'Next draw in ${diff.inDays}d';
+      if (diff.inHours >= 1) return 'Next draw in ${diff.inHours}h';
+      return 'Draw soon!';
     }
-    // Draw is at 20:30 AEST; if today is draw day but past 20:30, go to next week
-    if (next.day == now.day &&
-        (now.hour > 20 || (now.hour == 20 && now.minute >= 30))) {
-      next = next.add(const Duration(days: 7));
+
+    // US: multiple draw days per week at 22:59 ET (UTC-5)
+    final usDrawDays = switch (lottery.id) {
+      'us_powerball'    => [DateTime.monday, DateTime.wednesday, DateTime.saturday],
+      'us_megamillions' => [DateTime.tuesday, DateTime.friday],
+      _                 => null,
+    };
+    if (usDrawDays != null) {
+      final now = DateTime.now().toUtc().subtract(const Duration(hours: 5));
+      DateTime? nearest;
+      for (final weekday in usDrawDays) {
+        var candidate = now;
+        while (candidate.weekday != weekday) {
+          candidate = candidate.add(const Duration(days: 1));
+        }
+        // Draw closes at 22:59 ET; if past that on draw day, skip to next occurrence
+        if (candidate.day == now.day &&
+            (now.hour > 22 || (now.hour == 22 && now.minute >= 59))) {
+          candidate = candidate.add(const Duration(days: 7));
+        }
+        if (nearest == null || candidate.isBefore(nearest)) {
+          nearest = candidate;
+        }
+      }
+      if (nearest != null) {
+        final diff = nearest.difference(now);
+        if (diff.inDays >= 2) return 'Next draw in ${diff.inDays}d';
+        if (diff.inHours >= 1) return 'Next draw in ${diff.inHours}h';
+        return 'Draw soon!';
+      }
     }
 
-    final diff = next.difference(now);
-    if (diff.inDays >= 2) return 'Next draw in ${diff.inDays}d';
-    if (diff.inHours >= 1) return 'Next draw in ${diff.inHours}h';
-    return 'Draw soon!';
+    return '';
   }
 
   @override

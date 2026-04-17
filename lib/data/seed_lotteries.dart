@@ -1,7 +1,7 @@
 import '../models/lottery.dart';
 
-/// V1: Australia only. Oz Lotto & Saturday Lotto have no seed draw data yet.
 const List<Lottery> kSeedLotteries = [
+  // ── Australia ──────────────────────────────────────────────────────────────
   Lottery(
     id: 'au_powerball',
     countryCode: 'AU',
@@ -37,5 +37,31 @@ const List<Lottery> kSeedLotteries = [
     bonusCount: 2,
     bonusMin: 1,
     bonusMax: 45,
+  ),
+
+  // ── United States ──────────────────────────────────────────────────────────
+  Lottery(
+    id: 'us_powerball',
+    countryCode: 'US',
+    countryName: 'United States',
+    name: 'Powerball',
+    mainCount: 5,
+    mainMin: 1,
+    mainMax: 69,
+    bonusCount: 1,
+    bonusMin: 1,
+    bonusMax: 26,
+  ),
+  Lottery(
+    id: 'us_megamillions',
+    countryCode: 'US',
+    countryName: 'United States',
+    name: 'Mega Millions',
+    mainCount: 5,
+    mainMin: 1,
+    mainMax: 70,
+    bonusCount: 1,
+    bonusMin: 1,
+    bonusMax: 25,
   ),
 ];

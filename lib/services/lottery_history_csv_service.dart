@@ -19,12 +19,18 @@ class LotteryHistoryCsvService {
     'au_ozlotto': 'https://tonybjzhao.github.io/lottrun_flutter/oz_lotto.csv',
     'au_saturday':
         'https://tonybjzhao.github.io/lottrun_flutter/saturday_lotto.csv',
+    'us_powerball':
+        'https://tonybjzhao.github.io/lottrun_flutter/us_powerball.csv',
+    'us_megamillions':
+        'https://tonybjzhao.github.io/lottrun_flutter/us_megamillions.csv',
   };
 
   static const Map<String, String> _cacheKeys = {
     'au_powerball': 'cache_powerball_csv',
     'au_ozlotto': 'cache_oz_lotto_csv',
     'au_saturday': 'cache_saturday_lotto_csv',
+    'us_powerball': 'cache_us_powerball_csv',
+    'us_megamillions': 'cache_us_megamillions_csv',
   };
 
   Future<LotteryHistoryResult> fetchDraws(Lottery lottery) async {

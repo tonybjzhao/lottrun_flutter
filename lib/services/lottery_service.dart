@@ -2,6 +2,8 @@ import '../data/seed_lotteries.dart';
 import '../data/seed_oz_lotto.dart';
 import '../data/seed_powerball.dart';
 import '../data/seed_saturday_lotto.dart';
+import '../data/seed_us_megamillions.dart';
+import '../data/seed_us_powerball.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 
@@ -29,6 +31,10 @@ class LotteryService {
         return kOzLottoDraws;
       case 'au_saturday':
         return kSaturdayLottoDraws;
+      case 'us_powerball':
+        return kUsPowerballDraws;
+      case 'us_megamillions':
+        return kUsMegaMillionsDraws;
       default:
         return [];
     }
