@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'app.dart';
@@ -10,8 +11,24 @@ import 'services/analytics_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   AnalyticsService.init(_initFirebase());
-  unawaited(MobileAds.instance.initialize());
+  unawaited(_initAds());
   runApp(const LottFunApp());
+}
+
+/// Initializes AdMob and registers test device IDs in debug builds
+/// so banner ads fill during development.
+Future<void> _initAds() async {
+  await MobileAds.instance.initialize();
+  if (kDebugMode) {
+    // Device ID from the log: "To get test ads on this device, set: ..."
+    // Remove or leave empty before release — has no effect in release builds
+    // since kDebugMode is false.
+    await MobileAds.instance.updateRequestConfiguration(
+      RequestConfiguration(
+        testDeviceIds: ['c9807b9b342ebb9faedbeeb80e9905ed'],
+      ),
+    );
+  }
 }
 
 /// Initializes Firebase exactly once.
