@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery.dart';
 import '../data/seed_lotteries.dart';
@@ -34,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isPickExpanded = false;
   int _luckOffset = 0; // shifts ±10 each generate
   int _streak = 0;
+  int _insightKey = 0; // cycles insight message on each generate
 
   @override
   void initState() {
@@ -114,7 +116,36 @@ class _HomeScreenState extends State<HomeScreen> {
       _isLoading = false;
       _isPickExpanded = false;
       _luckOffset = Random().nextInt(21) - 10; // −10 to +10
+      _insightKey++;
     });
+  }
+
+  static const _insightMessages = {
+    PlayStyle.balanced: [
+      'AI sees a balanced spread for today',
+      'History points to an even distribution',
+      'Balanced picks look stronger today',
+    ],
+    PlayStyle.hot: [
+      'Hot trend is active tonight 🔥',
+      'Recent draws favour these numbers',
+      'AI detects a hot-number streak',
+    ],
+    PlayStyle.cold: [
+      'AI sees a cold-number comeback today ❄️',
+      'Overdue numbers are in your corner',
+      'Cold picks may be ready to break out',
+    ],
+    PlayStyle.random: [
+      'Sometimes pure luck is all you need 🎲',
+      'Chaos is a strategy too',
+      'Pure randomness — trust the universe',
+    ],
+  };
+
+  String get _insightText {
+    final msgs = _insightMessages[_selectedStyle]!;
+    return msgs[_insightKey % msgs.length];
   }
 
   Future<void> _savePick() async {
@@ -196,6 +227,8 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const _InsightPillRow(),
+            const SizedBox(height: 12),
             const DisclaimerCard(),
             const SizedBox(height: 16),
 
@@ -268,7 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
             OutlinedButton.icon(
               onPressed: _isLoading ? null : _showThreePicks,
               icon: const Icon(Icons.filter_3_rounded, size: 18),
-              label: const Text('Generate 3 Picks'),
+              label: const Text('Generate 3 Smart Picks'),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -276,6 +309,34 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 20),
+
+            // ── AI insight line ───────────────────────────────────
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 350),
+              child: _pick != null
+                  ? Padding(
+                      key: ValueKey('insight-$_insightKey'),
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Row(
+                        children: [
+                          Icon(Icons.auto_awesome_rounded,
+                              size: 14,
+                              color: theme.colorScheme.primary.withAlpha(180)),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              _insightText,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.primary.withAlpha(200),
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : const SizedBox.shrink(key: ValueKey('no-insight')),
+            ),
 
             // ── Result / empty state ──────────────────────────────
             AnimatedSwitcher(
@@ -339,6 +400,48 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
+    );
+  }
+}
+
+// ── Insight pill row ──────────────────────────────────────────────────────────
+
+class _InsightPillRow extends StatelessWidget {
+  const _InsightPillRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final pillStyle = theme.textTheme.labelSmall?.copyWith(
+      fontWeight: FontWeight.w600,
+    );
+    final pills = [
+      ('🔥', 'Hot trend'),
+      ('❄️', 'Cold comeback'),
+      ('🤖', 'AI mixed pick'),
+    ];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (final (icon, label) in pills)
+            Container(
+              margin: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primaryContainer.withAlpha(120),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                '$icon  $label',
+                style: pillStyle?.copyWith(
+                  color: theme.colorScheme.onPrimaryContainer,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
@@ -517,11 +620,11 @@ class _GradientButtonState extends State<_GradientButton> {
                   : Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.casino_rounded,
+                        const Icon(Icons.auto_awesome_rounded,
                             color: Colors.white, size: 20),
                         const SizedBox(width: 10),
                         Text(
-                          'Try My Luck',
+                          'Generate AI Pick',
                           style: TextStyle(
                             color: widget.onPressed == null
                                 ? Colors.grey.shade600
@@ -776,7 +879,12 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
                   ),
                   child: _MiniPickCard(
                     pick: _picks[i],
-                    label: const ['⭐ Best Pick', '🔥 Hot Trend', '🎲 Lucky Mix'][i],
+                    label: const ['⭐ Best AI Pick', '🔥 Hot Trend Pick', '🎲 Lucky Mix Pick'][i],
+                    microcopy: const [
+                      'Based on balanced frequency',
+                      'Leans toward recent hot numbers',
+                      'Mix of hot, cold, and random',
+                    ][i],
                     lottery: widget.lottery,
                   ),
                 );
@@ -819,6 +927,20 @@ class _CompactPickBanner extends StatelessWidget {
     required this.onExpand,
   });
 
+  String _buildShareText(Lottery? lottery) {
+    final name = lottery?.name ?? pick.lotteryId;
+    final main = pick.mainNumbers.join('  ');
+    final bonus = (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
+        ? ' + ${pick.bonusNumbers!.join(' ')}'
+        : '';
+    return 'My AI ${pick.style.tagline}\n$name: $main$bonus\nGenerated for fun — LottoRun AI 🎯';
+  }
+
+  Future<void> _share() async {
+    HapticFeedback.lightImpact();
+    await Share.share(_buildShareText(null));
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -849,15 +971,26 @@ class _CompactPickBanner extends StatelessWidget {
                 // ── Label row ─────────────────────────────────
                 Row(
                   children: [
-                    Text(
-                      'Quick Pick · ${pick.style.tagline}',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.2,
+                    Expanded(
+                      child: Text(
+                        'AI Pick · ${pick.style.tagline}',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.2,
+                        ),
                       ),
                     ),
-                    const Spacer(),
+                    IconButton(
+                      onPressed: _share,
+                      icon: const Icon(Icons.share_rounded, size: 16),
+                      tooltip: 'Share pick',
+                      visualDensity: VisualDensity.compact,
+                      color: theme.colorScheme.onSurface.withAlpha(120),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                    const SizedBox(width: 2),
                     Icon(
                       Icons.expand_more_rounded,
                       size: 18,
@@ -904,25 +1037,27 @@ class _CompactPickBanner extends StatelessWidget {
 class _MiniPickCard extends StatelessWidget {
   final GeneratedPick pick;
   final String label;
+  final String microcopy;
   final Lottery lottery;
 
   const _MiniPickCard({
     required this.pick,
     required this.label,
+    required this.microcopy,
     required this.lottery,
   });
 
-  String _buildCopyText() {
+  String _buildShareText() {
     final main = pick.mainNumbers.join('  ');
     final bonus = (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
-        ? '  |  PB ${pick.bonusNumbers!.join(' ')}'
+        ? ' + ${pick.bonusNumbers!.join(' ')}'
         : '';
-    return '$label · ${pick.style.label} · ${lottery.name}\n$main$bonus\nGenerated for fun — LottoRun AI';
+    return '$label\n${lottery.name}: $main$bonus\nGenerated for fun — LottoRun AI 🎯';
   }
 
   Future<void> _copy(BuildContext context) async {
     HapticFeedback.lightImpact();
-    await Clipboard.setData(ClipboardData(text: _buildCopyText()));
+    await Clipboard.setData(ClipboardData(text: _buildShareText()));
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -931,6 +1066,11 @@ class _MiniPickCard extends StatelessWidget {
         ),
       );
     }
+  }
+
+  Future<void> _share() async {
+    HapticFeedback.lightImpact();
+    await Share.share(_buildShareText());
   }
 
   @override
@@ -947,14 +1087,27 @@ class _MiniPickCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(
-                  label,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.w700,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        microcopy,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withAlpha(110),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const Spacer(),
                 TextButton.icon(
                   onPressed: () => _copy(context),
                   icon: const Icon(Icons.copy_rounded, size: 14),
@@ -965,6 +1118,12 @@ class _MiniPickCard extends StatelessWidget {
                     textStyle: const TextStyle(fontSize: 12),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
+                ),
+                IconButton(
+                  onPressed: _share,
+                  icon: const Icon(Icons.share_rounded, size: 18),
+                  tooltip: 'Share',
+                  visualDensity: VisualDensity.compact,
                 ),
               ],
             ),
