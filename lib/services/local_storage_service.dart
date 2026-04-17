@@ -100,6 +100,7 @@ class LocalStorageService {
         'pickLabel': pick.pickLabel,
         'drawDate': pick.drawDate?.toIso8601String(),
         'drawLabel': pick.drawLabel,
+        'source': pick.source.name,
       };
 
   static GeneratedPick _pickFromMap(Map<String, dynamic> map) {
@@ -123,6 +124,10 @@ class LocalStorageService {
           ? DateTime.parse(map['drawDate'] as String)
           : null,
       drawLabel: map['drawLabel'] as String?,
+      source: PickSource.values.firstWhere(
+        (s) => s.name == map['source'],
+        orElse: () => PickSource.generated,
+      ),
     );
   }
 

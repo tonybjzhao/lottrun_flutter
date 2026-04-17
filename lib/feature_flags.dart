@@ -13,8 +13,7 @@ bool get kIsSimulatorOrEmulator {
   if (Platform.isAndroid) {
     // ro.kernel.qemu=1 on AOSP emulators; check via brand/product is fragile,
     // but the env var below is reliable for standard Android Studio AVDs.
-    return Platform.environment.containsKey('ANDROID_EMULATOR_HOME') ||
-        Platform.environment['ANDROID_DATA'] == '/data';
+    return Platform.environment.containsKey('ANDROID_EMULATOR_HOME');
   }
   return false;
 }

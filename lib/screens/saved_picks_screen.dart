@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery.dart';
+import 'manual_pick_entry_screen.dart';
 import '../models/lottery_draw.dart';
 import '../services/local_storage_service.dart';
 import '../services/lottery_service.dart';
@@ -60,6 +61,14 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
     }
   }
 
+  Future<void> _addManual() async {
+    final saved = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => const ManualPickEntryScreen()),
+    );
+    if (saved == true) _load();
+  }
+
   Future<void> _clearAll() async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -99,6 +108,11 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
       appBar: AppBar(
         title: const Text('Saved Picks'),
         actions: [
+          IconButton(
+            onPressed: _addManual,
+            icon: const Icon(Icons.add_rounded),
+            tooltip: 'Add My Numbers',
+          ),
           if (_picks.isNotEmpty)
             TextButton(
               onPressed: _clearAll,
@@ -413,12 +427,36 @@ class _PickItemState extends State<_PickItem> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              _lotteryName,
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: theme.colorScheme.primary,
-                                fontWeight: FontWeight.w700,
-                              ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    _lotteryName,
+                                    style: theme.textTheme.labelMedium?.copyWith(
+                                      color: theme.colorScheme.primary,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                if (widget.pick.source == PickSource.manual)
+                                  Container(
+                                    margin: const EdgeInsets.only(left: 6),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.tertiaryContainer,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      '👤 My Pick',
+                                      style: theme.textTheme.labelSmall?.copyWith(
+                                        color: theme.colorScheme.onTertiaryContainer,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                             const SizedBox(height: 2),
                             Text(
