@@ -202,10 +202,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
       return const SizedBox.shrink();
     }
 
-    if (history.source != LotteryHistorySource.cache) {
+    if (history.source == LotteryHistorySource.network) {
       return const SizedBox(height: 12);
     }
 
+    // Seed data is bundled — no banner needed (not "offline", just not yet synced)
+    if (history.source == LotteryHistorySource.seed) {
+      return const SizedBox(height: 12);
+    }
+
+    // cache = network failed but a previously-downloaded copy exists
     final updatedAtText = history.loadedAt == null
         ? null
         : DateFormat('d MMM, h:mm a').format(history.loadedAt!.toLocal());

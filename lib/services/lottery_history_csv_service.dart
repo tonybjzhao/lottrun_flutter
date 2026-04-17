@@ -92,7 +92,7 @@ class LotteryHistoryCsvService {
       if (seedDraws.isNotEmpty) {
         return LotteryHistoryResult(
           draws: seedDraws,
-          source: LotteryHistorySource.cache,
+          source: LotteryHistorySource.seed,
           loadedAt: null,
         );
       }

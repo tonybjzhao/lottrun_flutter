@@ -1,6 +1,6 @@
 import 'lottery_draw.dart';
 
-enum LotteryHistorySource { network, cache }
+enum LotteryHistorySource { network, cache, seed }
 
 class LotteryHistoryResult {
   final List<LotteryDraw> draws;
