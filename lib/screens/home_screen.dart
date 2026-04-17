@@ -215,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Text(
-              'Play smart · Just for fun',
+              'Smart picks from real draw history',
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w400,
