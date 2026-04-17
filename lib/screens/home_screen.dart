@@ -143,27 +143,41 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: 'Lott',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  color: theme.colorScheme.onPrimary,
-                ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'LottoRun ',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: theme.colorScheme.onPrimary,
+                    ),
+                  ),
+                  TextSpan(
+                    text: 'AI',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: theme.colorScheme.secondaryContainer,
+                    ),
+                  ),
+                ],
               ),
-              TextSpan(
-                text: 'Fun',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  color: theme.colorScheme.secondaryContainer,
-                ),
+            ),
+            Text(
+              'Play smart · Just for fun',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w400,
+                color: theme.colorScheme.onPrimary.withAlpha(180),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         actions: [
           IconButton(
@@ -635,7 +649,7 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
 
   String _buildCopyAll() {
     final lines = <String>[
-      'LottFun · ${widget.style.label} · ${widget.lottery.name}',
+      'LottoRun AI ·${widget.style.label} · ${widget.lottery.name}',
     ];
     for (var i = 0; i < _picks.length; i++) {
       final p = _picks[i];
@@ -645,7 +659,7 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
           : '';
       lines.add('Pick ${i + 1}: $main$bonus');
     }
-    lines.add('Generated for fun — LottFun');
+    lines.add('Generated for fun — LottoRun AI');
     return lines.join('\n');
   }
 
@@ -903,7 +917,7 @@ class _MiniPickCard extends StatelessWidget {
     final bonus = (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
         ? '  |  PB ${pick.bonusNumbers!.join(' ')}'
         : '';
-    return '$label · ${pick.style.label} · ${lottery.name}\n$main$bonus\nGenerated for fun — LottFun';
+    return '$label · ${pick.style.label} · ${lottery.name}\n$main$bonus\nGenerated for fun — LottoRun AI';
   }
 
   Future<void> _copy(BuildContext context) async {
