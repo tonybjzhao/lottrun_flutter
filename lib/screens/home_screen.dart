@@ -12,6 +12,8 @@ import '../services/lottery_service.dart';
 import '../services/analytics_service.dart';
 import '../services/draw_date_service.dart';
 import '../services/local_storage_service.dart';
+import '../services/notification_service.dart';
+import '../services/result_notification_service.dart';
 import '../widgets/disclaimer_card.dart';
 import '../widgets/lotto_ball.dart';
 import '../widgets/result_panel.dart';
@@ -28,7 +30,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Lottery _selectedLottery = kSeedLotteries.first;
   PlayStyle _selectedStyle = PlayStyle.balanced;
   GeneratedPick? _pick;
@@ -44,14 +46,36 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _restorePrefs();
     _initStreak();
+    // Check for newly resolved results after first frame so the navigator is ready.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final launchedFromNotif =
+          await NotificationService.instance.checkLaunchedFromNotification();
+      if (launchedFromNotif && mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const SavedPicksScreen()),
+        );
+      } else {
+        unawaited(ResultNotificationService.instance.checkAndNotify());
+      }
+    });
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _flashTimer?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(ResultNotificationService.instance.checkAndNotify());
+    }
   }
 
   Future<void> _initStreak() async {

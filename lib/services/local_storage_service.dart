@@ -101,6 +101,7 @@ class LocalStorageService {
         'drawDate': pick.drawDate?.toIso8601String(),
         'drawLabel': pick.drawLabel,
         'source': pick.source.name,
+        'hasNotifiedResultReady': pick.hasNotifiedResultReady,
       };
 
   static GeneratedPick _pickFromMap(Map<String, dynamic> map) {
@@ -128,7 +129,26 @@ class LocalStorageService {
         (s) => s.name == map['source'],
         orElse: () => PickSource.generated,
       ),
+      hasNotifiedResultReady: map['hasNotifiedResultReady'] as bool? ?? false,
     );
+  }
+
+  /// Marks a set of picks as notified by updating the JSON in-place.
+  /// Does not deserialize the full model — efficient for large lists.
+  Future<void> markPicksNotified(Set<String> ids) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getStringList(_keySavedPicks) ?? [];
+    final updated = raw.map((s) {
+      try {
+        final map = jsonDecode(s) as Map<String, dynamic>;
+        if (ids.contains(map['id'])) {
+          map['hasNotifiedResultReady'] = true;
+          return jsonEncode(map);
+        }
+      } catch (_) {}
+      return s;
+    }).toList();
+    await prefs.setStringList(_keySavedPicks, updated);
   }
 
   Future<List<GeneratedPick>> getSavedPicks() async {

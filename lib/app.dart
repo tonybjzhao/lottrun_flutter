@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'navigator_key.dart';
 import 'screens/home_screen.dart';
 
 class LottFunApp extends StatelessWidget {
@@ -7,6 +8,7 @@ class LottFunApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: globalNavigatorKey,
       title: 'LottFun',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

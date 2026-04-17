@@ -7,9 +7,11 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'app.dart';
 import 'firebase_options.dart';
 import 'services/analytics_service.dart';
+import 'services/notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  unawaited(NotificationService.instance.init());
   AnalyticsService.init(_initFirebase());
   unawaited(_initAds());
   runApp(const LottFunApp());
