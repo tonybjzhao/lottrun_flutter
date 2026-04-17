@@ -1,7 +1,10 @@
 lottery_id,draw_date,draw_number,main_1,main_2,main_3,main_4,main_5,supp_1
 us_powerball,2026-04-15,1,13,21,27,43,45,26
+us_powerball,2026-04-15,,13,21,27,43,45,26
 us_powerball,2026-04-13,2,38,43,59,63,64,15
+us_powerball,2026-04-13,,38,43,59,63,64,15
 us_powerball,2026-04-11,3,6,47,49,53,60,6
+us_powerball,2026-04-11,,6,47,49,53,60,6
 us_powerball,2026-04-08,4,3,16,17,42,52,3
 us_powerball,2026-04-06,5,7,24,37,42,57,5
 us_powerball,2026-04-04,6,3,6,13,41,65,1

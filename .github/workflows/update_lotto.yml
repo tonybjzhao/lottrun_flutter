@@ -1,9 +1,18 @@
-name: Update AU Lottery CSVs
+name: Update Lottery CSVs
 
 on:
   workflow_dispatch:
   schedule:
+    # AU sync — daily at 12:00 UTC (AU draws: Tue/Wed/Thu/Sat)
     - cron: "0 12 * * *"
+    # US Powerball + Lotto America draws: Mon/Wed/Sat
+    # Run at 03:30 and 04:30 UTC (Tue/Thu/Sun) — safely after 22:59 ET cutoff
+    - cron: "30 3 * * 2,4,0"
+    - cron: "30 4 * * 2,4,0"
+    # US Mega Millions draws: Tue/Fri
+    # Run at 03:30 and 04:30 UTC (Wed/Sat)
+    - cron: "30 3 * * 3,6"
+    - cron: "30 4 * * 3,6"
 
 permissions:
   contents: write
@@ -15,7 +24,7 @@ concurrency:
 jobs:
   update-csv:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - name: Check out repository
@@ -34,18 +43,21 @@ jobs:
       - name: Install Playwright Chromium
         run: python -m playwright install --with-deps chromium
 
-      - name: Update lottery CSVs
+      - name: Update AU lottery CSVs
         run: python scrape_au_lottos.py
+
+      - name: Update US lottery CSVs
+        run: python tools/sync_us_lottery_history.py --recent-draws 3
 
       - name: Commit updated CSVs
         run: |
-          if [ -z "$(git status --porcelain -- docs/*.csv)" ]; then
+          if [ -z "$(git status --porcelain -- docs/*.csv lib/data/seed_us_*.dart)" ]; then
             echo "No CSV changes to commit."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/*.csv
-          git commit -m "Update AU lottery CSVs"
+          git add docs/*.csv lib/data/seed_us_*.dart
+          git commit -m "Update lottery CSVs [skip ci]"
           git push
