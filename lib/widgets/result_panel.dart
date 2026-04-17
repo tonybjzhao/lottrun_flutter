@@ -162,7 +162,10 @@ class _ResultPanelState extends State<ResultPanel>
 
     return Stack(
       children: [
-        Offstage(
+        Positioned(
+          left: -10000,
+          top: 0,
+          width: 360,
           child: RepaintBoundary(
             key: _shareCardKey,
             child: PickShareCard(pick: widget.pick, lottery: widget.lottery),

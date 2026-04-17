@@ -1020,8 +1020,11 @@ class _CompactPickBannerState extends State<_CompactPickBanner>
 
     return Stack(
       children: [
-        // ── Offstage share card (captured for PNG export) ──────
-        Offstage(
+        // ── Off-screen share card (must be painted for toImage()) ─
+        Positioned(
+          left: -10000,
+          top: 0,
+          width: 360,
           child: RepaintBoundary(
             key: _shareCardKey,
             child: PickShareCard(pick: widget.pick, lottery: widget.lottery),
