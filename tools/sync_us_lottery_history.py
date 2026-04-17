@@ -309,11 +309,18 @@ def write_csv(game: GameConfig, rows: list[dict]) -> None:
             ])
 
 
+def _row_key(row: dict) -> tuple:
+    return (
+        row["draw_date"],
+        tuple(sorted(row["main_numbers"])),
+        tuple(row["supp_numbers"]),
+    )
+
+
 def merge_rows(existing: list[dict], incoming: list[dict]) -> list[dict]:
     merged: dict[tuple, dict] = {}
     for row in existing + incoming:
-        key = (row.get("draw_number"), row["draw_date"])
-        merged[key] = row
+        merged[_row_key(row)] = row
     return sorted(
         merged.values(),
         key=lambda r: (r["draw_date"], r.get("draw_number") or 0),
@@ -376,8 +383,7 @@ def sync_game(game: GameConfig, recent_draws: int | None) -> int:
         # Full rebuild: dedupe incoming only
         seen: dict[tuple, dict] = {}
         for row in incoming:
-            key = (row.get("draw_number"), row["draw_date"])
-            seen[key] = row
+            seen[_row_key(row)] = row
         rows = sorted(
             seen.values(),
             key=lambda r: (r["draw_date"], r.get("draw_number") or 0),

@@ -112,11 +112,17 @@ class LotteryHistoryCsvService {
     }
 
     try {
+      final seen = <String>{};
       final draws = rows
           .skip(1)
           .where((row) => row.length >= 3)
           .map((row) => _rowToDraw(row, lottery))
           .whereType<LotteryDraw>()
+          .where((draw) {
+            final key =
+                '${draw.drawDate.toIso8601String()}-${draw.mainNumbers.join(',')}-${(draw.bonusNumbers ?? []).join(',')}';
+            return seen.add(key);
+          })
           .toList()
         ..sort((a, b) => b.drawDate.compareTo(a.drawDate));
 
