@@ -75,17 +75,29 @@ enum PlayStyle {
 }
 
 class GeneratedPick {
+  final String id;
   final String lotteryId;
   final PlayStyle style;
   final List<int> mainNumbers;
   final List<int>? bonusNumbers;
   final DateTime createdAt;
+  final String? pickLabel; // e.g. "⭐ Best AI Pick" — set when saved from 3-picks
 
-  const GeneratedPick({
+  GeneratedPick({
+    String? id,
     required this.lotteryId,
     required this.style,
     required this.mainNumbers,
     this.bonusNumbers,
     required this.createdAt,
-  });
+    this.pickLabel,
+  }) : id = id ?? '${createdAt.millisecondsSinceEpoch}_${lotteryId.hashCode.abs()}';
+
+  String get countryCode {
+    if (lotteryId.startsWith('us_')) return 'US';
+    if (lotteryId.startsWith('au_')) return 'AU';
+    return 'OTHER';
+  }
+
+  String get displayLabel => pickLabel ?? style.tagline;
 }

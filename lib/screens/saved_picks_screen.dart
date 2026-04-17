@@ -8,6 +8,24 @@ import '../services/local_storage_service.dart';
 import '../services/lottery_service.dart';
 import '../widgets/lotto_ball.dart';
 
+// Country helpers ──────────────────────────────────────────────────────────────
+
+String _countryFlag(String code) => switch (code) {
+      'US' => '🇺🇸',
+      'AU' => '🇦🇺',
+      _ => '🌍',
+    };
+
+String _countryName(String code) => switch (code) {
+      'US' => 'United States',
+      'AU' => 'Australia',
+      _ => 'Other',
+    };
+
+const _countryOrder = ['US', 'AU', 'OTHER'];
+
+// ── Screen ────────────────────────────────────────────────────────────────────
+
 class SavedPicksScreen extends StatefulWidget {
   const SavedPicksScreen({super.key});
 
@@ -30,24 +48,45 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
     if (mounted) setState(() { _picks = picks; _loading = false; });
   }
 
-  Future<void> _delete(int index) async {
-    await LocalStorageService.instance.deleteSavedPickAt(index);
-    setState(() => _picks.removeAt(index));
+  Future<void> _delete(GeneratedPick pick) async {
+    await LocalStorageService.instance.deleteSavedPickById(pick.id);
+    setState(() => _picks.removeWhere((p) => p.id == pick.id));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pick deleted'), duration: Duration(seconds: 2)),
+      );
+    }
   }
 
-  String _shareText(GeneratedPick pick) {
-    final lottery = LotteryService.instance.getLotteryById(pick.lotteryId);
-    final name = lottery?.name ?? pick.lotteryId;
-    final main = pick.mainNumbers.join('  ');
-    final bonusLabel = switch (pick.lotteryId) {
-      'us_powerball' => 'Powerball',
-      'us_megamillions' => 'Mega Ball',
-      _ => 'Bonus',
-    };
-    final bonus = (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
-        ? '\n+ $bonusLabel: ${pick.bonusNumbers!.join(' ')}'
-        : '';
-    return '🎯 My AI $name Pick\n${pick.style.tagline}\n\n$main$bonus\n\nGenerated for fun — LottoRun AI';
+  Future<void> _clearAll() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Clear all saved picks?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Clear all'),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true && mounted) {
+      await LocalStorageService.instance.clearSavedPicks();
+      setState(() => _picks.clear());
+    }
+  }
+
+  Map<String, List<GeneratedPick>> _groupByCountry() {
+    final map = <String, List<GeneratedPick>>{};
+    for (final p in _picks) {
+      map.putIfAbsent(p.countryCode, () => []).add(p);
+    }
+    return map;
   }
 
   @override
@@ -60,34 +99,9 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
         actions: [
           if (_picks.isNotEmpty)
             TextButton(
-              onPressed: () async {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    title: const Text('Clear all saved picks?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Clear all'),
-                      ),
-                    ],
-                  ),
-                );
-                if (confirm == true && mounted) {
-                  for (var i = _picks.length - 1; i >= 0; i--) {
-                    await LocalStorageService.instance.deleteSavedPickAt(0);
-                  }
-                  setState(() => _picks.clear());
-                }
-              },
-              child: Text(
-                'Clear all',
-                style: TextStyle(color: theme.colorScheme.error),
-              ),
+              onPressed: _clearAll,
+              child: Text('Clear all',
+                  style: TextStyle(color: theme.colorScheme.error)),
             ),
         ],
       ),
@@ -112,18 +126,100 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
                     ],
                   ),
                 )
-              : ListView.separated(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 12),
-                  itemCount: _picks.length,
-                  separatorBuilder: (context, i) => const SizedBox(height: 8),
-                  itemBuilder: (ctx, i) =>
-                      _PickItem(
-                        pick: _picks[i],
-                        onDelete: () => _delete(i),
-                        shareText: _shareText(_picks[i]),
-                      ),
-                ),
+              : _buildGroupedList(theme),
+    );
+  }
+
+  Widget _buildGroupedList(ThemeData theme) {
+    final grouped = _groupByCountry();
+    final sections = _countryOrder.where(grouped.containsKey).toList();
+
+    final items = <Widget>[];
+
+    // "Newest first" indicator
+    items.add(Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      child: Row(
+        children: [
+          Icon(Icons.access_time_rounded,
+              size: 13, color: theme.colorScheme.onSurface.withAlpha(100)),
+          const SizedBox(width: 4),
+          Text(
+            'Newest first',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurface.withAlpha(100),
+            ),
+          ),
+        ],
+      ),
+    ));
+
+    for (final country in sections) {
+      final picks = grouped[country]!;
+      items.add(_SectionHeader(
+        flag: _countryFlag(country),
+        name: _countryName(country),
+        count: picks.length,
+      ));
+      for (final pick in picks) {
+        items.add(Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: _PickItem(
+            pick: pick,
+            onDelete: () => _delete(pick),
+            onTap: () => Navigator.pop(context, pick),
+          ),
+        ));
+      }
+    }
+
+    return ListView(
+      padding: const EdgeInsets.only(bottom: 24),
+      children: items,
+    );
+  }
+}
+
+// ── Section header ────────────────────────────────────────────────────────────
+
+class _SectionHeader extends StatelessWidget {
+  final String flag;
+  final String name;
+  final int count;
+
+  const _SectionHeader({
+    required this.flag,
+    required this.name,
+    required this.count,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: Row(
+        children: [
+          Text('$flag  $name',
+              style: theme.textTheme.titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w700)),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              '$count',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onPrimaryContainer,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -133,12 +229,12 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
 class _PickItem extends StatelessWidget {
   final GeneratedPick pick;
   final VoidCallback onDelete;
-  final String shareText;
+  final VoidCallback onTap;
 
   const _PickItem({
     required this.pick,
     required this.onDelete,
-    required this.shareText,
+    required this.onTap,
   });
 
   String get _lotteryName {
@@ -146,9 +242,22 @@ class _PickItem extends StatelessWidget {
     return l?.name ?? pick.lotteryId;
   }
 
+  String get _shareText {
+    final main = pick.mainNumbers.join('  ');
+    final bonusLabel = switch (pick.lotteryId) {
+      'us_powerball' => 'Powerball',
+      'us_megamillions' => 'Mega Ball',
+      _ => 'Bonus',
+    };
+    final bonus = (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
+        ? '\n+ $bonusLabel: ${pick.bonusNumbers!.join(' ')}'
+        : '';
+    return '🎯 My AI $_lotteryName Pick\n${pick.displayLabel}\n\n$main$bonus\n\nGenerated for fun — LottoRun AI';
+  }
+
   Future<void> _copy(BuildContext context) async {
     HapticFeedback.lightImpact();
-    await Clipboard.setData(ClipboardData(text: shareText));
+    await Clipboard.setData(ClipboardData(text: _shareText));
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Copied to clipboard.'),
@@ -162,7 +271,7 @@ class _PickItem extends StatelessWidget {
     final box = btnCtx.findRenderObject() as RenderBox?;
     final origin =
         box == null ? null : box.localToGlobal(Offset.zero) & box.size;
-    await Share.share(shareText, sharePositionOrigin: origin);
+    await Share.share(_shareText, sharePositionOrigin: origin);
   }
 
   @override
@@ -173,94 +282,120 @@ class _PickItem extends StatelessWidget {
     final bonusNums = pick.bonusNumbers ?? [];
 
     return Card(
-      shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 12, 8, 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Header row ─────────────────────────────────────
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${pick.style.tagline} · $_lotteryName',
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w700,
+      clipBehavior: Clip.hardEdge,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 12, 8, 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Header row ─────────────────────────────────────
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _lotteryName,
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        dateStr,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withAlpha(110),
+                        const SizedBox(height: 2),
+                        Text(
+                          pick.displayLabel,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withAlpha(160),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: onDelete,
-                  icon: const Icon(Icons.delete_outline_rounded, size: 20),
-                  color: theme.colorScheme.onSurface.withAlpha(120),
-                  tooltip: 'Delete',
-                  visualDensity: VisualDensity.compact,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 10),
-
-            // ── Balls ───────────────────────────────────────────
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                ...pick.mainNumbers
-                    .map((n) => LottoBall(number: n, size: 38)),
-                ...bonusNums.map(
-                    (n) => LottoBall(number: n, isBonus: true, size: 38)),
-              ],
-            ),
-
-            const SizedBox(height: 10),
-
-            // ── Actions ─────────────────────────────────────────
-            Row(
-              children: [
-                TextButton.icon(
-                  onPressed: () => _copy(context),
-                  icon: const Icon(Icons.copy_rounded, size: 14),
-                  label: const Text('Copy'),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
-                    textStyle: const TextStyle(fontSize: 12),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                ),
-                Builder(
-                  builder: (btnCtx) => TextButton.icon(
-                    onPressed: () => _share(btnCtx),
-                    icon: const Icon(Icons.share_rounded, size: 14),
-                    label: const Text('Share'),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      textStyle: const TextStyle(fontSize: 12),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        const SizedBox(height: 2),
+                        Text(
+                          dateStr,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withAlpha(100),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  IconButton(
+                    onPressed: onDelete,
+                    icon: const Icon(Icons.delete_outline_rounded, size: 20),
+                    color: theme.colorScheme.onSurface.withAlpha(120),
+                    tooltip: 'Delete',
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 10),
+
+              // ── Balls ───────────────────────────────────────────
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  ...pick.mainNumbers
+                      .map((n) => LottoBall(number: n, size: 36)),
+                  ...bonusNums.map(
+                      (n) => LottoBall(number: n, isBonus: true, size: 36)),
+                ],
+              ),
+
+              const SizedBox(height: 10),
+
+              // ── Actions ─────────────────────────────────────────
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => _copy(context),
+                      icon: const Icon(Icons.copy_rounded, size: 14),
+                      label: const Text('Copy'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        textStyle: const TextStyle(fontSize: 12),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Builder(
+                      builder: (btnCtx) => OutlinedButton.icon(
+                        onPressed: () => _share(btnCtx),
+                        icon: const Icon(Icons.share_rounded, size: 14),
+                        label: const Text('Share'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          textStyle: const TextStyle(fontSize: 12),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onTap,
+                      icon: const Icon(Icons.upload_rounded, size: 14),
+                      label: const Text('Load'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        textStyle: const TextStyle(fontSize: 12),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

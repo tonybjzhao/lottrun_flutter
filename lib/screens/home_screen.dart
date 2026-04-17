@@ -234,10 +234,24 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const SavedPicksScreen()),
-            ),
+            onPressed: () async {
+              final loaded = await Navigator.push<GeneratedPick>(
+                context,
+                MaterialPageRoute(builder: (_) => const SavedPicksScreen()),
+              );
+              if (loaded != null && mounted) {
+                final lottery = kSeedLotteries.firstWhere(
+                  (l) => l.id == loaded.lotteryId,
+                  orElse: () => kSeedLotteries.first,
+                );
+                setState(() {
+                  _selectedLottery = lottery;
+                  _pick = loaded;
+                  _isSaved = true;
+                  _isPickExpanded = false;
+                });
+              }
+            },
             icon: const Icon(Icons.bookmark_rounded),
             tooltip: 'Saved Picks',
           ),
@@ -813,7 +827,29 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
 
   Future<void> _saveAll() async {
     HapticFeedback.lightImpact();
-    await Future.wait(_picks.map(LocalStorageService.instance.savePickToHistory));
+    if (_savedStates.every((s) => s)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Already saved'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    final labels = const ['⭐ Best AI Pick', '🔥 Hot Trend Pick', '🎲 Lucky Mix Pick'];
+    await Future.wait([
+      for (var i = 0; i < _picks.length; i++)
+        if (!_savedStates[i])
+          LocalStorageService.instance.savePickToHistory(GeneratedPick(
+            id: _picks[i].id,
+            lotteryId: _picks[i].lotteryId,
+            style: _picks[i].style,
+            mainNumbers: _picks[i].mainNumbers,
+            bonusNumbers: _picks[i].bonusNumbers,
+            createdAt: _picks[i].createdAt,
+            pickLabel: labels[i],
+          )),
+    ]);
     if (!mounted) return;
     setState(() => _savedStates = [true, true, true]);
     ScaffoldMessenger.of(context).showSnackBar(
@@ -941,7 +977,16 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
                     onSave: () async {
                       HapticFeedback.lightImpact();
                       final messenger = ScaffoldMessenger.of(context);
-                      await LocalStorageService.instance.savePickToHistory(_picks[i]);
+                      final label = const ['⭐ Best AI Pick', '🔥 Hot Trend Pick', '🎲 Lucky Mix Pick'][i];
+                      await LocalStorageService.instance.savePickToHistory(GeneratedPick(
+                        id: _picks[i].id,
+                        lotteryId: _picks[i].lotteryId,
+                        style: _picks[i].style,
+                        mainNumbers: _picks[i].mainNumbers,
+                        bonusNumbers: _picks[i].bonusNumbers,
+                        createdAt: _picks[i].createdAt,
+                        pickLabel: label,
+                      ));
                       if (!mounted) return;
                       setState(() => _savedStates[i] = true);
                       messenger.showSnackBar(
@@ -966,7 +1011,7 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: _savedStates.every((s) => s) ? null : _saveAll,
+                      onPressed: _saveAll,
                       icon: const Icon(Icons.bookmark_rounded, size: 18),
                       label: const Text('Save All'),
                       style: OutlinedButton.styleFrom(
@@ -1264,64 +1309,27 @@ class _MiniPickCardState extends State<_MiniPickCard> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           elevation: 1,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.label,
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            widget.microcopy,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withAlpha(110),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    TextButton.icon(
-                      onPressed: () => _copy(context),
-                      icon: const Icon(Icons.copy_rounded, size: 14),
-                      label: const Text('Copy'),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        textStyle: const TextStyle(fontSize: 12),
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                    ),
-                    Builder(
-                      builder: (btnCtx) => IconButton(
-                        onPressed: () => _shareCard(btnCtx),
-                        icon: const Icon(Icons.share_rounded, size: 18),
-                        tooltip: 'Share',
-                        visualDensity: VisualDensity.compact,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: widget.isSaved ? null : widget.onSave,
-                      icon: Icon(
-                        widget.isSaved ? Icons.bookmark : Icons.bookmark_outline_rounded,
-                        size: 18,
-                      ),
-                      tooltip: widget.isSaved ? 'Saved' : 'Save',
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ],
+                // ── Label + microcopy ───────────────────────────
+                Text(
+                  widget.label,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 2),
+                Text(
+                  widget.microcopy,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withAlpha(110),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // ── Balls ────────────────────────────────────────
                 Wrap(
                   spacing: 6,
                   runSpacing: 6,
@@ -1331,6 +1339,57 @@ class _MiniPickCardState extends State<_MiniPickCard> {
                     if (widget.pick.bonusNumbers != null)
                       ...widget.pick.bonusNumbers!.map(
                           (n) => LottoBall(number: n, isBonus: true, size: 38)),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                // ── Equal-weight actions ─────────────────────────
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _copy(context),
+                        icon: const Icon(Icons.copy_rounded, size: 14),
+                        label: const Text('Copy'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          textStyle: const TextStyle(fontSize: 12),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Builder(
+                        builder: (btnCtx) => OutlinedButton.icon(
+                          onPressed: () => _shareCard(btnCtx),
+                          icon: const Icon(Icons.share_rounded, size: 14),
+                          label: const Text('Share'),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            textStyle: const TextStyle(fontSize: 12),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: widget.isSaved ? null : widget.onSave,
+                        icon: Icon(
+                          widget.isSaved
+                              ? Icons.bookmark
+                              : Icons.bookmark_outline_rounded,
+                          size: 14,
+                        ),
+                        label: Text(widget.isSaved ? 'Saved ✓' : 'Save'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          textStyle: const TextStyle(fontSize: 12),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ],
