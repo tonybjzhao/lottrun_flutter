@@ -81,7 +81,9 @@ class GeneratedPick {
   final List<int> mainNumbers;
   final List<int>? bonusNumbers;
   final DateTime createdAt;
-  final String? pickLabel; // e.g. "⭐ Best AI Pick" — set when saved from 3-picks
+  final String? pickLabel;  // e.g. "⭐ Best AI Pick" — set when saved from 3-picks
+  final DateTime? drawDate; // UTC date of the targeted draw
+  final String? drawLabel;  // e.g. "Thu 17 Apr"
 
   GeneratedPick({
     String? id,
@@ -91,6 +93,8 @@ class GeneratedPick {
     this.bonusNumbers,
     required this.createdAt,
     this.pickLabel,
+    this.drawDate,
+    this.drawLabel,
   }) : id = id ?? '${createdAt.millisecondsSinceEpoch}_${lotteryId.hashCode.abs()}';
 
   String get countryCode {

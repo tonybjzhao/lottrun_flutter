@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery.dart';
+import '../models/lottery_draw.dart';
 import '../services/local_storage_service.dart';
 import '../services/lottery_service.dart';
+import '../services/pick_result_service.dart';
 import '../widgets/ball_row.dart';
 import '../widgets/pick_share_card.dart';
 
@@ -130,13 +132,37 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
     );
   }
 
+  List<GeneratedPick> _sortPicks(List<GeneratedPick> picks) {
+    final drawsCache = <String, List<LotteryDraw>>{};
+    int group(GeneratedPick p) {
+      final draws = drawsCache.putIfAbsent(
+          p.lotteryId, () => LotteryService.instance.getDraws(p.lotteryId));
+      final result = checkPickResult(p, draws);
+      if (result == null) return 2;        // legacy — no draw context
+      if (result.isPending) return 0;      // pending draw
+      return 1;                            // resolved
+    }
+
+    return [...picks]..sort((a, b) {
+      final ga = group(a);
+      final gb = group(b);
+      if (ga != gb) return ga.compareTo(gb);
+      if (ga == 0) {
+        // pending: sort soonest draw first
+        return a.drawDate!.compareTo(b.drawDate!);
+      }
+      // resolved + legacy: newest first
+      return b.createdAt.compareTo(a.createdAt);
+    });
+  }
+
   Widget _buildGroupedList(ThemeData theme) {
     final grouped = _groupByCountry();
     final sections = _countryOrder.where(grouped.containsKey).toList();
 
     final items = <Widget>[];
 
-    // "Newest first" indicator
+    // "Pending first" indicator
     items.add(Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       child: Row(
@@ -145,7 +171,7 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
               size: 13, color: theme.colorScheme.onSurface.withAlpha(100)),
           const SizedBox(width: 4),
           Text(
-            'Newest first',
+            'Pending draws first',
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurface.withAlpha(100),
             ),
@@ -155,7 +181,7 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
     ));
 
     for (final country in sections) {
-      final picks = grouped[country]!;
+      final picks = _sortPicks(grouped[country]!);
       items.add(_SectionHeader(
         flag: _countryFlag(country),
         name: _countryName(country),
@@ -243,6 +269,15 @@ class _PickItem extends StatefulWidget {
 
 class _PickItemState extends State<_PickItem> {
   final _shareCardKey = GlobalKey();
+  late final List<LotteryDraw> _draws;
+
+  @override
+  void initState() {
+    super.initState();
+    _draws = LotteryService.instance.getDraws(widget.pick.lotteryId);
+  }
+
+  PickMatchResult? get _result => checkPickResult(widget.pick, _draws);
 
   Lottery? get _lottery =>
       LotteryService.instance.getLotteryById(widget.pick.lotteryId);
@@ -278,6 +313,67 @@ class _PickItemState extends State<_PickItem> {
     HapticFeedback.lightImpact();
     await sharePickCard(repaintKey: _shareCardKey, btnContext: btnCtx);
   }
+
+  Widget _buildResultChip(ThemeData theme) {
+    final result = _result!;
+    if (result.isPending) {
+      final label = widget.pick.drawLabel != null
+          ? 'Pending · ${widget.pick.drawLabel}'
+          : 'Pending';
+      return _chip(
+        theme: theme,
+        icon: '⏳',
+        text: label,
+        bg: theme.colorScheme.surfaceContainerHighest,
+        fg: theme.colorScheme.onSurfaceVariant,
+        bold: false,
+      );
+    }
+    final summary = result.summary(widget.pick.lotteryId);
+    final isGood = result.matchedMain >= 3 || result.matchedBonus > 0;
+    return _chip(
+      theme: theme,
+      icon: isGood ? '🎯' : '📋',
+      text: summary,
+      bg: isGood
+          ? theme.colorScheme.primaryContainer
+          : theme.colorScheme.surfaceContainerHighest,
+      fg: isGood
+          ? theme.colorScheme.onPrimaryContainer
+          : theme.colorScheme.onSurfaceVariant,
+      bold: isGood,
+    );
+  }
+
+  Widget _chip({
+    required ThemeData theme,
+    required String icon,
+    required String text,
+    required Color bg,
+    required Color fg,
+    required bool bold,
+  }) =>
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 11)),
+            const SizedBox(width: 4),
+            Text(
+              text,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: fg,
+                fontWeight: bold ? FontWeight.w700 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -361,6 +457,12 @@ class _PickItemState extends State<_PickItem> {
                     ballSize: 36,
                     spacing: 6,
                   ),
+
+                  // ── Result chip ─────────────────────────────────────
+                  if (_result != null) ...[
+                    const SizedBox(height: 8),
+                    _buildResultChip(theme),
+                  ],
 
                   const SizedBox(height: 10),
 

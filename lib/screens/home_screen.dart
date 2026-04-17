@@ -10,6 +10,7 @@ import '../data/seed_lotteries.dart';
 import '../services/generator_service.dart';
 import '../services/lottery_service.dart';
 import '../services/analytics_service.dart';
+import '../services/draw_date_service.dart';
 import '../services/local_storage_service.dart';
 import '../widgets/disclaimer_card.dart';
 import '../widgets/lotto_ball.dart';
@@ -166,9 +167,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _savePick() async {
     if (_pick == null) return;
     HapticFeedback.lightImpact();
+    final pickToSave = GeneratedPick(
+      id: _pick!.id,
+      lotteryId: _pick!.lotteryId,
+      style: _pick!.style,
+      mainNumbers: _pick!.mainNumbers,
+      bonusNumbers: _pick!.bonusNumbers,
+      createdAt: _pick!.createdAt,
+      drawDate: nextDrawDate(_selectedLottery.id),
+      drawLabel: nextDrawLabel(_selectedLottery.id),
+    );
     await Future.wait([
-      LocalStorageService.instance.saveLastPick(_pick!),
-      LocalStorageService.instance.savePickToHistory(_pick!),
+      LocalStorageService.instance.saveLastPick(pickToSave),
+      LocalStorageService.instance.savePickToHistory(pickToSave),
     ]);
     unawaited(AnalyticsService.logNumbersSaved(
       lottery: _selectedLottery.id,
@@ -838,6 +849,8 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
       return;
     }
     final labels = const ['⭐ Best AI Pick', '🔥 Hot Trend Pick', '🎲 Lucky Mix Pick'];
+    final drawDate = nextDrawDate(widget.lottery.id);
+    final drawLabel = nextDrawLabel(widget.lottery.id);
     await Future.wait([
       for (var i = 0; i < _picks.length; i++)
         if (!_savedStates[i])
@@ -849,6 +862,8 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
             bonusNumbers: _picks[i].bonusNumbers,
             createdAt: _picks[i].createdAt,
             pickLabel: labels[i],
+            drawDate: drawDate,
+            drawLabel: drawLabel,
           )),
     ]);
     if (!mounted) return;
@@ -987,6 +1002,8 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
                         bonusNumbers: _picks[i].bonusNumbers,
                         createdAt: _picks[i].createdAt,
                         pickLabel: label,
+                        drawDate: nextDrawDate(widget.lottery.id),
+                        drawLabel: nextDrawLabel(widget.lottery.id),
                       ));
                       if (!mounted) return;
                       setState(() => _savedStates[i] = true);
