@@ -936,9 +936,13 @@ class _CompactPickBanner extends StatelessWidget {
     return 'My AI ${pick.style.tagline}\n$name: $main$bonus\nGenerated for fun — LottoRun AI 🎯';
   }
 
-  Future<void> _share() async {
+  Future<void> _share(BuildContext btnContext) async {
     HapticFeedback.lightImpact();
-    await Share.share(_buildShareText(null));
+    final box = btnContext.findRenderObject() as RenderBox?;
+    final origin = box == null
+        ? null
+        : box.localToGlobal(Offset.zero) & box.size;
+    await Share.share(_buildShareText(null), sharePositionOrigin: origin);
   }
 
   @override
@@ -981,14 +985,16 @@ class _CompactPickBanner extends StatelessWidget {
                         ),
                       ),
                     ),
-                    IconButton(
-                      onPressed: _share,
-                      icon: const Icon(Icons.share_rounded, size: 16),
-                      tooltip: 'Share pick',
-                      visualDensity: VisualDensity.compact,
-                      color: theme.colorScheme.onSurface.withAlpha(120),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                    Builder(
+                      builder: (btnCtx) => IconButton(
+                        onPressed: () => _share(btnCtx),
+                        icon: const Icon(Icons.share_rounded, size: 16),
+                        tooltip: 'Share pick',
+                        visualDensity: VisualDensity.compact,
+                        color: theme.colorScheme.onSurface.withAlpha(120),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
                     ),
                     const SizedBox(width: 2),
                     Icon(
@@ -1068,9 +1074,13 @@ class _MiniPickCard extends StatelessWidget {
     }
   }
 
-  Future<void> _share() async {
+  Future<void> _share(BuildContext btnContext) async {
     HapticFeedback.lightImpact();
-    await Share.share(_buildShareText());
+    final box = btnContext.findRenderObject() as RenderBox?;
+    final origin = box == null
+        ? null
+        : box.localToGlobal(Offset.zero) & box.size;
+    await Share.share(_buildShareText(), sharePositionOrigin: origin);
   }
 
   @override
@@ -1119,11 +1129,13 @@ class _MiniPickCard extends StatelessWidget {
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                 ),
-                IconButton(
-                  onPressed: _share,
-                  icon: const Icon(Icons.share_rounded, size: 18),
-                  tooltip: 'Share',
-                  visualDensity: VisualDensity.compact,
+                Builder(
+                  builder: (btnCtx) => IconButton(
+                    onPressed: () => _share(btnCtx),
+                    icon: const Icon(Icons.share_rounded, size: 18),
+                    tooltip: 'Share',
+                    visualDensity: VisualDensity.compact,
+                  ),
                 ),
               ],
             ),
