@@ -78,15 +78,21 @@ class _ResultPanelState extends State<ResultPanel>
 
   String _buildCopyText() {
     final main = widget.pick.mainNumbers.join('  ');
-    final lines = <String>[
-      '${widget.pick.style.label} · ${widget.lottery.name}',
-      main,
-      if (widget.pick.bonusNumbers != null && widget.pick.bonusNumbers!.isNotEmpty)
-        'Powerball: ${widget.pick.bonusNumbers!.join(' ')}',
-      'Generated for fun — LottoRun AI',
-    ];
-    return lines.join('\n');
+    final bonusLine =
+        (widget.pick.bonusNumbers != null && widget.pick.bonusNumbers!.isNotEmpty)
+            ? '\n+ ${_bonusLabel()}: ${widget.pick.bonusNumbers!.join(' ')}'
+            : '';
+    return '🎯 My AI ${widget.lottery.name} Pick\n'
+        '${widget.pick.style.tagline}\n\n'
+        '$main$bonusLine\n\n'
+        'Generated for fun — LottoRun AI';
   }
+
+  String _bonusLabel() => switch (widget.lottery.id) {
+        'us_powerball' => 'Powerball',
+        'us_megamillions' => 'Mega Ball',
+        _ => 'Bonus',
+      };
 
   Future<void> _copy(BuildContext context) async {
     HapticFeedback.lightImpact();
