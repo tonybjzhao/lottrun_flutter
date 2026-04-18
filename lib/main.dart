@@ -16,7 +16,7 @@ Future<void> main() async {
   unawaited(NotificationService.instance.init());
   AnalyticsService.init(_initFirebase());
   if (Platform.isIOS) await _requestTrackingPermission();
-  unawaited(_initAds());
+  await _initAds();
   runApp(const LottFunApp());
 }
 
