@@ -21,20 +21,12 @@ HEADERS = {
     ),
 }
 
-CSV_HEADER = [
-    "lottery_id",
-    "draw_date",
-    "draw_number",
-    "main_1",
-    "main_2",
-    "main_3",
-    "main_4",
-    "main_5",
-    "main_6",
-    "main_7",
-    "supp_1",
-    "supp_2",
-]
+def csv_header(game: GameConfig) -> list[str]:
+    return (
+        ["lottery_id", "draw_date", "draw_number"]
+        + [f"main_{i}" for i in range(1, game.main_count + 1)]
+        + [f"supp_{i}" for i in range(1, game.supp_count + 1)]
+    )
 
 
 @dataclass(frozen=True)
@@ -68,7 +60,7 @@ GAMES = [
         dart_file="lib/data/seed_oz_lotto.dart",
         dart_symbol="kOzLottoDraws",
         main_count=7,
-        supp_count=2,
+        supp_count=3,
     ),
     GameConfig(
         lottery_id="au_saturday",
@@ -137,10 +129,12 @@ def parse_draw(url: str, game: GameConfig) -> dict | None:
     html = fetch(url)
     soup = BeautifulSoup(html, "html.parser")
     ball_text = [item.get_text(strip=True) for item in soup.select("ul.balls li.ball")]
-    if len(ball_text) < game.main_count + game.supp_count:
+    if len(ball_text) < game.main_count + 1:
         return None
 
-    values = [int(value) for value in ball_text[: game.main_count + game.supp_count]]
+    available_supps = min(len(ball_text) - game.main_count, game.supp_count)
+    total = game.main_count + available_supps
+    values = [int(value) for value in ball_text[:total]]
     date_match = re.search(r"/results/(\d{2})-(\d{2})-(\d{4})", url)
     if not date_match:
         return None
@@ -192,17 +186,17 @@ def write_csv(game: GameConfig, rows: list[dict]) -> None:
 
     with open(game.output_csv, "w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
-        writer.writerow(CSV_HEADER)
+        writer.writerow(csv_header(game))
         for row in rows:
-            main = row["main_numbers"] + [""] * (7 - len(row["main_numbers"]))
-            supp = row["supp_numbers"] + [""] * (2 - len(row["supp_numbers"]))
+            main = row["main_numbers"] + [""] * (game.main_count - len(row["main_numbers"]))
+            supp = row["supp_numbers"] + [""] * (game.supp_count - len(row["supp_numbers"]))
             writer.writerow(
                 [
                     row["lottery_id"],
                     row["draw_date"],
                     row["draw_number"] or "",
-                    *main[:7],
-                    *supp[:2],
+                    *main,
+                    *supp,
                 ]
             )
 
@@ -219,8 +213,8 @@ def read_csv_rows(game: GameConfig) -> list[dict]:
             ]
             supp_numbers = [
                 int(item[f"supp_{index}"])
-                for index in range(1, 3)
-                if item[f"supp_{index}"]
+                for index in range(1, game.supp_count + 1)
+                if item.get(f"supp_{index}", "").strip()
             ]
             rows.append(
                 {

@@ -315,8 +315,9 @@ def search_one_draw(page, game: GameConfig, d: date) -> Optional[dict]:
         print(f"[WARN] No balls found for {game.name} {d}")
         return None
 
-    required = game.main_count + game.supp_count
-    if len(ball_values) < required:
+    # Require at least main + 1 supp; take however many supps are available up to supp_count.
+    # Oz Lotto changed format over time (2→3 supps), so older draws may have fewer.
+    if len(ball_values) < game.main_count + 1:
         return None
 
     title = page.title()
@@ -326,14 +327,16 @@ def search_one_draw(page, game: GameConfig, d: date) -> Optional[dict]:
         print(f"[WARN] Missing draw number for {game.name} {d}")
         return None
 
-    numbers = [int(value) for value in ball_values[:required]]
+    available_supps = min(len(ball_values) - game.main_count, game.supp_count)
+    total = game.main_count + available_supps
+    numbers = [int(value) for value in ball_values[:total]]
 
     return {
         "game": game.name,
         "draw_date": d.isoformat(),
         "draw_number": draw_number,
         "main_numbers": numbers[: game.main_count],
-        "supp_numbers": numbers[game.main_count : required],
+        "supp_numbers": numbers[game.main_count : total],
     }
 
 
