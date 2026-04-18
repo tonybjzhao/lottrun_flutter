@@ -309,7 +309,6 @@ class _DrawTile extends StatelessWidget {
 
   static const _ballSize = 30.0;
   static const _ballSpacing = 5.0;
-  static const _rowSplit = 5; // first N main numbers on row 1
 
   Widget _ballRow(List<int> numbers, {bool bonus = false}) {
     return Row(
@@ -326,8 +325,9 @@ class _DrawTile extends StatelessWidget {
     final theme = Theme.of(context);
     final dateStr = DateFormat('d MMM yy').format(draw.drawDate);
 
-    final row1 = draw.mainNumbers.take(_rowSplit).toList();
-    final row2 = draw.mainNumbers.skip(_rowSplit).toList();
+    // All main numbers on row 1, bonus/supps on row 2.
+    final row1 = draw.mainNumbers;
+    const row2 = <int>[];
     final bonus = draw.bonusNumbers ?? [];
 
     return Padding(

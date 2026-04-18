@@ -22,7 +22,7 @@ const List<Lottery> kSeedLotteries = [
     mainCount: 7,
     mainMin: 1,
     mainMax: 47,
-    bonusCount: 2,
+    bonusCount: 3,
     bonusMin: 1,
     bonusMax: 47,
   ),
