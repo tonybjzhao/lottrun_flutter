@@ -59,15 +59,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   ];
   static const _kThreePicksWindows = [100, 60, 30];
   static const _kThreePicksLabels = [
-    '⭐ Best Pick',
-    '🔥 Hot Trend',
-    '🎲 Lucky Mix',
+    '⭐ Your Best Pick Today',
+    '🔥 Hot Right Now',
+    '🎲 Lucky Surprise',
   ];
   static const _kThreePicksBadges = ['Balanced', 'Hot', 'Random'];
   static const _kThreePicksMicrocopy = [
-    'Balanced for even spread',
-    'Weighted toward recent trends',
-    'Pure randomness for surprise',
+    'Most promising today 👀',
+    'These numbers are on fire 🔥',
+    'You never know… 🍀',
+  ];
+  static const _kThreePicksColors = [
+    Color(0xFFF59E0B), // amber  — Best Pick
+    Color(0xFFEA580C), // orange — Hot
+    Color(0xFF7C3AED), // purple — Lucky
   ];
 
   @override
@@ -581,7 +586,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       label: Text(
                         _isThreePicksLoading
                             ? 'Generating…'
-                            : '✨ Generate 3 Smart Picks',
+                            : '🎲 Try My Luck (3 Picks)',
                         style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w700),
                       ),
@@ -603,6 +608,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       color: theme.colorScheme.onSurface.withAlpha(110),
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '✨ 1 in 5 users matched at least 2 numbers last week',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontSize: 12,
+                      color: theme.colorScheme.primary.withAlpha(160),
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -616,6 +630,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 labels: _kThreePicksLabels,
                 badges: _kThreePicksBadges,
                 microcopy: _kThreePicksMicrocopy,
+                colors: _kThreePicksColors,
                 lottery: _selectedLottery,
                 shareKeys: _threePicksShareKeys,
                 savedStates: _threePicksSaved,
@@ -747,11 +762,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
 // ── Three picks inline result ─────────────────────────────────────────────────
 
-class _ThreePicksInline extends StatelessWidget {
+class _ThreePicksInline extends StatefulWidget {
   final List<GeneratedPick> picks;
   final List<String> labels;
   final List<String> badges;
   final List<String> microcopy;
+  final List<Color> colors;
   final Lottery lottery;
   final List<GlobalKey> shareKeys;
   final List<bool> savedStates;
@@ -763,6 +779,7 @@ class _ThreePicksInline extends StatelessWidget {
     required this.labels,
     required this.badges,
     required this.microcopy,
+    required this.colors,
     required this.lottery,
     required this.shareKeys,
     required this.savedStates,
@@ -771,29 +788,72 @@ class _ThreePicksInline extends StatelessWidget {
   });
 
   @override
+  State<_ThreePicksInline> createState() => _ThreePicksInlineState();
+}
+
+class _ThreePicksInlineState extends State<_ThreePicksInline>
+    with TickerProviderStateMixin {
+  late AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 850),
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  Animation<double> _cardAnim(int index) {
+    final start = index * 0.22;
+    return CurvedAnimation(
+      parent: _ctrl,
+      curve: Interval(start, (start + 0.55).clamp(0.0, 1.0),
+          curve: Curves.easeOutBack),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        for (var i = 0; i < picks.length; i++) ...[
-          _InlinePickCard(
-            pick: picks[i],
-            label: labels[i],
-            badge: badges[i],
-            microcopy: microcopy[i],
-            lottery: lottery,
-            shareCardKey: shareKeys[i],
-            isSaved: savedStates[i],
-            onSave: () => onSave(i),
+        for (var i = 0; i < widget.picks.length; i++) ...[
+          AnimatedBuilder(
+            animation: _cardAnim(i),
+            builder: (_, child) => Opacity(
+              opacity: _cardAnim(i).value.clamp(0.0, 1.0),
+              child: Transform.translate(
+                offset: Offset(0, 22 * (1 - _cardAnim(i).value)),
+                child: child,
+              ),
+            ),
+            child: _InlinePickCard(
+              pick: widget.picks[i],
+              label: widget.labels[i],
+              badge: widget.badges[i],
+              microcopy: widget.microcopy[i],
+              accentColor: widget.colors[i],
+              lottery: widget.lottery,
+              shareCardKey: widget.shareKeys[i],
+              isSaved: widget.savedStates[i],
+              onSave: () => widget.onSave(i),
+            ),
           ),
-          if (i < picks.length - 1) const SizedBox(height: 12),
+          if (i < widget.picks.length - 1) const SizedBox(height: 12),
         ],
         const SizedBox(height: 14),
         Row(
           children: [
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: onSaveAll,
+                onPressed: widget.onSaveAll,
                 icon: const Icon(Icons.bookmark_rounded, size: 18),
                 label: const Text('Save All'),
                 style: OutlinedButton.styleFrom(
@@ -807,8 +867,8 @@ class _ThreePicksInline extends StatelessWidget {
             Expanded(
               child: Builder(
                 builder: (btnCtx) => FilledButton.icon(
-                  onPressed: () =>
-                      sharePickCards(repaintKeys: shareKeys, btnContext: btnCtx),
+                  onPressed: () => sharePickCards(
+                      repaintKeys: widget.shareKeys, btnContext: btnCtx),
                   icon: const Icon(Icons.share_rounded, size: 18),
                   label: const Text('Share All'),
                   style: FilledButton.styleFrom(
@@ -833,6 +893,7 @@ class _InlinePickCard extends StatelessWidget {
   final String label;
   final String badge;
   final String microcopy;
+  final Color accentColor;
   final Lottery lottery;
   final GlobalKey shareCardKey;
   final bool isSaved;
@@ -843,6 +904,7 @@ class _InlinePickCard extends StatelessWidget {
     required this.label,
     required this.badge,
     required this.microcopy,
+    required this.accentColor,
     required this.lottery,
     required this.shareCardKey,
     required this.isSaved,
@@ -898,11 +960,16 @@ class _InlinePickCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: theme.cardColor,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: Colors.black.withAlpha(13)),
+            border: Border(
+              left: BorderSide(color: accentColor, width: 4),
+              top: BorderSide(color: Colors.black.withAlpha(13)),
+              right: BorderSide(color: Colors.black.withAlpha(13)),
+              bottom: BorderSide(color: Colors.black.withAlpha(13)),
+            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withAlpha(10),
-                blurRadius: 12,
+                color: accentColor.withAlpha(25),
+                blurRadius: 14,
                 offset: const Offset(0, 5),
               ),
             ],
@@ -919,7 +986,7 @@ class _InlinePickCard extends StatelessWidget {
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: theme.colorScheme.primary,
+                        color: accentColor,
                       ),
                     ),
                   ),
@@ -928,14 +995,14 @@ class _InlinePickCard extends StatelessWidget {
                         horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(999),
-                      color: theme.colorScheme.primaryContainer.withAlpha(180),
+                      color: accentColor.withAlpha(30),
                     ),
                     child: Text(
                       badge,
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.onPrimaryContainer,
+                        color: accentColor,
                       ),
                     ),
                   ),
