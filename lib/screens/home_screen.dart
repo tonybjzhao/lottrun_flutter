@@ -771,9 +771,9 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
   List<bool> _savedStates = [false, false, false];
   final List<GlobalKey> _shareKeys = List.generate(3, (_) => GlobalKey());
 
-  /// Use different history windows per pick so each pick has a different
-  /// frequency distribution → naturally diverse results.
-  static const _historyWindows = [30, 60, 100];
+  /// Fixed styles per slot: Best AI = balanced, Hot Trend = hot, Lucky Mix = random.
+  static const _pickStyles = [PlayStyle.balanced, PlayStyle.hot, PlayStyle.random];
+  static const _historyWindows = [100, 60, 30];
 
   @override
   void initState() {
@@ -786,7 +786,7 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
     _animController.forward();
     unawaited(AnalyticsService.logGenerateNumbers(
       lottery: widget.lottery.id,
-      strategy: widget.style.analyticsName,
+      strategy: 'three_picks',
       pickCount: 3,
       source: 'three_picks',
     ));
@@ -804,7 +804,7 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
           .getRecentDraws(widget.lottery.id, limit: _historyWindows[i]);
       return GeneratorService.instance.generate(
         lottery: widget.lottery,
-        style: widget.style,
+        style: _pickStyles[i],
         history: history,
       );
     });
@@ -851,7 +851,7 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
     });
     unawaited(AnalyticsService.logGenerateNumbers(
       lottery: widget.lottery.id,
-      strategy: widget.style.analyticsName,
+      strategy: 'three_picks',
       pickCount: 3,
       source: 'three_picks',
     ));
@@ -947,7 +947,7 @@ class _ThreePicksSheetState extends State<_ThreePicksSheet>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '3 Picks · ${widget.style.label} · ${widget.lottery.name}',
+                        '3 Smart Picks · ${widget.lottery.name}',
                         style: theme.textTheme.titleSmall
                             ?.copyWith(fontWeight: FontWeight.w700),
                       ),
