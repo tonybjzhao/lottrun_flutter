@@ -56,7 +56,7 @@ class PickShareCard extends StatelessWidget {
   }
 }
 
-// ── Result share card ─────────────────────────────────────────────────────────
+// ── Result share card (V2 — viral optimised) ──────────────────────────────────
 
 class _ResultShareCard extends StatelessWidget {
   final GeneratedPick pick;
@@ -71,42 +71,44 @@ class _ResultShareCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isSupp     = lottery.bonusIsSupplementary;
-    final matchMain  = result.matchedMain;
-    final suppHits   = result.suppCategoryHits(lottery);
-    final total      = matchMain + (isSupp ? suppHits : result.matchedBonus);
-    final variant    = _variantFor(total);
-    final score      = result.score;
-    final beatPct    = _beatPercent(score);
+    final isSupp    = lottery.bonusIsSupplementary;
+    final matchMain = result.matchedMain;
+    final suppHits  = result.suppCategoryHits(lottery);
+    final total     = matchMain + (isSupp ? suppHits : result.matchedBonus);
+    final variant   = _variantFor(total);
+    final beatPct   = _beatPercent(result.score);
 
-    final drawMain   = result.drawMainNumbers;
-    final drawSupp   = result.drawBonusNumbers ?? [];
-    final userMain   = pick.mainNumbers;
+    final drawMain  = result.drawMainNumbers;
+    final drawSupp  = result.drawBonusNumbers ?? [];
+    final userMain  = pick.mainNumbers;
 
     final matchedMainSet = result.matchedMainNumbers.toSet();
     final matchedSuppSet = result.matchedMainInDrawSupp.toSet();
 
-    // ── Variant config ─────────────────────────────────────────────────────
-    final String headline;
-    final String subline;
+    // ── Variant copy ───────────────────────────────────────────────────────
     final String emoji;
+    final String headline;
+    final String tensionLine; // short punchy line under headline
+    final String matchLine;   // factual match description
 
     switch (variant) {
       case _Variant.almostWin:
-        headline = 'So close!';
-        subline  = _matchDesc(matchMain, suppHits, isSupp, result.matchedBonus, lottery);
-        emoji    = '🔥';
+        emoji       = '🔥';
+        headline    = 'SO CLOSE!';
+        tensionLine = _tensionLine(matchMain, suppHits, isSupp, lottery);
+        matchLine   = _matchDesc(matchMain, suppHits, isSupp, result.matchedBonus, lottery);
       case _Variant.goodHit:
-        headline = 'Nice hit!';
-        subline  = 'You hit $total number${total == 1 ? '' : 's'}';
-        emoji    = '🎯';
+        emoji       = '🎯';
+        headline    = 'Not bad!';
+        tensionLine = '$total number${total == 1 ? '' : 's'} matched — keep going! 🎯';
+        matchLine   = _matchDesc(matchMain, suppHits, isSupp, result.matchedBonus, lottery);
       case _Variant.miss:
-        headline = 'Oops!';
-        subline  = 'Better luck next time 😊';
-        emoji    = '😆';
+        emoji       = '😂';
+        headline    = 'Well… not today';
+        tensionLine = '0 matched — but still playing! 🎊';
+        matchLine   = 'Still luckier than ${100 - beatPct}% of players 😂';
     }
 
-    // Purple gradient — consistent across all variants
     const bgTop    = Color(0xFF2D0B6B);
     const bgBottom = Color(0xFF4A1A8C);
 
@@ -124,107 +126,88 @@ class _ResultShareCard extends StatelessWidget {
         clipBehavior: Clip.hardEdge,
         child: Stack(
           children: [
-            // ── Background glow ──────────────────────────────────────────────
+            // Background glows
             Positioned(
-              top: -40,
-              left: -20,
+              top: -40, left: -20,
               child: Container(
-                width: 200,
-                height: 200,
+                width: 220, height: 220,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
-                    colors: [Color(0x55FFD700), Colors.transparent],
+                    colors: [Color(0x66FFD700), Colors.transparent],
                   ),
                 ),
               ),
             ),
             Positioned(
-              top: -20,
-              right: -30,
+              top: -30, right: -30,
               child: Container(
-                width: 160,
-                height: 160,
+                width: 180, height: 180,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
-                    colors: [Color(0x44AA44FF), Colors.transparent],
+                    colors: [Color(0x44BB44FF), Colors.transparent],
                   ),
                 ),
               ),
             ),
-            // ── Confetti particles (static) ──────────────────────────────────
+            // Confetti
             ..._confettiParticles(),
 
-            // ── Content ──────────────────────────────────────────────────────
+            // Content
             Padding(
-              padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
+              padding: const EdgeInsets.fromLTRB(22, 20, 22, 24),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Top bar: flag + lottery name | LottoRun AI
-                  _topBar(lottery),
-                  const SizedBox(height: 16),
+                  // ── Top bar ─────────────────────────────────────────────
+                  _topBar(),
+                  const SizedBox(height: 18),
 
-                  // Headline
-                  Text(
-                    emoji,
-                    style: const TextStyle(fontSize: 36),
-                  ),
-                  const SizedBox(height: 4),
+                  // ── Emotion block ────────────────────────────────────────
+                  Text(emoji, style: const TextStyle(fontSize: 40)),
+                  const SizedBox(height: 6),
                   Text(
                     headline,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 28,
+                      fontSize: 32,
                       fontWeight: FontWeight.w900,
                       letterSpacing: -0.5,
+                      height: 1.0,
                     ),
+                    textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 8),
                   Text(
-                    subline,
+                    tensionLine,
                     style: const TextStyle(
                       color: Colors.white70,
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
                     textAlign: TextAlign.center,
                   ),
 
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 20),
 
-                  // User pick balls (color-coded)
+                  // ── User pick balls — bigger, no legend ──────────────────
                   _userBallRow(userMain, matchedMainSet, matchedSuppSet),
-                  const SizedBox(height: 10),
-                  _legend(),
-
-                  const SizedBox(height: 16),
-                  Container(height: 1, color: Colors.white24),
-                  const SizedBox(height: 14),
-
-                  // Draw result
-                  const Text(
-                    'Draw result',
-                    style: TextStyle(
-                      color: Color(0xFFBBAAFF),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  _drawBallRow(drawMain, drawSupp, isSupp),
 
                   const SizedBox(height: 20),
 
-                  // Bottom motivation card
-                  _motivationCard(variant, beatPct, total),
+                  // ── Draw balls — no label, no divider ────────────────────
+                  _drawBallRow(drawMain, drawSupp, isSupp),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 22),
 
-                  // Footer
+                  // ── Punchy bottom card ───────────────────────────────────
+                  _bottomCard(variant, beatPct, matchLine),
+
+                  const SizedBox(height: 18),
+
+                  // ── Minimal footer ───────────────────────────────────────
                   _footer(),
                 ],
               ),
@@ -237,68 +220,57 @@ class _ResultShareCard extends StatelessWidget {
 
   // ── Top bar ───────────────────────────────────────────────────────────────
 
-  Widget _topBar(Lottery lottery) {
+  Widget _topBar() {
     final flag = switch (lottery.countryCode) {
       'AU' => '🇦🇺',
       'US' => '🇺🇸',
       _    => '🌍',
     };
+    final name = _lotteryShortName(lottery.name);
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '$flag ${_lotteryShortName(lottery.name)}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
+        Text(
+          '$flag  $name',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            height: 1.3,
+          ),
         ),
+        const Spacer(),
         const Text(
           'LottoRun AI',
-          style: TextStyle(
-            color: Colors.white70,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.w600),
         ),
       ],
     );
   }
 
   String _lotteryShortName(String name) {
-    // Break long names onto two implied lines via newline label
     if (name.contains('Saturday')) return 'Saturday\nLotto';
-    if (name.contains('Oz')) return 'Oz Lotto';
-    if (name.contains('Powerball')) return 'Powerball';
-    if (name.contains('Mega')) return 'Mega Millions';
+    if (name.contains('Oz'))       return 'Oz Lotto';
+    if (name.contains('Powerball'))return 'Powerball';
+    if (name.contains('Mega'))     return 'Mega Millions';
     return name;
   }
 
-  // ── User pick balls ───────────────────────────────────────────────────────
+  // ── User pick balls (+15% size, no legend) ────────────────────────────────
 
-  Widget _userBallRow(
-    List<int> nums,
-    Set<int> matchedMain,
-    Set<int> matchedSupp,
-  ) {
+  Widget _userBallRow(List<int> nums, Set<int> mainSet, Set<int> suppSet) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         for (var i = 0; i < nums.length; i++) ...[
           _ball(
             nums[i],
-            matchedMain.contains(nums[i])
+            mainSet.contains(nums[i])
                 ? _BallKind.mainHit
-                : matchedSupp.contains(nums[i])
+                : suppSet.contains(nums[i])
                     ? _BallKind.suppHit
                     : _BallKind.miss,
-            size: 44,
+            size: 50, // was 44 → +15%
           ),
           if (i < nums.length - 1) const SizedBox(width: 6),
         ],
@@ -306,35 +278,7 @@ class _ResultShareCard extends StatelessWidget {
     );
   }
 
-  // ── Legend ────────────────────────────────────────────────────────────────
-
-  Widget _legend() {
-    const style = TextStyle(color: Colors.white60, fontSize: 10);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _dot(const Color(0xFFE53935)),
-        const SizedBox(width: 4),
-        const Text('main match', style: style),
-        const SizedBox(width: 12),
-        _dot(const Color(0xFF1A5FA8)),
-        const SizedBox(width: 4),
-        const Text('supp match', style: style),
-        const SizedBox(width: 12),
-        _dot(const Color(0xFFBDBDBD)),
-        const SizedBox(width: 4),
-        const Text('no match', style: style),
-      ],
-    );
-  }
-
-  Widget _dot(Color c) => Container(
-        width: 8,
-        height: 8,
-        decoration: BoxDecoration(shape: BoxShape.circle, color: c),
-      );
-
-  // ── Draw result balls ─────────────────────────────────────────────────────
+  // ── Draw result balls (no label, bigger) ──────────────────────────────────
 
   Widget _drawBallRow(List<int> main, List<int> supp, bool isSupp) {
     return Column(
@@ -343,7 +287,7 @@ class _ResultShareCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             for (var i = 0; i < main.length; i++) ...[
-              _ball(main[i], _BallKind.drawMain, size: 40),
+              _ball(main[i], _BallKind.drawMain, size: 46), // was 40
               if (i < main.length - 1) const SizedBox(width: 5),
             ],
           ],
@@ -353,10 +297,12 @@ class _ResultShareCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('+', style: TextStyle(color: Colors.white54, fontSize: 16, fontWeight: FontWeight.w700)),
+              const Text('+',
+                  style: TextStyle(
+                      color: Colors.white54, fontSize: 18, fontWeight: FontWeight.w700)),
               const SizedBox(width: 8),
               for (var i = 0; i < supp.length; i++) ...[
-                _ball(supp[i], _BallKind.drawSupp, size: 34),
+                _ball(supp[i], _BallKind.drawSupp, size: 40), // was 34
                 if (i < supp.length - 1) const SizedBox(width: 5),
               ],
             ],
@@ -366,39 +312,41 @@ class _ResultShareCard extends StatelessWidget {
     );
   }
 
-  // ── Motivation card ───────────────────────────────────────────────────────
+  // ── Bottom card — punchy, no UI noise ────────────────────────────────────
 
-  Widget _motivationCard(_Variant variant, int beatPct, int total) {
+  Widget _bottomCard(_Variant variant, int beatPct, String matchLine) {
     switch (variant) {
       case _Variant.almostWin:
         return Container(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(16),
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('🪙', style: TextStyle(fontSize: 28)),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'You beat $beatPct% of players!',
-                      style: const TextStyle(
-                        color: Color(0xFF2D0B6B),
-                        fontWeight: FontWeight.w800,
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    const Text(
-                      'Every number brings you closer\nto your dream ✨',
-                      style: TextStyle(color: Color(0xFF555555), fontSize: 11),
-                    ),
-                  ],
+              Text(
+                'You beat $beatPct% of players 🎯',
+                style: const TextStyle(
+                  color: Color(0xFF2D0B6B),
+                  fontWeight: FontWeight.w900,
+                  fontSize: 15,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                matchLine,
+                style: const TextStyle(color: Color(0xFF555555), fontSize: 12),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Can you beat this? 👀',
+                style: TextStyle(
+                  color: Color(0xFF7B2FBE),
+                  fontWeight: FontWeight.w800,
+                  fontSize: 13,
                 ),
               ),
             ],
@@ -407,34 +355,35 @@ class _ResultShareCard extends StatelessWidget {
 
       case _Variant.goodHit:
         return Container(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(16),
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('🏆', style: TextStyle(fontSize: 28)),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Great pick!\nKeep it going!',
-                      style: TextStyle(
-                        color: Color(0xFF2D0B6B),
-                        fontWeight: FontWeight.w800,
-                        fontSize: 13,
-                        height: 1.3,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    const Text(
-                      'Consistency today,\nbig win tomorrow 💪',
-                      style: TextStyle(color: Color(0xFF555555), fontSize: 11),
-                    ),
-                  ],
+              Text(
+                'Better than $beatPct% of players! 🎯',
+                style: const TextStyle(
+                  color: Color(0xFF2D0B6B),
+                  fontWeight: FontWeight.w900,
+                  fontSize: 15,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                matchLine,
+                style: const TextStyle(color: Color(0xFF555555), fontSize: 12),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Can you beat this? 👀',
+                style: TextStyle(
+                  color: Color(0xFF7B2FBE),
+                  fontWeight: FontWeight.w800,
+                  fontSize: 13,
                 ),
               ),
             ],
@@ -443,40 +392,37 @@ class _ResultShareCard extends StatelessWidget {
 
       case _Variant.miss:
         return Container(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFF9C4), // sticky-note yellow
-            borderRadius: BorderRadius.circular(14),
+            color: const Color(0xFFFFF9C4),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: const Color(0xFFFFEE58), width: 1.5),
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'Today: practice',
-                      style: TextStyle(
-                        color: Color(0xFF333333),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                      ),
-                    ),
-                    Text(
-                      'Tomorrow: jackpot!',
-                      style: TextStyle(
-                        color: Color(0xFF333333),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      '🙂',
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ],
+              const Text(
+                'Today: practice\nTomorrow: jackpot! 🙂',
+                style: TextStyle(
+                  color: Color(0xFF333333),
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                matchLine,
+                style: const TextStyle(color: Color(0xFF666666), fontSize: 12),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Can you beat this? 👀',
+                style: TextStyle(
+                  color: Color(0xFF7B2FBE),
+                  fontWeight: FontWeight.w800,
+                  fontSize: 13,
                 ),
               ),
             ],
@@ -485,11 +431,11 @@ class _ResultShareCard extends StatelessWidget {
     }
   }
 
-  // ── Footer ────────────────────────────────────────────────────────────────
+  // ── Footer — minimal ──────────────────────────────────────────────────────
 
   Widget _footer() {
-    return Column(
-      children: const [
+    return const Column(
+      children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -497,23 +443,19 @@ class _ResultShareCard extends StatelessWidget {
             SizedBox(width: 6),
             Text(
               'LottoRun AI',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: 13,
-              ),
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13),
             ),
           ],
         ),
         SizedBox(height: 3),
         Text(
-          'Smart picks from real draw history',
-          style: TextStyle(color: Colors.white54, fontSize: 10),
+          'Try your luck 🍀',
+          style: TextStyle(color: Colors.white54, fontSize: 11),
         ),
-        SizedBox(height: 6),
+        SizedBox(height: 8),
         Text(
           '💜  Play responsibly. It\'s all about the fun.',
-          style: TextStyle(color: Colors.white38, fontSize: 9),
+          style: TextStyle(color: Colors.white30, fontSize: 9),
         ),
       ],
     );
@@ -616,6 +558,17 @@ List<Widget> _confettiParticles() {
       ),
     );
   }).toList();
+}
+
+// ── Tension line helper ───────────────────────────────────────────────────────
+
+String _tensionLine(int matchMain, int suppHits, bool isSupp, Lottery lottery) {
+  final away = lottery.mainCount - matchMain;
+  if (suppHits > 0 && matchMain > 0) {
+    return '$matchMain main + $suppHits supp — so close! 👀';
+  }
+  if (away == 1) return 'Just 1 number away from something BIG 👀';
+  return 'Only $away numbers away from something big 👀';
 }
 
 // ── Match description helper ──────────────────────────────────────────────────
