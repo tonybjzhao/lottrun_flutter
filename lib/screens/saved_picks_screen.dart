@@ -615,11 +615,20 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
     }
 
     final ctrl = _revealCtrl;
-    final matchedMain = result.matchedMainNumbers.toSet();
-    final matchedBonus = result.matchedBonusNumbers.toSet();
-    final totalMatched = result.matchedMainNumbers.length + result.matchedBonusNumbers.length;
+    final lottery = _lottery;
 
-    // Dim animation: non-matched balls fade to 0.4 over first 35% of ctrl
+    // A main-row pick number is "matched" if it hit either draw.main OR draw.supp
+    final matchedMainSet = {
+      ...result.matchedMainNumbers,
+      ...result.matchedMainInDrawSupp,
+    };
+    // A bonus-row pick number is "matched" if it hit either draw.bonus OR draw.main
+    final matchedBonusSet = {
+      ...result.matchedBonusNumbers,
+      ...result.matchedBonusInDrawMain,
+    };
+    final totalMatched = matchedMainSet.length + matchedBonusSet.length;
+
     final dimAnim = ctrl != null
         ? CurvedAnimation(
             parent: ctrl,
@@ -627,7 +636,6 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
           )
         : null;
 
-    // Staggered bounce per matched ball
     int matchIdx = 0;
     Animation<double> nextMatchAnim() {
       final i = matchIdx++;
@@ -640,9 +648,9 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
       );
     }
 
-    Widget wrappedBall(int n, bool isBonus) {
-      final isMatched = isBonus ? matchedBonus.contains(n) : matchedMain.contains(n);
-      final ball = LottoBall(number: n, isBonus: isBonus, isMatched: isMatched, size: 36);
+    Widget wrappedBall(int n, bool isBonus, {double size = 36}) {
+      final isMatched = isBonus ? matchedBonusSet.contains(n) : matchedMainSet.contains(n);
+      final ball = LottoBall(number: n, isBonus: isBonus, isMatched: isMatched, size: size);
       if (ctrl == null) return ball;
       if (isMatched) {
         final anim = nextMatchAnim();
@@ -666,7 +674,8 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
 
     final mainNums = widget.pick.mainNumbers;
     final bonusNums = widget.pick.bonusNumbers ?? [];
-    final bLabel = _lottery?.bonusLabel;
+    final isSupp = lottery?.bonusIsSupplementary ?? false;
+    final bLabel = lottery?.bonusLabel;
 
     final textAnim = ctrl != null
         ? CurvedAnimation(
@@ -687,12 +696,50 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
       drawLine = 'Draw$datePart: $mainStr$bonusStr';
     }
 
+    // ── Ball rows ─────────────────────────────────────────────────────────────
+    Widget mainBallRow() => SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              for (var i = 0; i < mainNums.length; i++) ...[
+                wrappedBall(mainNums[i], false),
+                if (i < mainNums.length - 1) const SizedBox(width: 6),
+              ],
+            ],
+          ),
+        );
+
+    Widget bonusBallRow({double size = 32}) => SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                bLabel ?? 'Supp',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: const Color(0xFFD32F2F),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 11,
+                ),
+              ),
+              const SizedBox(width: 6),
+              for (var i = 0; i < bonusNums.length; i++) ...[
+                wrappedBall(bonusNums[i], true, size: size),
+                if (i < bonusNums.length - 1) const SizedBox(width: 6),
+              ],
+            ],
+          ),
+        );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Divider(height: 18),
 
-        // ── Emotional headline ──────────────────────────────
+        // ── Emotional headline ──────────────────────────────────────────────
         if (textAnim != null)
           AnimatedBuilder(
             animation: textAnim,
@@ -704,12 +751,19 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
 
         const SizedBox(height: 10),
 
-        // ── Highlighted pick balls ──────────────────────────
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.only(right: 4),
+        // ── Highlighted pick balls ──────────────────────────────────────────
+        if (isSupp && bonusNums.isNotEmpty) ...[
+          // Supplementary lottery: two rows (main + Supp)
+          mainBallRow(),
+          const SizedBox(height: 6),
+          bonusBallRow(size: 32),
+        ] else if (bonusNums.isEmpty) ...[
+          mainBallRow(),
+        ] else ...[
+          // Powerball-style: inline
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -718,7 +772,7 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
                   if (i < mainNums.length - 1 || bonusNums.isNotEmpty)
                     const SizedBox(width: 6),
                 ],
-                if (bonusNums.isNotEmpty && bLabel != null) ...[
+                if (bLabel != null) ...[
                   Text(
                     bLabel,
                     style: theme.textTheme.labelSmall?.copyWith(
@@ -735,9 +789,9 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
               ],
             ),
           ),
-        ),
+        ],
 
-        // ── Draw result line ────────────────────────────────
+        // ── Draw result line ────────────────────────────────────────────────
         if (drawLine != null) ...[
           const SizedBox(height: 6),
           Text(
@@ -753,8 +807,10 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
   }
 
   Widget _emotionalRow(ThemeData theme, PickMatchResult result) {
-    final isGood = result.matchedMain >= 3 || result.matchedBonus > 0;
-    final isGreat = result.matchedMain >= 4;
+    final totalHits = result.matchedMain + result.suppHits + result.matchedBonus + result.matchedBonusInDrawMain.length;
+    final isGood = result.matchedMain >= 3 || (result.matchedMain >= 2 && result.suppHits >= 1) || result.matchedBonus > 0;
+    final isGreat = result.matchedMain >= 4 || (result.matchedMain >= 3 && result.suppHits >= 1);
+    final _ = totalHits; // used for future prize-tier styling
     return Row(
       children: [
         Expanded(
