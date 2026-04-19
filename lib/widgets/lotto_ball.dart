@@ -64,17 +64,17 @@ class _LottoBallState extends State<LottoBall>
 
     switch (widget.resultState) {
       case BallResultState.matchedMain:
-        gradientColors = [const Color(0xFFEF5350), const Color(0xFFC62828)];
-        shadowColor = const Color(0xFFC62828);
+        gradientColors = [const Color(0xFFE53935), const Color(0xFFB71C1C)];
+        shadowColor = const Color(0xFFB71C1C);
         textColor = Colors.white;
       case BallResultState.matchedSupp:
-        gradientColors = [const Color(0xFF42A5F5), const Color(0xFF1565C0)];
-        shadowColor = const Color(0xFF1565C0);
+        gradientColors = [const Color(0xFF5C9FD6), const Color(0xFF1A5FA8)];
+        shadowColor = const Color(0xFF1A5FA8);
         textColor = Colors.white;
       case BallResultState.unmatched:
-        gradientColors = [const Color(0xFFE0E0E0), const Color(0xFFBDBDBD)];
-        shadowColor = Colors.grey;
-        textColor = Colors.grey.shade600;
+        gradientColors = [const Color(0xFFEEEEEE), const Color(0xFFE0E0E0)];
+        shadowColor = Colors.grey.shade300;
+        textColor = Colors.grey.shade500;
       case BallResultState.none:
         // Default palette: matched=green, bonus=red-orange, normal=amber
         if (widget.isMatched) {

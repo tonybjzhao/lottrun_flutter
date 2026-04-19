@@ -69,7 +69,7 @@ void main() {
       expect(r.isPending, isFalse);
       expect(r.matchedMain, 0);
       expect(r.suppHits, 0);
-      expect(r.matchSummary(_saturdayLottery), 'No numbers matched');
+      expect(r.matchSummary(_saturdayLottery), 'No main matched');
       expect(r.levelLabel(_saturdayLottery), 'No match');
     });
 
@@ -91,14 +91,14 @@ void main() {
       expect(r.levelLabel(_saturdayLottery), 'Solid');
     });
 
-    test('3 main + 1 supp → 4 matched (incl. 1 supp)', () {
+    test('3 main + 1 supp → 3 matched + 1s', () {
       final pick = _pick(lotteryId: 'au_saturday', main: [1, 2, 3, 4, 5, 6]);
       final draw = _draw(lotteryId: 'au_saturday', main: [1, 2, 3, 10, 20, 30], supp: [4, 32]);
       final r = checkPickResult(pick, _saturdayLottery, [draw])!;
       expect(r.matchedMain, 3);
       expect(r.suppHits, 1);
       expect(r.matchedMainInDrawSupp, contains(4));
-      expect(r.matchSummary(_saturdayLottery), '4 matched (incl. 1 supp)');
+      expect(r.matchSummary(_saturdayLottery), '3 matched + 1s');
       expect(r.levelLabel(_saturdayLottery), 'Strong');
     });
 
@@ -109,7 +109,7 @@ void main() {
       final r = checkPickResult(pick, _saturdayLottery, [draw])!;
       expect(r.matchedMain, 0);
       expect(r.matchedBonusInDrawMain, isEmpty);
-      expect(r.matchSummary(_saturdayLottery), 'No numbers matched');
+      expect(r.matchSummary(_saturdayLottery), 'No main matched');
       expect(r.levelLabel(_saturdayLottery), 'No match');
     });
 
@@ -128,7 +128,7 @@ void main() {
       final r = checkPickResult(pick, _saturdayLottery, [draw])!;
       expect(r.matchedMain, 5);
       expect(r.suppHits, 1);
-      expect(r.matchSummary(_saturdayLottery), '6 matched (incl. 1 supp)');
+      expect(r.matchSummary(_saturdayLottery), '5 matched + 1s');
       expect(r.levelLabel(_saturdayLottery), 'Great');
     });
 
@@ -148,7 +148,7 @@ void main() {
       final r = checkPickResult(pick, _saturdayLottery, [draw])!;
       expect(r.matchedMain, 0);
       expect(r.matchedBonusInDrawMain, isEmpty);
-      expect(r.matchSummary(_saturdayLottery), 'No numbers matched');
+      expect(r.matchSummary(_saturdayLottery), 'No main matched');
     });
   });
 
@@ -161,7 +161,7 @@ void main() {
       final r = checkPickResult(pick, _ozLottery, [draw])!;
       expect(r.matchedMain, 6);
       expect(r.suppHits, 1);
-      expect(r.matchSummary(_ozLottery), '7 matched (incl. 1 supp)');
+      expect(r.matchSummary(_ozLottery), '6 matched + 1s');
       expect(r.levelLabel(_ozLottery), 'Great');
     });
 

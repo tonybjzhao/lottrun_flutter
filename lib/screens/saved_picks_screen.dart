@@ -349,14 +349,14 @@ class _StatsCard extends StatelessWidget {
 
   String _bestText() {
     if (stats.bestMain == 0 && stats.bestSupp == 0) return 'None yet';
-    if (stats.bestSupp == 0) return '${stats.bestMain}';
+    if (stats.bestSupp == 0) return '${stats.bestMain} main';
     if (stats.bestMain == 0) return '${stats.bestSupp} supp';
     return '${stats.bestMain}+${stats.bestSupp}';
   }
 
   String _totalText() {
-    if (stats.totalSuppHits == 0) return '${stats.totalMainHits}';
-    return '${stats.totalMainHits}m · ${stats.totalSuppHits}s';
+    if (stats.totalSuppHits == 0) return '${stats.totalMainHits} main';
+    return '${stats.totalMainHits} main · ${stats.totalSuppHits} supp';
   }
 
   @override
@@ -810,6 +810,14 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
     if (lottery == null) return const SizedBox.shrink();
 
     final level = result.levelLabel(lottery);
+    final levelEmoji = switch (level) {
+      'Light hit' => '🙂 ',
+      'Nice'      => '😊 ',
+      'Solid'     => '🔥 ',
+      'Strong'    => '💪 ',
+      'Great'     => '💥 ',
+      _           => '',
+    };
     final summary = result.matchSummary(lottery);
     final total = result.matchedMain +
         (lottery.bonusIsSupplementary
@@ -832,7 +840,7 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
-            level,
+            '$levelEmoji$level',
             style: theme.textTheme.labelSmall?.copyWith(
               color: isGreat
                   ? Colors.green.shade800
@@ -881,6 +889,8 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
   Widget _buildProgressDots(ThemeData theme, PickMatchResult result, Lottery lottery) {
     final matchedMain = result.matchedMain;
     final total = lottery.mainCount;
+    const redHit = Color(0xFFC62828);
+    const blueSupp = Color(0xFF1565C0);
 
     return Row(
       children: [
@@ -893,17 +903,28 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
                 fontSize: 9,
                 height: 1,
                 color: i < matchedMain
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface.withAlpha(70),
+                    ? redHit
+                    : theme.colorScheme.onSurface.withAlpha(55),
               ),
             ),
           ),
+        const SizedBox(width: 5),
+        Text(
+          '$matchedMain main',
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: matchedMain > 0
+                ? redHit
+                : theme.colorScheme.onSurface.withAlpha(90),
+            fontSize: 9,
+            fontWeight: matchedMain > 0 ? FontWeight.w700 : FontWeight.normal,
+          ),
+        ),
         if (lottery.bonusIsSupplementary && result.suppCategoryHits(lottery) > 0) ...[
           const SizedBox(width: 5),
           Text(
-            '+${result.suppCategoryHits(lottery)}s',
+            '+${result.suppCategoryHits(lottery)} supp',
             style: theme.textTheme.labelSmall?.copyWith(
-              color: const Color(0xFFD32F2F),
+              color: blueSupp,
               fontSize: 9,
               fontWeight: FontWeight.w700,
             ),
@@ -913,20 +934,12 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
           Text(
             '+${lottery.bonusLabel ?? 'B'}',
             style: theme.textTheme.labelSmall?.copyWith(
-              color: const Color(0xFFD32F2F),
+              color: blueSupp,
               fontSize: 9,
               fontWeight: FontWeight.w700,
             ),
           ),
         ],
-        const SizedBox(width: 6),
-        Text(
-          '$matchedMain / $total',
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.onSurface.withAlpha(90),
-            fontSize: 9,
-          ),
-        ),
       ],
     );
   }

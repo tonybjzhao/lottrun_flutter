@@ -71,11 +71,10 @@ class PickMatchResult {
 
     if (lottery.bonusIsSupplementary) {
       final totalSupp = suppCategoryHits(lottery);
-      final total = matchedMain + totalSupp;
-      if (total == 0) return 'No numbers matched';
-      if (matchedMain == 0) return '$total matched (supp)';
+      if (matchedMain == 0 && totalSupp == 0) return 'No main matched';
+      if (matchedMain == 0) return 'No main · ${totalSupp}s';
       if (totalSupp == 0) return '$matchedMain matched';
-      return '$total matched (incl. $totalSupp supp)';
+      return '$matchedMain matched + ${totalSupp}s';
     }
 
     // Powerball / inline-bonus lotteries
