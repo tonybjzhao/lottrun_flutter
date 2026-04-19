@@ -215,6 +215,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   List<GeneratedPick> _diversifyBonusBalls(List<GeneratedPick> picks) {
     if (!_selectedLottery.hasBonus) return picks;
+    // Supplementary lotteries (Saturday, Oz Lotto) have multiple supp numbers
+    // per pick — diversification doesn't apply; return as-is to avoid truncation.
+    if (_selectedLottery.bonusIsSupplementary) return picks;
+
     final min = _selectedLottery.bonusMin!;
     final max = _selectedLottery.bonusMax!;
     final used = <int>{};
