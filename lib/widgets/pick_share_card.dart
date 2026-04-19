@@ -178,7 +178,6 @@ class _FireTemplate extends StatelessWidget {
     final matchMain = result.matchedMain;
     final suppHits  = result.suppCategoryHits(lottery);
     final total     = matchMain + (isSupp ? suppHits : result.matchedBonus);
-    final beatPct   = _beatPercent(result.score);
     final mainCount = lottery.mainCount;
 
     final drawMain = result.drawMainNumbers;
@@ -235,30 +234,9 @@ class _FireTemplate extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // ── Top bar ───────────────────────────────────────────────
                   _topBar(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 18),
 
-                  // ── RESULT pill ───────────────────────────────────────────
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: _gold.withAlpha(90)),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Text(
-                      'R E S U L T',
-                      style: TextStyle(
-                        color: _gold,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 3.5,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // ── Big fraction score ────────────────────────────────────
                   RichText(
                     textAlign: TextAlign.center,
                     text: TextSpan(children: [
@@ -286,92 +264,51 @@ class _FireTemplate extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'SO CLOSE! 🔥',
+                    '🔥 So close!',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 20,
+                      fontSize: 24,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 1.5,
                     ),
                   ),
-
-                  const SizedBox(height: 20),
-
-                  // ── Gold horizontal rule ──────────────────────────────────
-                  Container(
-                    height: 1.5,
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.transparent, _gold, Colors.transparent],
-                      ),
+                  const SizedBox(height: 6),
+                  Text(
+                    _matchDesc(matchMain, suppHits, isSupp, result.matchedBonus, lottery),
+                    style: const TextStyle(
+                      color: Color(0xFFFFE082),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
                     ),
+                    textAlign: TextAlign.center,
                   ),
-
-                  const SizedBox(height: 20),
-
-                  // ── User pick balls ───────────────────────────────────────
-                  _sectionLabel('YOUR NUMBERS', _gold),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Only one number away 👀',
+                    style: TextStyle(color: Colors.white70, fontSize: 13),
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(height: 8),
                   _ballRow(userMain, (n) {
                     if (matchedMainSet.contains(n)) return _BallKind.mainHit;
                     if (matchedSuppSet.contains(n)) return _BallKind.suppHit;
                     return _BallKind.miss;
                   }, size: 48),
-
-                  const SizedBox(height: 16),
-
-                  // ── Draw numbers ──────────────────────────────────────────
-                  _sectionLabel('DRAW RESULT', Colors.white30),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 14),
                   _ballRow(drawMain, (_) => _BallKind.drawMain, size: 38),
                   if (isSupp && drawSupp.isNotEmpty) ...[
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 10),
                     _ballRow(drawSupp, (_) => _BallKind.drawSupp, size: 32),
                   ],
-
-                  const SizedBox(height: 22),
-
-                  // ── Gold stat card ────────────────────────────────────────
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(18, 15, 18, 15),
-                    decoration: BoxDecoration(
-                      color: _gold.withAlpha(18),
-                      border: Border.all(color: _gold.withAlpha(80)),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'You beat $beatPct% of players 🏆',
-                          style: const TextStyle(
-                            color: _gold,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 15,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _matchDesc(matchMain, suppHits, isSupp,
-                              result.matchedBonus, lottery),
-                          style: const TextStyle(
-                              color: Colors.white54, fontSize: 12),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Can you beat this? 👀',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Can you beat this? 👀',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 14,
                     ),
                   ),
-
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 14),
                   _footer(),
                 ],
               ),
@@ -401,13 +338,15 @@ class _FireTemplate extends StatelessWidget {
         ),
       ]);
 
-  Widget _footer() => const Column(children: [
-        Text('🔥  LottoRun AI  ·  Try your luck 🍀',
-            style: TextStyle(color: Colors.white30, fontSize: 10)),
-        SizedBox(height: 4),
-        Text("Play responsibly. It's all about the fun.",
-            style: TextStyle(color: Color(0x26FFFFFF), fontSize: 9)),
-      ]);
+  Widget _footer() => const Text(
+        '✨ LottoRun AI',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Color(0x99FFFFFF),
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+        ),
+      );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -437,7 +376,6 @@ class _ElectricTemplate extends StatelessWidget {
     final matchMain = result.matchedMain;
     final suppHits  = result.suppCategoryHits(lottery);
     final total     = matchMain + (isSupp ? suppHits : result.matchedBonus);
-    final beatPct   = _beatPercent(result.score);
     final mainCount = lottery.mainCount;
 
     final drawMain = result.drawMainNumbers;
@@ -486,15 +424,11 @@ class _ElectricTemplate extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── Top bar ───────────────────────────────────────────────
                   _topBar(),
-                  const SizedBox(height: 22),
-
-                  // ── Score badge + labels row ──────────────────────────────
+                  const SizedBox(height: 18),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Circular score
                       Container(
                         width: 84, height: 84,
                         decoration: BoxDecoration(
@@ -528,12 +462,11 @@ class _ElectricTemplate extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              '⚡ MATCHED',
+                              '🎯 Not bad!',
                               style: TextStyle(
                                 color: _cyan,
-                                fontSize: 11,
+                                fontSize: 22,
                                 fontWeight: FontWeight.w800,
-                                letterSpacing: 2,
                               ),
                             ),
                             const SizedBox(height: 5),
@@ -546,88 +479,32 @@ class _ElectricTemplate extends StatelessWidget {
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            _matchProgressBar(total, mainCount),
+                            const SizedBox(height: 6),
+                            const Text(
+                              'Can you beat this? 👀',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
-
-                  const SizedBox(height: 22),
-
-                  // ── User pick balls ───────────────────────────────────────
-                  _sectionLabel('YOUR PICK', Colors.white30),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 18),
                   _ballRow(userMain, (n) {
                     if (matchedMainSet.contains(n)) return _BallKind.mainHit;
                     if (matchedSuppSet.contains(n)) return _BallKind.suppHit;
                     return _BallKind.miss;
                   }, size: 44),
-
-                  const SizedBox(height: 16),
-
-                  // ── Draw numbers ──────────────────────────────────────────
-                  _sectionLabel('DRAW RESULT', Colors.white30),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 14),
                   _ballRow(drawMain, (_) => _BallKind.drawMain, size: 36),
                   if (isSupp && drawSupp.isNotEmpty) ...[
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 10),
                     _ballRow(drawSupp, (_) => _BallKind.drawSupp, size: 30),
                   ],
-
-                  const SizedBox(height: 20),
-
-                  // ── Stat card ─────────────────────────────────────────────
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0D1E3A),
-                      borderRadius: BorderRadius.circular(14),
-                      border:
-                          Border.all(color: const Color(0xFF1A3A5C)),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Better than $beatPct% of players! 🎯',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                'Can you beat this? 👀',
-                                style: TextStyle(
-                                  color: _cyan,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          width: 36, height: 36,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: _cyan.withAlpha(25),
-                            border: Border.all(color: _cyan.withAlpha(70)),
-                          ),
-                          child: const Icon(Icons.arrow_forward_rounded,
-                              color: _cyan, size: 18),
-                        ),
-                      ],
-                    ),
-                  ),
-
                   const SizedBox(height: 18),
                   _footer(),
                 ],
@@ -639,36 +516,6 @@ class _ElectricTemplate extends StatelessWidget {
     );
   }
 
-  Widget _matchProgressBar(int matched, int total) {
-    return LayoutBuilder(builder: (_, c) {
-      return Stack(
-        children: [
-          Container(
-            height: 6,
-            width: c.maxWidth,
-            decoration: BoxDecoration(
-              color: Colors.white10,
-              borderRadius: BorderRadius.circular(3),
-            ),
-          ),
-          FractionallySizedBox(
-            widthFactor: matched / total.clamp(1, 99),
-            child: Container(
-              height: 6,
-              decoration: BoxDecoration(
-                color: _cyan,
-                borderRadius: BorderRadius.circular(3),
-                boxShadow: [
-                  BoxShadow(color: _cyan.withAlpha(100), blurRadius: 6)
-                ],
-              ),
-            ),
-          ),
-        ],
-      );
-    });
-  }
-
   Widget _topBar() => Row(children: [
         Text(
           '${_flagEmoji(lottery.countryCode)}  ${_lotteryShortName(lottery.name)}',
@@ -676,21 +523,21 @@ class _ElectricTemplate extends StatelessWidget {
               color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w700),
         ),
         const Spacer(),
-        const Text('LottoRun AI',
+        const Text('✨ LottoRun AI',
             style: TextStyle(
-                color: Colors.white30,
-                fontSize: 11,
+                color: Color(0x99FFFFFF),
+                fontSize: 10,
                 fontWeight: FontWeight.w600)),
       ]);
 
-  Widget _footer() => Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.bolt_rounded, color: _cyan.withAlpha(120), size: 13),
-          const SizedBox(width: 4),
-          Text('LottoRun AI  ·  Play for fun 🍀',
-              style: TextStyle(color: _cyan.withAlpha(110), fontSize: 10)),
-        ],
+  Widget _footer() => const Text(
+        '✨ LottoRun AI',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Color(0x99FFFFFF),
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+        ),
       );
 }
 
@@ -754,8 +601,8 @@ class _WarmTemplate extends StatelessWidget {
 
     if (isMiss) {
       emoji    = '😂';
-      headline = 'Well… not today';
-      subhead  = 'But the next draw is waiting! 🎊';
+      headline = 'Not today';
+      subhead  = '0 matched';
       blurbText = null;
     } else if (isPending) {
       emoji    = '⏳';
@@ -879,11 +726,7 @@ class _WarmTemplate extends StatelessWidget {
                   else if (blurbText != null)
                     _strategyCard(blurbText, theme),
 
-                  const SizedBox(height: 20),
-
-                  // ── Footer ────────────────────────────────────────────────
-                  const Divider(color: Colors.white12, height: 1),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 18),
                   Text(
                     'Can you beat this? 👀',
                     style: TextStyle(
@@ -892,6 +735,16 @@ class _WarmTemplate extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                     ),
                     textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    '✨ LottoRun AI',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0x99FFFFFF),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
@@ -914,12 +767,20 @@ class _WarmTemplate extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Today: practice\nTomorrow: jackpot! 🙂',
+              '😂 Not today',
               style: TextStyle(
                 color: Color(0xFF333333),
                 fontWeight: FontWeight.w800,
-                fontSize: 14,
-                height: 1.4,
+                fontSize: 16,
+              ),
+            ),
+            SizedBox(height: 6),
+            Text(
+              '0 matched',
+              style: TextStyle(
+                color: Color(0xFF5F4339),
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
               ),
             ),
             SizedBox(height: 8),
@@ -1052,32 +913,9 @@ Widget _ballRow(
   );
 }
 
-/// Small uppercase section label.
-Widget _sectionLabel(String text, Color color) => Text(
-      text,
-      style: TextStyle(
-        color: color,
-        fontSize: 9,
-        fontWeight: FontWeight.w700,
-        letterSpacing: 2,
-      ),
-    );
-
 // ─────────────────────────────────────────────────────────────────────────────
 // § 8  Shared pure helpers
 // ─────────────────────────────────────────────────────────────────────────────
-
-/// Fun beat-percentile based on [score] (matchedMain×2 + suppHits + bonus×2).
-int _beatPercent(int score) {
-  if (score >= 10) return 99;
-  if (score >= 8)  return 96;
-  if (score >= 6)  return 92;
-  if (score >= 4)  return 83;
-  if (score >= 3)  return 75;
-  if (score >= 2)  return 65;
-  if (score >= 1)  return 56;
-  return 50;
-}
 
 /// Factual match description used in stat cards.
 String _matchDesc(
@@ -1553,9 +1391,9 @@ String _shareText(PickMatchResult? result, Lottery? lottery) {
 }
 
 String _templateLabel(ShareCardTemplate template) => switch (template) {
-      ShareCardTemplate.fire => '🔥 Feeling Hot',
-      ShareCardTemplate.electric => '⚡ Lucky Shot',
-      ShareCardTemplate.warm => '🍀 Feeling Lucky',
+      ShareCardTemplate.fire => '🔥 Almost Win',
+      ShareCardTemplate.electric => '🎯 Good Hit',
+      ShareCardTemplate.warm => '😂 Funny Fail',
     };
 
 String _templateDescription(ShareCardTemplate template) => switch (template) {

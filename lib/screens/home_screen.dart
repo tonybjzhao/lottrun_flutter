@@ -853,37 +853,15 @@ class _ThreePicksInlineState extends State<_ThreePicksInline>
           if (i < widget.picks.length - 1) const SizedBox(height: 12),
         ],
         const SizedBox(height: 14),
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: widget.onSaveAll,
-                icon: const Icon(Icons.bookmark_rounded, size: 18),
-                label: const Text('Save All'),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(0, 48),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Builder(
-                builder: (btnCtx) => FilledButton.icon(
-                  onPressed: () => sharePickCards(
-                      repaintKeys: widget.shareKeys, btnContext: btnCtx),
-                  icon: const Icon(Icons.share_rounded, size: 18),
-                  label: const Text('Share All'),
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(0, 48),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                ),
-              ),
-            ),
-          ],
+        OutlinedButton.icon(
+          onPressed: widget.onSaveAll,
+          icon: const Icon(Icons.bookmark_rounded, size: 18),
+          label: const Text('Save All'),
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 48),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
+          ),
         ),
       ],
     );
