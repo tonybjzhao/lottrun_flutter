@@ -46,6 +46,7 @@ class LocalStorageService {
     try {
       final map = jsonDecode(raw) as Map<String, dynamic>;
       return GeneratedPick(
+        id: map['id'] as String?,
         lotteryId: map['lotteryId'] as String,
         style: PlayStyle.values.firstWhere(
           (s) => s.name == map['style'],
@@ -192,6 +193,7 @@ class LocalStorageService {
   Future<void> saveLastPick(GeneratedPick pick) async {
     final prefs = await SharedPreferences.getInstance();
     final map = {
+      'id': pick.id,
       'lotteryId': pick.lotteryId,
       'style': pick.style.name,
       'mainNumbers': pick.mainNumbers,

@@ -104,6 +104,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       unawaited(ResultNotificationService.instance.checkAndNotify());
+      unawaited(_syncSavedFlags());
     }
   }
 
@@ -117,6 +118,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final lotteryId = await storage.getLastLotteryId();
     final style = await storage.getLastStyle();
     final pick = await storage.getLastPick();
+    final savedPicks = await storage.getSavedPicks();
 
     if (!mounted) return;
     setState(() {
@@ -129,7 +131,25 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       if (style != null) _selectedStyle = style;
       if (pick != null) {
         _pick = pick;
-        _isSaved = true;
+        _isSaved = savedPicks.any((saved) => saved.id == pick.id);
+      }
+    });
+  }
+
+  Future<void> _syncSavedFlags() async {
+    final savedPicks = await LocalStorageService.instance.getSavedPicks();
+    if (!mounted) return;
+    setState(() {
+      if (_pick != null) {
+        _isSaved = savedPicks.any((saved) => saved.id == _pick!.id);
+      } else {
+        _isSaved = false;
+      }
+
+      if (_threePicks != null) {
+        _threePicksSaved = _threePicks!
+            .map((pick) => savedPicks.any((saved) => saved.id == pick.id))
+            .toList();
       }
     });
   }
@@ -425,6 +445,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   _isPickExpanded = false;
                   _threePicks = null;
                 });
+              } else {
+                await _syncSavedFlags();
               }
             },
             icon: const Icon(Icons.bookmark_rounded),
