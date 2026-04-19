@@ -61,17 +61,24 @@ void main() {
 
   // ── Saturday Lotto ────────────────────────────────────────────────────────
 
-  group('Saturday Lotto (mainCount=6, supplementary)', () {
-    test('no match at all', () {
+  group('Saturday Lotto (mainCount=6, supplementary) — matchSummary', () {
+    test('no match', () {
       final pick = _pick(lotteryId: 'au_saturday', main: [1, 2, 3, 4, 5, 6], bonus: [7, 8]);
       final draw = _draw(lotteryId: 'au_saturday', main: [10, 20, 30, 40, 41, 42], supp: [43, 44]);
       final r = checkPickResult(pick, _saturdayLottery, [draw])!;
       expect(r.isPending, isFalse);
       expect(r.matchedMain, 0);
       expect(r.suppHits, 0);
-      expect(r.matchedBonus, 0);
-      expect(r.emotionalText(_saturdayLottery),
-          'No match this time — luck is building 🤞');
+      expect(r.matchSummary(_saturdayLottery), 'No numbers matched');
+      expect(r.levelLabel(_saturdayLottery), 'No match');
+    });
+
+    test('1 main matched', () {
+      final pick = _pick(lotteryId: 'au_saturday', main: [1, 2, 3, 4, 5, 6]);
+      final draw = _draw(lotteryId: 'au_saturday', main: [1, 10, 20, 30, 40, 41], supp: [42, 43]);
+      final r = checkPickResult(pick, _saturdayLottery, [draw])!;
+      expect(r.matchSummary(_saturdayLottery), '1 main matched');
+      expect(r.levelLabel(_saturdayLottery), 'Light hit');
     });
 
     test('3 main matched', () {
@@ -80,7 +87,8 @@ void main() {
       final r = checkPickResult(pick, _saturdayLottery, [draw])!;
       expect(r.matchedMain, 3);
       expect(r.suppHits, 0);
-      expect(r.emotionalText(_saturdayLottery), '3 main matched — almost! 🤞');
+      expect(r.matchSummary(_saturdayLottery), '3 main matched');
+      expect(r.levelLabel(_saturdayLottery), 'Solid');
     });
 
     test('3 main + 1 supp', () {
@@ -90,43 +98,36 @@ void main() {
       expect(r.matchedMain, 3);
       expect(r.suppHits, 1);
       expect(r.matchedMainInDrawSupp, contains(4));
-      expect(r.emotionalText(_saturdayLottery), '😮 3 main + 1 supp matched — almost!');
+      expect(r.matchSummary(_saturdayLottery), '3 main + 1 supp matched');
+      expect(r.levelLabel(_saturdayLottery), 'Strong');
     });
 
-    test('4 main (Division 4 tier) — "So close"', () {
-      final pick = _pick(lotteryId: 'au_saturday', main: [1, 2, 3, 4, 5, 6]);
-      final draw = _draw(lotteryId: 'au_saturday', main: [1, 2, 3, 4, 20, 30], supp: [31, 32]);
-      final r = checkPickResult(pick, _saturdayLottery, [draw])!;
-      expect(r.matchedMain, 4);
-      expect(r.suppHits, 0);
-      // mainCount-2 = 4 → "So close"
-      expect(r.emotionalText(_saturdayLottery), '😮 So close — 4 main matched!');
-    });
-
-    test('5 main = Division 3', () {
+    test('5 main matched', () {
       final pick = _pick(lotteryId: 'au_saturday', main: [1, 2, 3, 4, 5, 6]);
       final draw = _draw(lotteryId: 'au_saturday', main: [1, 2, 3, 4, 5, 30], supp: [31, 32]);
       final r = checkPickResult(pick, _saturdayLottery, [draw])!;
       expect(r.matchedMain, 5);
-      expect(r.suppHits, 0);
-      expect(r.emotionalText(_saturdayLottery), '🔥 Division 3! 5 main matched!');
+      expect(r.matchSummary(_saturdayLottery), '5 main matched');
+      expect(r.levelLabel(_saturdayLottery), 'Great');
     });
 
-    test('5 main + 1 supp = Division 2', () {
+    test('5 main + 1 supp', () {
       final pick = _pick(lotteryId: 'au_saturday', main: [1, 2, 3, 4, 5, 6]);
       final draw = _draw(lotteryId: 'au_saturday', main: [1, 2, 3, 4, 5, 30], supp: [6, 32]);
       final r = checkPickResult(pick, _saturdayLottery, [draw])!;
       expect(r.matchedMain, 5);
       expect(r.suppHits, 1);
-      expect(r.emotionalText(_saturdayLottery), '🏆 Division 2! 5 main + 1 supp matched!');
+      expect(r.matchSummary(_saturdayLottery), '5 main + 1 supp matched');
+      expect(r.levelLabel(_saturdayLottery), 'Great');
     });
 
-    test('6 main = Division 1', () {
+    test('6 main matched (jackpot tier)', () {
       final pick = _pick(lotteryId: 'au_saturday', main: [1, 2, 3, 4, 5, 6]);
       final draw = _draw(lotteryId: 'au_saturday', main: [1, 2, 3, 4, 5, 6], supp: [31, 32]);
       final r = checkPickResult(pick, _saturdayLottery, [draw])!;
       expect(r.matchedMain, 6);
-      expect(r.emotionalText(_saturdayLottery), '🏆 Division 1! All 6 matched!');
+      expect(r.matchSummary(_saturdayLottery), '6 main matched');
+      expect(r.levelLabel(_saturdayLottery), 'Great');
     });
 
     test('supp pick hit a draw main number', () {
@@ -141,21 +142,23 @@ void main() {
   // ── Oz Lotto ──────────────────────────────────────────────────────────────
 
   group('Oz Lotto (mainCount=7, supplementary)', () {
-    test('6 main + 1 supp = Division 2', () {
+    test('6 main + 1 supp', () {
       final pick = _pick(lotteryId: 'au_ozlotto', main: [1, 2, 3, 4, 5, 6, 7]);
       final draw = _draw(lotteryId: 'au_ozlotto', main: [1, 2, 3, 4, 5, 6, 30], supp: [7, 32, 33]);
       final r = checkPickResult(pick, _ozLottery, [draw])!;
       expect(r.matchedMain, 6);
       expect(r.suppHits, 1);
-      expect(r.emotionalText(_ozLottery), '🏆 Division 2! 6 main + 1 supp matched!');
+      expect(r.matchSummary(_ozLottery), '6 main + 1 supp matched');
+      expect(r.levelLabel(_ozLottery), 'Great');
     });
 
-    test('7 main = Division 1', () {
+    test('7 main matched', () {
       final pick = _pick(lotteryId: 'au_ozlotto', main: [1, 2, 3, 4, 5, 6, 7]);
       final draw = _draw(lotteryId: 'au_ozlotto', main: [1, 2, 3, 4, 5, 6, 7], supp: [31, 32, 33]);
       final r = checkPickResult(pick, _ozLottery, [draw])!;
       expect(r.matchedMain, 7);
-      expect(r.emotionalText(_ozLottery), '🏆 Division 1! All 7 matched!');
+      expect(r.matchSummary(_ozLottery), '7 main matched');
+      expect(r.levelLabel(_ozLottery), 'Great');
     });
   });
 
@@ -163,7 +166,6 @@ void main() {
 
   group('AU Powerball (bonusIsSupplementary=false)', () {
     test('no cross-pool contamination: pick.main vs draw.bonus ignored', () {
-      // pick main includes draw bonus number (26) — should NOT count as supp hit
       final pick = _pick(lotteryId: 'au_powerball', main: [1, 2, 3, 4, 5, 6, 26], bonus: [5]);
       final draw = _draw(lotteryId: 'au_powerball', main: [10, 20, 30, 40, 41, 42, 43], supp: [5, 26]);
       final r = checkPickResult(pick, _auPowerball, [draw])!;
@@ -172,13 +174,14 @@ void main() {
       expect(r.matchedMainInDrawSupp, isEmpty);
     });
 
-    test('bonus ball match', () {
+    test('bonus ball only', () {
       final pick = _pick(lotteryId: 'au_powerball', main: [1, 2, 3, 4, 5, 6, 7], bonus: [5]);
       final draw = _draw(lotteryId: 'au_powerball', main: [10, 20, 30, 40, 41, 42, 43], supp: [5]);
       final r = checkPickResult(pick, _auPowerball, [draw])!;
       expect(r.matchedBonus, 1);
       expect(r.matchedMain, 0);
-      expect(r.emotionalText(_auPowerball), 'Powerball matched! — keep going 🙌');
+      expect(r.matchSummary(_auPowerball), 'Powerball matched');
+      expect(r.levelLabel(_auPowerball), 'Light hit');
     });
 
     test('4 main matched', () {
@@ -186,7 +189,18 @@ void main() {
       final draw = _draw(lotteryId: 'au_powerball', main: [1, 2, 3, 4, 10, 20, 30], supp: [11]);
       final r = checkPickResult(pick, _auPowerball, [draw])!;
       expect(r.matchedMain, 4);
-      expect(r.emotionalText(_auPowerball), '🔥 Wow — 4 matched!');
+      expect(r.matchSummary(_auPowerball), 'Matched 4 numbers');
+      expect(r.levelLabel(_auPowerball), 'Strong');
+    });
+
+    test('3 main + Powerball', () {
+      final pick = _pick(lotteryId: 'au_powerball', main: [1, 2, 3, 4, 5, 6, 7], bonus: [9]);
+      final draw = _draw(lotteryId: 'au_powerball', main: [1, 2, 3, 10, 20, 30, 40], supp: [9]);
+      final r = checkPickResult(pick, _auPowerball, [draw])!;
+      expect(r.matchedMain, 3);
+      expect(r.matchedBonus, 1);
+      expect(r.matchSummary(_auPowerball), 'Matched 3 numbers + Powerball');
+      expect(r.levelLabel(_auPowerball), 'Strong');
     });
   });
 

@@ -748,15 +748,21 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
       children: [
         const Divider(height: 18),
 
-        // ── Emotional headline ──────────────────────────────────────────────
+        // ── Level + match summary ───────────────────────────────────────────
         if (textAnim != null)
           AnimatedBuilder(
             animation: textAnim,
             builder: (_, child) => Opacity(opacity: textAnim.value, child: child!),
-            child: _emotionalRow(theme, result),
+            child: _resultHeaderRow(theme, result),
           )
         else
-          _emotionalRow(theme, result),
+          _resultHeaderRow(theme, result),
+
+        // ── Progress dots ───────────────────────────────────────────────────
+        if (lottery != null) ...[
+          const SizedBox(height: 6),
+          _buildProgressDots(theme, result, lottery),
+        ],
 
         const SizedBox(height: 10),
 
@@ -811,26 +817,67 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
             ),
           ),
         ],
+
+        // ── Disclaimer ──────────────────────────────────────────────────────
+        const SizedBox(height: 6),
+        Text(
+          'Check official results for prizes',
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurface.withAlpha(70),
+            fontStyle: FontStyle.italic,
+            fontSize: 10,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _emotionalRow(ThemeData theme, PickMatchResult result) {
-    final isGood = result.matchedMain >= 3 || (result.matchedMain >= 2 && result.suppHits >= 1) || result.matchedBonus > 0;
-    final isGreat = result.matchedMain >= 4 || (result.matchedMain >= 3 && result.suppHits >= 1);
+  Widget _resultHeaderRow(ThemeData theme, PickMatchResult result) {
     final lottery = _lottery;
+    if (lottery == null) return const SizedBox.shrink();
+
+    final level = result.levelLabel(lottery);
+    final summary = result.matchSummary(lottery);
+    final total = result.matchedMain +
+        (lottery.bonusIsSupplementary ? result.suppHits : result.matchedBonus);
+    final isGood = total >= 2;
+    final isGreat = total >= 4;
+
     return Row(
       children: [
+        // Level badge
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+          decoration: BoxDecoration(
+            color: isGreat
+                ? Colors.green.shade100
+                : isGood
+                    ? theme.colorScheme.primaryContainer
+                    : theme.colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            level,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: isGreat
+                  ? Colors.green.shade800
+                  : isGood
+                      ? theme.colorScheme.onPrimaryContainer
+                      : theme.colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w700,
+              fontSize: 10,
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
         Expanded(
           child: Text(
-            lottery != null ? result.emotionalText(lottery) : '',
+            summary,
             style: theme.textTheme.labelMedium?.copyWith(
-              color: isGreat
-                  ? Colors.green.shade700
-                  : isGood
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.onSurface.withAlpha(140),
-              fontWeight: isGood ? FontWeight.w700 : FontWeight.normal,
+              color: isGood
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurface.withAlpha(140),
+              fontWeight: isGood ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
         ),
@@ -852,6 +899,59 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
             ),
           ),
         ],
+      ],
+    );
+  }
+
+  Widget _buildProgressDots(ThemeData theme, PickMatchResult result, Lottery lottery) {
+    final matchedMain = result.matchedMain;
+    final total = lottery.mainCount;
+
+    return Row(
+      children: [
+        for (int i = 0; i < total; i++)
+          Padding(
+            padding: const EdgeInsets.only(right: 3),
+            child: Text(
+              i < matchedMain ? '●' : '○',
+              style: TextStyle(
+                fontSize: 9,
+                height: 1,
+                color: i < matchedMain
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface.withAlpha(70),
+              ),
+            ),
+          ),
+        if (lottery.bonusIsSupplementary && result.suppHits > 0) ...[
+          const SizedBox(width: 5),
+          Text(
+            '+${result.suppHits}s',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: const Color(0xFFD32F2F),
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ] else if (!lottery.bonusIsSupplementary && result.matchedBonus > 0) ...[
+          const SizedBox(width: 5),
+          Text(
+            '+${lottery.bonusLabel ?? 'B'}',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: const Color(0xFFD32F2F),
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+        const SizedBox(width: 6),
+        Text(
+          '$matchedMain / $total',
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurface.withAlpha(90),
+            fontSize: 9,
+          ),
+        ),
       ],
     );
   }

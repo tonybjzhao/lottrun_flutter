@@ -125,30 +125,28 @@ class _ResultPanelState extends State<ResultPanel>
         widget.pick.bonusNumbers!.any((n) => draw.bonusNumbers!.contains(n));
     final dateStr = DateFormat('d MMM yyyy').format(draw.drawDate);
 
-    String label;
-    Color color;
-    if (matched.length >= 5 || (matched.length >= 4 && bonusHit)) {
-      label = '🎯 Incredible — ${matched.length}${bonusHit ? ' + PB' : ''} matched last draw ($dateStr)';
-      color = Colors.green.shade700;
-    } else if (matched.length >= 3) {
-      label = '😮 So close — ${matched.length}${bonusHit ? ' + PB' : ''} matched last draw ($dateStr)';
-      color = theme.colorScheme.primary;
-    } else if (matched.length == 2) {
-      label = '🙌 Almost — 2 matched last draw ($dateStr)';
-      color = theme.colorScheme.onSurface.withAlpha(160);
-    } else if (matched.length == 1) {
-      label = '1 matched last draw ($dateStr) — keep trying';
+    final bonusLabel = widget.lottery.bonusLabel ?? 'Supp';
+    final bonusSuffix = bonusHit ? ' + $bonusLabel' : '';
+    final String label;
+    final Color color;
+    if (matched.isEmpty && !bonusHit) {
+      label = 'No match last draw ($dateStr)';
+      color = theme.colorScheme.onSurface.withAlpha(100);
+    } else if (matched.isEmpty) {
+      label = '$bonusLabel matched last draw ($dateStr)';
       color = theme.colorScheme.onSurface.withAlpha(140);
     } else {
-      label = '0 matched last draw ($dateStr) — luck is building';
-      color = theme.colorScheme.onSurface.withAlpha(100);
+      label = 'Matched ${matched.length}$bonusSuffix last draw ($dateStr)';
+      color = matched.length >= 3
+          ? theme.colorScheme.primary
+          : theme.colorScheme.onSurface.withAlpha(140);
     }
 
     return Text(
       label,
       style: theme.textTheme.labelSmall?.copyWith(
         color: color,
-        fontWeight: matched.length >= 3 ? FontWeight.w600 : FontWeight.normal,
+        fontWeight: matched.length >= 3 || bonusHit ? FontWeight.w600 : FontWeight.normal,
       ),
     );
   }

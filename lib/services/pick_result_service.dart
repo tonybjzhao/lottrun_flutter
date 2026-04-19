@@ -10,7 +10,6 @@ class PickMatchResult {
   final List<int> matchedMainNumbers;
 
   /// pick.mainNumbers ∩ draw.bonusNumbers (supp lotteries only)
-  /// e.g. one of the player's 6 picks appeared in the draw's supp pool.
   final List<int> matchedMainInDrawSupp;
 
   /// pick.bonusNumbers ∩ draw.bonusNumbers
@@ -18,7 +17,6 @@ class PickMatchResult {
   final List<int> matchedBonusNumbers;
 
   /// pick.bonusNumbers ∩ draw.mainNumbers
-  /// The player's bonus pick happened to match a main draw number.
   final List<int> matchedBonusInDrawMain;
 
   final List<int> drawMainNumbers;
@@ -47,61 +45,55 @@ class PickMatchResult {
   int get suppHits => matchedMainInDrawSupp.length;
 
   /// Higher score = better pick. Used for "Best Pick" badge ranking.
-  /// Supp hits and cross-pool bonus hits count but with lower weight.
   int get score =>
       matchedMain * 2 +
       suppHits +
       matchedBonus * 2 +
       matchedBonusInDrawMain.length;
 
-  String emotionalText(Lottery lottery) {
+  /// Total effective matches for level calculation.
+  int _levelTotal(Lottery lottery) =>
+      matchedMain +
+      (lottery.bonusIsSupplementary ? suppHits : matchedBonus);
+
+  /// Factual match summary — no prize or win language.
+  /// e.g. "3 main + 1 supp matched", "Matched 4 numbers + Powerball",
+  ///      "No numbers matched"
+  String matchSummary(Lottery lottery) {
     if (isPending) return '';
 
     if (lottery.bonusIsSupplementary) {
-      return _emotionalTextSupp(lottery.mainCount);
+      final m = matchedMain;
+      final s = suppHits;
+      if (m == 0 && s == 0) return 'No numbers matched';
+      final parts = <String>[];
+      if (m > 0) parts.add('$m main');
+      if (s > 0) parts.add('$s supp');
+      return '${parts.join(' + ')} matched';
     }
 
     // Powerball / inline-bonus lotteries
+    final m = matchedMain;
+    final b = matchedBonus > 0;
     final label = lottery.bonusLabel ?? '+';
-    final hasBonus = matchedBonus > 0;
-    final bp = hasBonus ? ' + $label' : '';
-    return switch (matchedMain) {
-      0 when !hasBonus => 'No match this time — luck is building 🤞',
-      0                => '$label matched! — keep going 🙌',
-      1 when !hasBonus => '1 matched — keep going 🙌',
-      1                => '1$bp matched 😊',
-      2                => '2$bp matched — almost! 🤞',
-      3                => '😮 So close — 3$bp matched!',
-      4                => '🔥 Wow — 4$bp matched!',
-      _                => hasBonus
-          ? '🏆 Incredible — $matchedMain + bonus matched!'
-          : '🚀 Amazing — $matchedMain matched!',
-    };
+    if (m == 0 && !b) return 'No numbers matched';
+    if (m == 0) return '$label matched';
+    if (!b) return 'Matched $m number${m == 1 ? '' : 's'}';
+    return 'Matched $m number${m == 1 ? '' : 's'} + $label';
   }
 
-  String _emotionalTextSupp(int mainCount) {
-    final m = matchedMain;
-    final s = suppHits;
-    final bonusPickHit = matchedBonus > 0 || matchedBonusInDrawMain.isNotEmpty;
-
-    if (m == 0 && s == 0 && !bonusPickHit) {
-      return 'No match this time — luck is building 🤞';
-    }
-
-    final parts = <String>[];
-    if (m > 0) parts.add('$m main');
-    if (s > 0) parts.add('$s supp');
-    final hit = parts.join(' + ');
-
-    if (m >= mainCount) return '🏆 Division 1! All $m matched!';
-    if (m >= mainCount - 1 && s >= 1) return '🏆 Division 2! $hit matched!';
-    if (m >= mainCount - 1) return '🔥 Division 3! $m main matched!';
-    if (m >= mainCount - 2) return '😮 So close — $hit matched!';
-    if (m >= 3 && s >= 1) return '😮 $hit matched — almost!';
-    if (m >= 3) return '3 main matched — almost! 🤞';
-    if (hit.isNotEmpty) return '$hit matched — keep going 🙌';
-    if (matchedBonus > 0) return 'Supp pick correct! — keep going 🙌';
-    return 'Supp pick hit a draw number! 🎯';
+  /// Gamification level label based on total effective matches.
+  /// Uses neutral language — no prize implication.
+  String levelLabel(Lottery lottery) {
+    final total = _levelTotal(lottery);
+    return switch (total) {
+      0 => 'No match',
+      1 => 'Light hit',
+      2 => 'Nice',
+      3 => 'Solid',
+      4 => 'Strong',
+      _ => 'Great',
+    };
   }
 }
 
