@@ -310,12 +310,13 @@ class _DrawTile extends StatelessWidget {
   static const _ballSize = 30.0;
   static const _ballSpacing = 5.0;
 
-  Widget _ballRow(List<int> numbers, {bool bonus = false}) {
+  Widget _ballRow(List<int> numbers, {bool bonus = false, double? size}) {
+    final s = size ?? _ballSize;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: numbers.map((n) => Padding(
         padding: const EdgeInsets.only(right: _ballSpacing),
-        child: LottoBall(number: n, isBonus: bonus, size: _ballSize),
+        child: LottoBall(number: n, isBonus: bonus, size: s),
       )).toList(),
     );
   }
@@ -325,10 +326,9 @@ class _DrawTile extends StatelessWidget {
     final theme = Theme.of(context);
     final dateStr = DateFormat('d MMM yy').format(draw.drawDate);
 
-    // All main numbers on row 1, bonus/supps on row 2.
-    final row1 = draw.mainNumbers;
-    const row2 = <int>[];
-    final bonus = draw.bonusNumbers ?? [];
+    final mainNums = draw.mainNumbers;
+    final bonusNums = draw.bonusNumbers ?? [];
+    final bonusLabel = lottery.bonusLabel; // null = supplementary
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
@@ -354,16 +354,27 @@ class _DrawTile extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _ballRow(row1),
-              if (row2.isNotEmpty || bonus.isNotEmpty) ...[
+              _ballRow(mainNums),
+              if (bonusNums.isNotEmpty) ...[
                 const SizedBox(height: 5),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (row2.isNotEmpty) _ballRow(row2),
-                    if (row2.isNotEmpty && bonus.isNotEmpty)
-                      const SizedBox(width: 6),
-                    if (bonus.isNotEmpty) _ballRow(bonus, bonus: true),
+                    Text(
+                      bonusLabel ?? 'Supp',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: const Color(0xFFD32F2F),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 10,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    _ballRow(
+                      bonusNums,
+                      bonus: true,
+                      // Supp balls slightly smaller; powerball keeps same size
+                      size: bonusLabel == null ? _ballSize - 2 : _ballSize,
+                    ),
                   ],
                 ),
               ],

@@ -6,6 +6,7 @@ import '../models/lottery.dart';
 import 'manual_pick_entry_screen.dart';
 import '../models/lottery_draw.dart';
 import '../services/local_storage_service.dart';
+import '../services/lottery_history_csv_service.dart';
 import '../services/lottery_service.dart';
 import '../services/pick_result_service.dart';
 import '../widgets/ball_row.dart';
@@ -61,6 +62,7 @@ class SavedPicksScreen extends StatefulWidget {
 
 class _SavedPicksScreenState extends State<SavedPicksScreen> {
   List<GeneratedPick> _picks = [];
+  Map<String, List<LotteryDraw>> _drawsByLottery = {};
   bool _loading = true;
 
   @override
@@ -71,7 +73,28 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
 
   Future<void> _load() async {
     final picks = await LocalStorageService.instance.getSavedPicks();
-    if (mounted) setState(() { _picks = picks; _loading = false; });
+    if (!mounted) return;
+
+    final uniqueIds = picks.map((p) => p.lotteryId).toSet();
+    final drawsMap = <String, List<LotteryDraw>>{};
+    await Future.wait(uniqueIds.map((id) async {
+      final lottery = LotteryService.instance.getLotteryById(id);
+      if (lottery == null) return;
+      try {
+        final result = await LotteryHistoryCsvService.instance.fetchDraws(lottery);
+        drawsMap[id] = result.draws;
+      } catch (_) {
+        drawsMap[id] = LotteryService.instance.getDraws(id);
+      }
+    }));
+
+    if (mounted) {
+      setState(() {
+        _picks = picks;
+        _drawsByLottery = drawsMap;
+        _loading = false;
+      });
+    }
   }
 
   Future<void> _delete(GeneratedPick pick) async {
@@ -169,12 +192,12 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
     );
   }
 
+  List<LotteryDraw> _drawsFor(String lotteryId) =>
+      _drawsByLottery[lotteryId] ?? LotteryService.instance.getDraws(lotteryId);
+
   List<GeneratedPick> _sortPicks(List<GeneratedPick> picks) {
-    final drawsCache = <String, List<LotteryDraw>>{};
     int group(GeneratedPick p) {
-      final draws = drawsCache.putIfAbsent(
-          p.lotteryId, () => LotteryService.instance.getDraws(p.lotteryId));
-      final result = checkPickResult(p, draws);
+      final result = checkPickResult(p, _drawsFor(p.lotteryId));
       if (result == null) return 2;        // legacy — no draw context
       if (result.isPending) return 0;      // pending draw
       return 1;                            // resolved
@@ -201,8 +224,7 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
     int totalHits = 0;
 
     for (final pick in _picks) {
-      final draws = LotteryService.instance.getDraws(pick.lotteryId);
-      final result = checkPickResult(pick, draws);
+      final result = checkPickResult(pick, _drawsFor(pick.lotteryId));
       if (result == null || result.isPending) continue;
       resolvedCount++;
       totalHits += result.matchedMain + result.matchedBonus;
@@ -231,8 +253,7 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
     int bestScore = 0;
     String? bestId;
     for (final pick in _picks) {
-      final draws = LotteryService.instance.getDraws(pick.lotteryId);
-      final result = checkPickResult(pick, draws);
+      final result = checkPickResult(pick, _drawsFor(pick.lotteryId));
       if (result == null || result.isPending) continue;
       if (result.score > bestScore) {
         bestScore = result.score;
@@ -287,6 +308,7 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: _PickItem(
             pick: pick,
+            draws: _drawsFor(pick.lotteryId),
             isBest: pick.id == bestId,
             onDelete: () => _delete(pick),
             onTap: () => Navigator.pop(context, pick),
@@ -504,12 +526,14 @@ class _SectionHeader extends StatelessWidget {
 
 class _PickItem extends StatefulWidget {
   final GeneratedPick pick;
+  final List<LotteryDraw> draws;
   final VoidCallback onDelete;
   final VoidCallback onTap;
   final bool isBest;
 
   const _PickItem({
     required this.pick,
+    required this.draws,
     required this.onDelete,
     required this.onTap,
     this.isBest = false,
@@ -521,15 +545,13 @@ class _PickItem extends StatefulWidget {
 
 class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixin {
   final _shareCardKey = GlobalKey();
-  late final List<LotteryDraw> _draws;
   late final PickMatchResult? _result;
   AnimationController? _revealCtrl;
 
   @override
   void initState() {
     super.initState();
-    _draws = LotteryService.instance.getDraws(widget.pick.lotteryId);
-    _result = checkPickResult(widget.pick, _draws);
+    _result = checkPickResult(widget.pick, widget.draws);
     if (_result != null && !_result.isPending) {
       _revealCtrl = AnimationController(
         vsync: this,
@@ -644,7 +666,7 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
 
     final mainNums = widget.pick.mainNumbers;
     final bonusNums = widget.pick.bonusNumbers ?? [];
-    final bLabel = bonusLabelForLottery(widget.pick.lotteryId);
+    final bLabel = _lottery?.bonusLabel;
 
     final textAnim = ctrl != null
         ? CurvedAnimation(
@@ -898,7 +920,7 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
                     BallRow(
                       mainNumbers: widget.pick.mainNumbers,
                       bonusNumbers: bonusNums,
-                      bonusLabel: bonusLabelForLottery(widget.pick.lotteryId),
+                      bonusLabel: _lottery?.bonusLabel,
                       ballSize: 36,
                       spacing: 6,
                     ),

@@ -1014,7 +1014,7 @@ class _InlinePickCard extends StatelessWidget {
               BallRow(
                 mainNumbers: pick.mainNumbers,
                 bonusNumbers: pick.bonusNumbers ?? [],
-                bonusLabel: bonusLabelForLottery(lottery.id),
+                bonusLabel: lottery.bonusLabel,
                 ballSize: 38,
                 spacing: 6,
               ),
@@ -1335,59 +1335,80 @@ class _CompactPickBannerState extends State<_CompactPickBanner>
                       ],
                     ),
                     const SizedBox(height: 10),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 4),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            for (var i = 0; i < mainNums.length; i++) ...[
-                              AnimatedBuilder(
-                                animation: _ballAnim(i, total),
-                                builder: (_, child) => Transform.scale(
-                                  scale: _ballAnim(i, total)
-                                      .value
-                                      .clamp(0.0, 1.0),
-                                  child: child,
-                                ),
-                                child: LottoBall(
-                                    number: mainNums[i], size: 38),
-                              ),
-                              SizedBox(
-                                  width: i < mainNums.length - 1 ||
-                                          bonusNums.isNotEmpty
-                                      ? 6
-                                      : 0),
-                            ],
-                            if (bonusNums.isNotEmpty) ...[
-                              const SizedBox(width: 2),
-                              for (var i = 0;
-                                  i < bonusNums.length;
-                                  i++) ...[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              for (var i = 0; i < mainNums.length; i++) ...[
                                 AnimatedBuilder(
-                                  animation:
-                                      _ballAnim(mainNums.length + i, total),
+                                  animation: _ballAnim(i, total),
                                   builder: (_, child) => Transform.scale(
-                                    scale: _ballAnim(
-                                            mainNums.length + i, total)
-                                        .value
-                                        .clamp(0.0, 1.0),
+                                    scale: _ballAnim(i, total).value.clamp(0.0, 1.0),
                                     child: child,
                                   ),
-                                  child: LottoBall(
-                                      number: bonusNums[i],
-                                      isBonus: true,
-                                      size: 38),
+                                  child: LottoBall(number: mainNums[i], size: 38),
                                 ),
-                                if (i < bonusNums.length - 1)
+                                if (i < mainNums.length - 1 ||
+                                    (bonusNums.isNotEmpty && !widget.lottery.bonusIsSupplementary))
                                   const SizedBox(width: 6),
                               ],
+                              // Powerball-style: inline
+                              if (bonusNums.isNotEmpty && !widget.lottery.bonusIsSupplementary) ...[
+                                const SizedBox(width: 2),
+                                for (var i = 0; i < bonusNums.length; i++) ...[
+                                  AnimatedBuilder(
+                                    animation: _ballAnim(mainNums.length + i, total),
+                                    builder: (_, child) => Transform.scale(
+                                      scale: _ballAnim(mainNums.length + i, total).value.clamp(0.0, 1.0),
+                                      child: child,
+                                    ),
+                                    child: LottoBall(number: bonusNums[i], isBonus: true, size: 38),
+                                  ),
+                                  if (i < bonusNums.length - 1) const SizedBox(width: 6),
+                                ],
+                              ],
                             ],
-                          ],
+                          ),
                         ),
-                      ),
+                        // Supplementary-style: second row
+                        if (bonusNums.isNotEmpty && widget.lottery.bonusIsSupplementary) ...[
+                          const SizedBox(height: 6),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Supp',
+                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: const Color(0xFFD32F2F),
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                for (var i = 0; i < bonusNums.length; i++) ...[
+                                  AnimatedBuilder(
+                                    animation: _ballAnim(mainNums.length + i, total),
+                                    builder: (_, child) => Transform.scale(
+                                      scale: _ballAnim(mainNums.length + i, total).value.clamp(0.0, 1.0),
+                                      child: child,
+                                    ),
+                                    child: LottoBall(number: bonusNums[i], isBonus: true, size: 34),
+                                  ),
+                                  if (i < bonusNums.length - 1) const SizedBox(width: 6),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),

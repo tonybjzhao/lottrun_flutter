@@ -62,7 +62,7 @@ class _ResultPanelState extends State<ResultPanel>
     );
   }
 
-  Widget _animBall(int number, bool isBonus, int index, int total) {
+  Widget _animBall(int number, bool isBonus, int index, int total, {double size = 44}) {
     final anim = _ballAnim(index, total);
     return AnimatedBuilder(
       animation: anim,
@@ -70,7 +70,7 @@ class _ResultPanelState extends State<ResultPanel>
         scale: anim.value.clamp(0.0, 1.0),
         child: child,
       ),
-      child: LottoBall(number: number, isBonus: isBonus),
+      child: LottoBall(number: number, isBonus: isBonus, size: size),
     );
   }
 
@@ -88,11 +88,7 @@ class _ResultPanelState extends State<ResultPanel>
         'Generated for fun — LottoRun AI';
   }
 
-  String _bonusLabel() => switch (widget.lottery.id) {
-        'us_powerball' => 'Powerball',
-        'us_megamillions' => 'Mega Ball',
-        _ => 'Bonus',
-      };
+  String _bonusLabel() => widget.lottery.bonusLabel ?? 'Supp';
 
   Future<void> _copy(BuildContext context) async {
     HapticFeedback.lightImpact();
@@ -224,37 +220,74 @@ class _ResultPanelState extends State<ResultPanel>
             const SizedBox(height: 16),
 
             // ── Balls (staggered pop-in, horizontal scroll) ────
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.only(right: 4),
+            if (widget.lottery.bonusIsSupplementary && bonusNums.isNotEmpty) ...[
+              // Supplementary: two rows (main row + Supp row)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(children: [
+                  for (var i = 0; i < mainNums.length; i++) ...[
+                    _animBall(mainNums[i], false, i, total),
+                    if (i < mainNums.length - 1) const SizedBox(width: 8),
+                  ],
+                ]),
+              ),
+              const SizedBox(height: 8),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    for (var i = 0; i < mainNums.length; i++) ...[
-                      _animBall(mainNums[i], false, i, total),
-                      SizedBox(width: i < mainNums.length - 1 || bonusNums.isNotEmpty ? 8 : 0),
-                    ],
-                    if (bonusNums.isNotEmpty) ...[
-                      Text(
-                        _bonusLabel(),
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: const Color(0xFFD32F2F),
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.3,
-                        ),
+                    Text(
+                      'Supp',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: const Color(0xFFD32F2F),
+                        fontWeight: FontWeight.w700,
                       ),
-                      const SizedBox(width: 10),
-                      for (var i = 0; i < bonusNums.length; i++) ...[
-                        _animBall(bonusNums[i], true, mainNums.length + i, total),
-                        if (i < bonusNums.length - 1) const SizedBox(width: 8),
-                      ],
+                    ),
+                    const SizedBox(width: 8),
+                    for (var i = 0; i < bonusNums.length; i++) ...[
+                      _animBall(bonusNums[i], true, mainNums.length + i, total, size: 38),
+                      if (i < bonusNums.length - 1) const SizedBox(width: 8),
                     ],
                   ],
                 ),
               ),
-            ),
+            ] else ...[
+              // Inline: powerball-style, all on one row
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      for (var i = 0; i < mainNums.length; i++) ...[
+                        _animBall(mainNums[i], false, i, total),
+                        SizedBox(width: i < mainNums.length - 1 || bonusNums.isNotEmpty ? 8 : 0),
+                      ],
+                      if (bonusNums.isNotEmpty) ...[
+                        Text(
+                          _bonusLabel(),
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: const Color(0xFFD32F2F),
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        for (var i = 0; i < bonusNums.length; i++) ...[
+                          _animBall(bonusNums[i], true, mainNums.length + i, total),
+                          if (i < bonusNums.length - 1) const SizedBox(width: 8),
+                        ],
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
 
             // ── Match check ────────────────────────────────────
             if (matchRow != null) ...[

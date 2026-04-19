@@ -5,7 +5,6 @@ import '../models/generated_pick.dart';
 import '../models/lottery.dart';
 import '../services/draw_date_service.dart';
 import '../services/local_storage_service.dart';
-import '../widgets/ball_row.dart';
 
 class ManualPickEntryScreen extends StatefulWidget {
   final Lottery? initialLottery;
@@ -88,7 +87,7 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
     if (mounted) Navigator.pop(context, true);
   }
 
-  String _bonusLabel() => bonusLabelForLottery(_lottery.id) ?? 'Bonus';
+  String _bonusLabel() => _lottery.bonusLabel ?? 'Supp';
 
   @override
   Widget build(BuildContext context) {

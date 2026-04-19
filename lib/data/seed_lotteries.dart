@@ -13,6 +13,7 @@ const List<Lottery> kSeedLotteries = [
     bonusCount: 1,
     bonusMin: 1,
     bonusMax: 20,
+    bonusLabel: 'Powerball',
   ),
   Lottery(
     id: 'au_ozlotto',
@@ -25,6 +26,7 @@ const List<Lottery> kSeedLotteries = [
     bonusCount: 3,
     bonusMin: 1,
     bonusMax: 47,
+    // bonusLabel: null → supplementary style (Supp row)
   ),
   Lottery(
     id: 'au_saturday',
@@ -37,6 +39,7 @@ const List<Lottery> kSeedLotteries = [
     bonusCount: 2,
     bonusMin: 1,
     bonusMax: 45,
+    // bonusLabel: null → supplementary style (Supp row)
   ),
 
   // ── United States ──────────────────────────────────────────────────────────
@@ -51,6 +54,7 @@ const List<Lottery> kSeedLotteries = [
     bonusCount: 1,
     bonusMin: 1,
     bonusMax: 26,
+    bonusLabel: 'Powerball',
   ),
   Lottery(
     id: 'us_megamillions',
@@ -63,5 +67,6 @@ const List<Lottery> kSeedLotteries = [
     bonusCount: 1,
     bonusMin: 1,
     bonusMax: 25,
+    bonusLabel: 'Mega Ball',
   ),
 ];

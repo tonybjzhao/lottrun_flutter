@@ -10,6 +10,10 @@ class Lottery {
   final int? bonusMin;
   final int? bonusMax;
 
+  /// Inline label shown before bonus balls (e.g. "Powerball", "Mega Ball").
+  /// null = supplementary style (shown on second row, labeled "Supp").
+  final String? bonusLabel;
+
   const Lottery({
     required this.id,
     required this.countryCode,
@@ -21,9 +25,13 @@ class Lottery {
     this.bonusCount,
     this.bonusMin,
     this.bonusMax,
+    this.bonusLabel,
   });
 
   bool get hasBonus => bonusCount != null && bonusCount! > 0;
+
+  /// true = bonus balls are secondary (Supp row); false = inline powerball-style
+  bool get bonusIsSupplementary => hasBonus && bonusLabel == null;
 
   String get displayName => '$countryName · $name';
 }
