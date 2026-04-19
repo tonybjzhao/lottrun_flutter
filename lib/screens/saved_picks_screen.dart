@@ -648,10 +648,15 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
       return BallResultState.unmatched;
     }
 
+    final mainNums = widget.pick.mainNumbers;
+    final bonusNums = widget.pick.bonusNumbers ?? [];
+    final isSupp = lottery?.bonusIsSupplementary ?? false;
+    final bLabel = lottery?.bonusLabel;
+
+    // For supp lotteries, bonus balls are draw-only — not displayed, not animated.
     final totalMatched = result.matchedMainNumbers.length +
         result.matchedMainInDrawSupp.length +
-        result.matchedBonusNumbers.length +
-        result.matchedBonusInDrawMain.length;
+        (isSupp ? 0 : result.matchedBonusNumbers.length + result.matchedBonusInDrawMain.length);
 
     final dimAnim = ctrl != null
         ? CurvedAnimation(
@@ -672,9 +677,9 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
       );
     }
 
-    Widget wrappedBall(int n, bool isSupp, BallResultState state, {double size = 36}) {
+    Widget wrappedBall(int n, bool isBonusBall, BallResultState state, {double size = 36}) {
       final isHit = state != BallResultState.unmatched;
-      final ball = LottoBall(number: n, isBonus: isSupp, resultState: state, size: size);
+      final ball = LottoBall(number: n, isBonus: isBonusBall, resultState: state, size: size);
       if (ctrl == null) return ball;
       if (isHit) {
         final anim = nextMatchAnim();
@@ -695,11 +700,6 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
         );
       }
     }
-
-    final mainNums = widget.pick.mainNumbers;
-    final bonusNums = widget.pick.bonusNumbers ?? [];
-    final isSupp = lottery?.bonusIsSupplementary ?? false;
-    final bLabel = lottery?.bonusLabel;
 
     final textAnim = ctrl != null
         ? CurvedAnimation(
@@ -754,25 +754,26 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
             children: [
               for (var i = 0; i < mainNums.length; i++) ...[
                 wrappedBall(mainNums[i], false, mainState(mainNums[i])),
-                if (i < mainNums.length - 1 || bonusNums.isNotEmpty)
+                if (i < mainNums.length - 1 || (bonusNums.isNotEmpty && !isSupp))
                   const SizedBox(width: 6),
               ],
-              // Powerball-style: label before bonus ball
-              if (bonusNums.isNotEmpty && !isSupp && bLabel != null) ...[
-                Text(
-                  bLabel,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withAlpha(120),
-                    fontWeight: FontWeight.w700,
+              // Supp lotteries: bonus balls are draw-only, not user picks — skip.
+              // Powerball-style: show label + bonus ball.
+              if (bonusNums.isNotEmpty && !isSupp) ...[
+                if (bLabel != null) ...[
+                  Text(
+                    bLabel,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withAlpha(120),
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 6),
-              ],
-              // Bonus/supp balls — slightly smaller for supplementary type
-              for (var i = 0; i < bonusNums.length; i++) ...[
-                wrappedBall(bonusNums[i], true, bonusState(bonusNums[i]),
-                    size: isSupp ? 30 : 36),
-                if (i < bonusNums.length - 1) const SizedBox(width: 6),
+                  const SizedBox(width: 6),
+                ],
+                for (var i = 0; i < bonusNums.length; i++) ...[
+                  wrappedBall(bonusNums[i], true, bonusState(bonusNums[i])),
+                  if (i < bonusNums.length - 1) const SizedBox(width: 6),
+                ],
               ],
             ],
           ),

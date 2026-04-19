@@ -102,15 +102,15 @@ void main() {
       expect(r.levelLabel(_saturdayLottery), 'Strong');
     });
 
-    test('supp-only hit shows matched not "No match"', () {
+    test('bonus picks ignored for supp lottery — no false match', () {
+      // App-generated bonus picks should not contaminate match result for Saturday Lotto.
       final pick = _pick(lotteryId: 'au_saturday', main: [10, 20, 30, 40, 41, 42], bonus: [1, 2]);
-      // supp pick "1" hits draw.main
       final draw = _draw(lotteryId: 'au_saturday', main: [1, 3, 4, 5, 6, 7], supp: [31, 32]);
       final r = checkPickResult(pick, _saturdayLottery, [draw])!;
       expect(r.matchedMain, 0);
-      expect(r.matchedBonusInDrawMain, contains(1));
-      expect(r.matchSummary(_saturdayLottery), '1 matched (supp)');
-      expect(r.levelLabel(_saturdayLottery), 'Light hit');
+      expect(r.matchedBonusInDrawMain, isEmpty);
+      expect(r.matchSummary(_saturdayLottery), 'No numbers matched');
+      expect(r.levelLabel(_saturdayLottery), 'No match');
     });
 
     test('5 main matched', () {
@@ -141,14 +141,14 @@ void main() {
       expect(r.levelLabel(_saturdayLottery), 'Great');
     });
 
-    test('supp picks both hit draw main — 2 matched (supp)', () {
+    test('bonus picks ignored even if they hit draw main', () {
+      // For supp lotteries, bonus numbers are app-generated — not user picks.
       final pick = _pick(lotteryId: 'au_saturday', main: [10, 20, 30, 40, 41, 42], bonus: [1, 2]);
       final draw = _draw(lotteryId: 'au_saturday', main: [1, 2, 3, 4, 5, 6], supp: [31, 32]);
       final r = checkPickResult(pick, _saturdayLottery, [draw])!;
       expect(r.matchedMain, 0);
-      expect(r.matchedBonusInDrawMain, containsAll([1, 2]));
-      expect(r.matchSummary(_saturdayLottery), '2 matched (supp)');
-      expect(r.levelLabel(_saturdayLottery), 'Nice');
+      expect(r.matchedBonusInDrawMain, isEmpty);
+      expect(r.matchSummary(_saturdayLottery), 'No numbers matched');
     });
   });
 

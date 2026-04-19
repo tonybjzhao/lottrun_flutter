@@ -132,13 +132,18 @@ PickMatchResult? checkPickResult(
       ? pick.mainNumbers.where(drawSuppSet.contains).toList()
       : <int>[];
 
-  // pick.bonus vs draw.bonus
-  final matchedBonus = (pick.bonusNumbers != null && drawSuppSet.isNotEmpty)
+  // pick.bonus vs draw.bonus — only meaningful for non-supp lotteries (e.g. Powerball).
+  // For supplementary lotteries (Saturday, Oz Lotto), bonus numbers are app-generated
+  // and not real user selections — ignore them completely.
+  final matchedBonus = (!lottery.bonusIsSupplementary &&
+          pick.bonusNumbers != null &&
+          drawSuppSet.isNotEmpty)
       ? pick.bonusNumbers!.where(drawSuppSet.contains).toList()
       : <int>[];
 
-  // pick.bonus vs draw.main (bonus pick happened to hit a main draw number)
-  final matchedBonusInDrawMain = pick.bonusNumbers != null
+  // pick.bonus vs draw.main — same gate: supp lotteries skip this entirely.
+  final matchedBonusInDrawMain = (!lottery.bonusIsSupplementary &&
+          pick.bonusNumbers != null)
       ? pick.bonusNumbers!.where(drawMainSet.contains).toList()
       : <int>[];
 
