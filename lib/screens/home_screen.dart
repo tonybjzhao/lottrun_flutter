@@ -49,8 +49,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   List<GeneratedPick>? _threePicks;
   List<bool> _threePicksSaved = [false, false, false];
   bool _isThreePicksLoading = false;
-  final List<GlobalKey> _threePicksShareKeys =
-      List.generate(3, (_) => GlobalKey());
 
   static const _kThreePicksStyles = [
     PlayStyle.balanced,
@@ -636,7 +634,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 microcopy: _kThreePicksMicrocopy,
                 colors: _kThreePicksColors,
                 lottery: _selectedLottery,
-                shareKeys: _threePicksShareKeys,
                 savedStates: _threePicksSaved,
                 onSave: _saveThreePick,
                 onSaveAll: _saveAllThreePicks,
@@ -773,7 +770,6 @@ class _ThreePicksInline extends StatefulWidget {
   final List<String> microcopy;
   final List<Color> colors;
   final Lottery lottery;
-  final List<GlobalKey> shareKeys;
   final List<bool> savedStates;
   final void Function(int index) onSave;
   final VoidCallback onSaveAll;
@@ -785,7 +781,6 @@ class _ThreePicksInline extends StatefulWidget {
     required this.microcopy,
     required this.colors,
     required this.lottery,
-    required this.shareKeys,
     required this.savedStates,
     required this.onSave,
     required this.onSaveAll,
@@ -795,72 +790,37 @@ class _ThreePicksInline extends StatefulWidget {
   State<_ThreePicksInline> createState() => _ThreePicksInlineState();
 }
 
-class _ThreePicksInlineState extends State<_ThreePicksInline>
-    with TickerProviderStateMixin {
-  late AnimationController _ctrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 850),
-    )..forward();
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  Animation<double> _cardAnim(int index) {
-    final start = index * 0.22;
-    return CurvedAnimation(
-      parent: _ctrl,
-      curve: Interval(start, (start + 0.55).clamp(0.0, 1.0),
-          curve: Curves.easeOutBack),
-    );
-  }
-
+class _ThreePicksInlineState extends State<_ThreePicksInline> {
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         for (var i = 0; i < widget.picks.length; i++) ...[
-          AnimatedBuilder(
-            animation: _cardAnim(i),
-            builder: (_, child) => Opacity(
-              opacity: _cardAnim(i).value.clamp(0.0, 1.0),
-              child: Transform.translate(
-                offset: Offset(0, 22 * (1 - _cardAnim(i).value)),
-                child: child,
-              ),
-            ),
-            child: _InlinePickCard(
-              pick: widget.picks[i],
-              label: widget.labels[i],
-              badge: widget.badges[i],
-              microcopy: widget.microcopy[i],
-              accentColor: widget.colors[i],
-              lottery: widget.lottery,
-              shareCardKey: widget.shareKeys[i],
-              isSaved: widget.savedStates[i],
-              onSave: () => widget.onSave(i),
-            ),
+          _InlinePickCard(
+            pick: widget.picks[i],
+            label: widget.labels[i],
+            badge: widget.badges[i],
+            microcopy: widget.microcopy[i],
+            accentColor: widget.colors[i],
+            lottery: widget.lottery,
+            isSaved: widget.savedStates[i],
+            onSave: () => widget.onSave(i),
           ),
           if (i < widget.picks.length - 1) const SizedBox(height: 12),
         ],
         const SizedBox(height: 14),
-        OutlinedButton.icon(
-          onPressed: widget.onSaveAll,
-          icon: const Icon(Icons.bookmark_rounded, size: 18),
-          label: const Text('Save All'),
-          style: OutlinedButton.styleFrom(
-            minimumSize: const Size(double.infinity, 48),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: widget.onSaveAll,
+            icon: const Icon(Icons.bookmark_rounded, size: 18),
+            label: const Text('Save All'),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(0, 48),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
           ),
         ),
       ],
@@ -877,7 +837,6 @@ class _InlinePickCard extends StatelessWidget {
   final String microcopy;
   final Color accentColor;
   final Lottery lottery;
-  final GlobalKey shareCardKey;
   final bool isSaved;
   final VoidCallback onSave;
 
@@ -888,7 +847,6 @@ class _InlinePickCard extends StatelessWidget {
     required this.microcopy,
     required this.accentColor,
     required this.lottery,
-    required this.shareCardKey,
     required this.isSaved,
     required this.onSave,
   });
@@ -927,149 +885,154 @@ class _InlinePickCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Stack(
-      children: [
-        // Off-screen share card
-        Positioned(
-          left: -10000,
-          top: 0,
-          width: 360,
-          child: RepaintBoundary(
-            key: shareCardKey,
-            child: PickShareCard(pick: pick, lottery: lottery),
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.black.withAlpha(13)),
+        boxShadow: [
+          BoxShadow(
+            color: accentColor.withAlpha(25),
+            blurRadius: 14,
+            offset: const Offset(0, 5),
           ),
-        ),
-
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: theme.cardColor,
-            borderRadius: BorderRadius.circular(18),
-            border: Border(
-              left: BorderSide(color: accentColor, width: 4),
-              top: BorderSide(color: Colors.black.withAlpha(13)),
-              right: BorderSide(color: Colors.black.withAlpha(13)),
-              bottom: BorderSide(color: Colors.black.withAlpha(13)),
+        ],
+      ),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              width: 4,
+              decoration: BoxDecoration(
+                color: accentColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(18),
+                  bottomLeft: Radius.circular(18),
+                ),
+              ),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: accentColor.withAlpha(25),
-                blurRadius: 14,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Label + badge ────────────────────────────────────
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      label,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: accentColor,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(999),
-                      color: accentColor.withAlpha(30),
-                    ),
-                    child: Text(
-                      badge,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: accentColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // ── Ball row ─────────────────────────────────────────
-              BallRow(
-                mainNumbers: pick.mainNumbers,
-                bonusNumbers: pick.bonusNumbers ?? [],
-                bonusLabel: lottery.bonusLabel,
-                ballSize: 38,
-                spacing: 6,
-              ),
-              const SizedBox(height: 12),
-
-              // ── Microcopy ────────────────────────────────────────
-              Text(
-                microcopy,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontSize: 12,
-                  color: theme.colorScheme.onSurface.withAlpha(120),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // ── Actions ──────────────────────────────────────────
-              Row(
-                children: [
-                  Expanded(
-                    child: Builder(
-                      builder: (btnCtx) => FilledButton.icon(
-                        onPressed: () => _share(btnCtx),
-                        icon: const Icon(Icons.share_rounded, size: 14),
-                        label: const Text('Share'),
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          textStyle: const TextStyle(fontSize: 12),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ── Label + badge ────────────────────────────────────
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            label,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: accentColor,
+                            ),
+                          ),
                         ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(999),
+                            color: accentColor.withAlpha(30),
+                          ),
+                          child: Text(
+                            badge,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: accentColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    // ── Ball row ─────────────────────────────────────────
+                    BallRow(
+                      mainNumbers: pick.mainNumbers,
+                      bonusNumbers: pick.bonusNumbers ?? [],
+                      bonusLabel: lottery.bonusLabel,
+                      ballSize: 38,
+                      spacing: 6,
+                    ),
+                    const SizedBox(height: 12),
+
+                    // ── Microcopy ────────────────────────────────────────
+                    Text(
+                      microcopy,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurface.withAlpha(120),
                       ),
                     ),
+                    const SizedBox(height: 12),
+
+                    // ── Actions ──────────────────────────────────────────
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Builder(
+                            builder: (btnCtx) => FilledButton.icon(
+                              onPressed: () => _share(btnCtx),
+                              icon: const Icon(Icons.share_rounded, size: 14),
+                              label: const Text('Share'),
+                              style: FilledButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 5),
+                                textStyle: const TextStyle(fontSize: 12),
+                                tapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () => _copy(context),
+                            icon: const Icon(Icons.copy_rounded, size: 14),
+                            label: const Text('Copy'),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 5),
+                              textStyle: const TextStyle(fontSize: 12),
+                              tapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: isSaved ? null : onSave,
+                            icon: Icon(
+                              isSaved
+                                  ? Icons.bookmark
+                                  : Icons.bookmark_outline_rounded,
+                              size: 14,
+                            ),
+                            label: Text(isSaved ? 'Saved ✓' : 'Save'),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 5),
+                              textStyle: const TextStyle(fontSize: 12),
+                              tapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _copy(context),
-                    icon: const Icon(Icons.copy_rounded, size: 14),
-                    label: const Text('Copy'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      textStyle: const TextStyle(fontSize: 12),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: isSaved ? null : onSave,
-                    icon: Icon(
-                        isSaved
-                            ? Icons.bookmark
-                            : Icons.bookmark_outline_rounded,
-                        size: 14,
-                      ),
-                      label: Text(isSaved ? 'Saved ✓' : 'Save'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
-                        textStyle: const TextStyle(fontSize: 12),
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                    ),
-                  ),
-                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

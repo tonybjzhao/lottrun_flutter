@@ -1150,6 +1150,7 @@ class _PickShareSheetState extends State<_PickShareSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
     return FractionallySizedBox(
       heightFactor: 0.94,
       child: Container(
@@ -1273,7 +1274,7 @@ class _PickShareSheetState extends State<_PickShareSheet> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+              padding: EdgeInsets.fromLTRB(20, 8, 20, 20 + bottomInset),
               child: Row(
                 children: [
                   Expanded(
