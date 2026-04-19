@@ -10,7 +10,7 @@ import '../services/lottery_history_csv_service.dart';
 import '../services/lottery_service.dart';
 import '../services/pick_result_service.dart';
 import '../widgets/ball_row.dart';
-import '../widgets/lotto_ball.dart';
+import '../widgets/draw_reveal_panel.dart';
 import '../widgets/pick_share_card.dart';
 
 // Country helpers ──────────────────────────────────────────────────────────────
@@ -556,10 +556,9 @@ class _PickItem extends StatefulWidget {
   State<_PickItem> createState() => _PickItemState();
 }
 
-class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixin {
+class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
   final _shareCardKey = GlobalKey();
   late final PickMatchResult? _result;
-  AnimationController? _revealCtrl;
 
   @override
   void initState() {
@@ -568,22 +567,8 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
     _result = lottery != null
         ? checkPickResult(widget.pick, lottery, widget.draws)
         : null;
-    if (_result != null && !_result.isPending) {
-      _revealCtrl = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 800),
-      );
-      Future.delayed(const Duration(milliseconds: 450), () {
-        if (mounted) _revealCtrl?.forward();
-      });
-    }
   }
 
-  @override
-  void dispose() {
-    _revealCtrl?.dispose();
-    super.dispose();
-  }
 
   Lottery? get _lottery =>
       LotteryService.instance.getLotteryById(widget.pick.lotteryId);
@@ -620,329 +605,7 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
     await sharePickCard(repaintKey: _shareCardKey, btnContext: btnCtx);
   }
 
-  // ── Result section ────────────────────────────────────────────────────────
 
-  Widget _buildResultSection(ThemeData theme, PickMatchResult result) {
-    if (result.isPending) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 8),
-        child: _pendingChip(theme),
-      );
-    }
-
-    final ctrl = _revealCtrl;
-    final lottery = _lottery;
-
-    // Determine three-state result color for each pick number.
-    // Main picks: red if hit draw.main, blue if hit draw.supp, grey otherwise.
-    // Supp picks: red if hit draw.main, blue if hit draw.supp, grey otherwise.
-    BallResultState mainState(int n) {
-      if (result.matchedMainNumbers.contains(n)) return BallResultState.matchedMain;
-      if (result.matchedMainInDrawSupp.contains(n)) return BallResultState.matchedSupp;
-      return BallResultState.unmatched;
-    }
-
-    BallResultState bonusState(int n) {
-      if (result.matchedBonusInDrawMain.contains(n)) return BallResultState.matchedMain;
-      if (result.matchedBonusNumbers.contains(n)) return BallResultState.matchedSupp;
-      return BallResultState.unmatched;
-    }
-
-    final mainNums = widget.pick.mainNumbers;
-    final bonusNums = widget.pick.bonusNumbers ?? [];
-    final isSupp = lottery?.bonusIsSupplementary ?? false;
-    final bLabel = lottery?.bonusLabel;
-
-    // For supp lotteries, bonus balls are draw-only — not displayed, not animated.
-    final totalMatched = result.matchedMainNumbers.length +
-        result.matchedMainInDrawSupp.length +
-        (isSupp ? 0 : result.matchedBonusNumbers.length + result.matchedBonusInDrawMain.length);
-
-    final dimAnim = ctrl != null
-        ? CurvedAnimation(
-            parent: ctrl,
-            curve: const Interval(0.0, 0.35, curve: Curves.easeOut),
-          )
-        : null;
-
-    int matchIdx = 0;
-    Animation<double> nextMatchAnim() {
-      final i = matchIdx++;
-      final step = 0.55 / totalMatched.clamp(1, 99);
-      final start = i * step * 0.75;
-      final end = (start + step + 0.25).clamp(0.0, 1.0);
-      return CurvedAnimation(
-        parent: ctrl!,
-        curve: Interval(start, end, curve: Curves.elasticOut),
-      );
-    }
-
-    Widget wrappedBall(int n, bool isBonusBall, BallResultState state, {double size = 36}) {
-      final isHit = state != BallResultState.unmatched;
-      final ball = LottoBall(number: n, isBonus: isBonusBall, resultState: state, size: size);
-      if (ctrl == null) return ball;
-      if (isHit) {
-        final anim = nextMatchAnim();
-        return AnimatedBuilder(
-          animation: anim,
-          builder: (_, child) => Transform.scale(
-            scale: (0.5 + 0.5 * anim.value).clamp(0.0, 1.5),
-            child: child,
-          ),
-          child: ball,
-        );
-      } else {
-        return AnimatedBuilder(
-          animation: dimAnim!,
-          builder: (_, child) =>
-              Opacity(opacity: (1.0 - 0.5 * dimAnim.value).clamp(0.5, 1.0), child: child),
-          child: ball,
-        );
-      }
-    }
-
-    final textAnim = ctrl != null
-        ? CurvedAnimation(
-            parent: ctrl,
-            curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
-          )
-        : null;
-
-    String? drawLine;
-    if (result.drawMainNumbers.isNotEmpty) {
-      final datePart = result.drawDate != null
-          ? ' (${DateFormat('d MMM').format(result.drawDate!.toLocal())})'
-          : '';
-      final mainStr = result.drawMainNumbers.join(' · ');
-      final bonusStr = result.drawBonusNumbers?.isNotEmpty == true
-          ? '  +  ${result.drawBonusNumbers!.join(' · ')}'
-          : '';
-      drawLine = 'Draw$datePart: $mainStr$bonusStr';
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Divider(height: 18),
-
-        // ── Level + match summary ───────────────────────────────────────────
-        if (textAnim != null)
-          AnimatedBuilder(
-            animation: textAnim,
-            builder: (_, child) => Opacity(opacity: textAnim.value, child: child!),
-            child: _resultHeaderRow(theme, result),
-          )
-        else
-          _resultHeaderRow(theme, result),
-
-        // ── Progress dots ───────────────────────────────────────────────────
-        if (lottery != null) ...[
-          const SizedBox(height: 6),
-          _buildProgressDots(theme, result, lottery),
-        ],
-
-        const SizedBox(height: 10),
-
-        // ── ONE ROW: all pick numbers with result-state colors ──────────────
-        // Red = matched draw main, Blue = matched draw supp, Grey = no match.
-        // Supp picks shown slightly smaller after a separator.
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              for (var i = 0; i < mainNums.length; i++) ...[
-                wrappedBall(mainNums[i], false, mainState(mainNums[i])),
-                if (i < mainNums.length - 1 || (bonusNums.isNotEmpty && !isSupp))
-                  const SizedBox(width: 6),
-              ],
-              // Supp lotteries: bonus balls are draw-only, not user picks — skip.
-              // Powerball-style: show label + bonus ball.
-              if (bonusNums.isNotEmpty && !isSupp) ...[
-                if (bLabel != null) ...[
-                  Text(
-                    bLabel,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withAlpha(120),
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                ],
-                for (var i = 0; i < bonusNums.length; i++) ...[
-                  wrappedBall(bonusNums[i], true, bonusState(bonusNums[i])),
-                  if (i < bonusNums.length - 1) const SizedBox(width: 6),
-                ],
-              ],
-            ],
-          ),
-        ),
-
-        // ── Draw result line ────────────────────────────────────────────────
-        if (drawLine != null) ...[
-          const SizedBox(height: 6),
-          Text(
-            drawLine,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurface.withAlpha(90),
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        ],
-
-        // ── Disclaimer ──────────────────────────────────────────────────────
-        const SizedBox(height: 6),
-        Text(
-          'Check official results for prizes',
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.onSurface.withAlpha(70),
-            fontStyle: FontStyle.italic,
-            fontSize: 10,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _resultHeaderRow(ThemeData theme, PickMatchResult result) {
-    final lottery = _lottery;
-    if (lottery == null) return const SizedBox.shrink();
-
-    final level = result.levelLabel(lottery);
-    final levelEmoji = switch (level) {
-      'Light hit' => '🙂 ',
-      'Nice'      => '😊 ',
-      'Solid'     => '🔥 ',
-      'Strong'    => '💪 ',
-      'Great'     => '💥 ',
-      _           => '',
-    };
-    final summary = result.matchSummary(lottery);
-    final total = result.matchedMain +
-        (lottery.bonusIsSupplementary
-            ? result.suppCategoryHits(lottery)
-            : result.matchedBonus);
-    final isGood = total >= 2;
-    final isGreat = total >= 4;
-
-    return Row(
-      children: [
-        // Level badge
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-          decoration: BoxDecoration(
-            color: isGreat
-                ? Colors.green.shade100
-                : isGood
-                    ? theme.colorScheme.primaryContainer
-                    : theme.colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            '$levelEmoji$level',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: isGreat
-                  ? Colors.green.shade800
-                  : isGood
-                      ? theme.colorScheme.onPrimaryContainer
-                      : theme.colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w700,
-              fontSize: 10,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            summary,
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: isGood
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurface.withAlpha(140),
-              fontWeight: isGood ? FontWeight.w600 : FontWeight.normal,
-            ),
-          ),
-        ),
-        if (widget.isBest) ...[
-          const SizedBox(width: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-            decoration: BoxDecoration(
-              color: Colors.amber.shade100,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              '🏆 Best',
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: Colors.amber.shade900,
-                fontWeight: FontWeight.w800,
-                fontSize: 10,
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildProgressDots(ThemeData theme, PickMatchResult result, Lottery lottery) {
-    final matchedMain = result.matchedMain;
-    final total = lottery.mainCount;
-    const redHit = Color(0xFFC62828);
-    const blueSupp = Color(0xFF1565C0);
-
-    return Row(
-      children: [
-        for (int i = 0; i < total; i++)
-          Padding(
-            padding: const EdgeInsets.only(right: 3),
-            child: Text(
-              i < matchedMain ? '●' : '○',
-              style: TextStyle(
-                fontSize: 9,
-                height: 1,
-                color: i < matchedMain
-                    ? redHit
-                    : theme.colorScheme.onSurface.withAlpha(55),
-              ),
-            ),
-          ),
-        const SizedBox(width: 5),
-        Text(
-          '$matchedMain main',
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: matchedMain > 0
-                ? redHit
-                : theme.colorScheme.onSurface.withAlpha(90),
-            fontSize: 9,
-            fontWeight: matchedMain > 0 ? FontWeight.w700 : FontWeight.normal,
-          ),
-        ),
-        if (lottery.bonusIsSupplementary && result.suppCategoryHits(lottery) > 0) ...[
-          const SizedBox(width: 5),
-          Text(
-            '+${result.suppCategoryHits(lottery)} supp',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: blueSupp,
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ] else if (!lottery.bonusIsSupplementary && result.matchedBonus > 0) ...[
-          const SizedBox(width: 5),
-          Text(
-            '+${lottery.bonusLabel ?? 'B'}',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: blueSupp,
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ],
-    );
-  }
 
   Widget _pendingChip(ThemeData theme) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -1067,8 +730,20 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
 
                   const SizedBox(height: 10),
 
-                  // ── Balls: normal row OR animated highlighted result ─
-                  if (!hasResolvedResult)
+                  // ── Resolved result: full reveal panel ──────────────
+                  if (hasResolvedResult && lottery != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2, bottom: 4),
+                      child: DrawRevealPanel(
+                        key: ValueKey(widget.pick.id),
+                        pick: widget.pick,
+                        lottery: lottery,
+                        result: result,
+                        isBest: widget.isBest,
+                      ),
+                    )
+                  else ...[
+                    // Pending / legacy: show normal ball row
                     BallRow(
                       mainNumbers: widget.pick.mainNumbers,
                       bonusNumbers: bonusNums,
@@ -1076,10 +751,12 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
                       ballSize: 36,
                       spacing: 6,
                     ),
-
-                  // ── Result section (pending chip / animated result) ──
-                  if (result != null)
-                    _buildResultSection(theme, result),
+                    if (result != null && result.isPending)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: _pendingChip(theme),
+                      ),
+                  ],
 
                   const SizedBox(height: 10),
 
