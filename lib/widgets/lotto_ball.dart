@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 
+/// Match state for result display. When set, overrides the default isBonus color.
+enum BallResultState {
+  none,        // default: isBonus drives the color (amber/red gradient)
+  matchedMain, // hit a draw main number → red
+  matchedSupp, // hit a draw supplementary number → blue
+  unmatched,   // no match → grey (dimmed)
+}
+
 class LottoBall extends StatefulWidget {
   final int number;
   final bool isBonus;
-  final bool isMatched; // green glow when a draw result matched this number
+  final bool isMatched; // legacy green glow — used in result_panel only
+  final BallResultState resultState;
   final double size;
 
   const LottoBall({
@@ -11,6 +20,7 @@ class LottoBall extends StatefulWidget {
     required this.number,
     this.isBonus = false,
     this.isMatched = false,
+    this.resultState = BallResultState.none,
     this.size = 44,
   });
 
@@ -26,7 +36,10 @@ class _LottoBallState extends State<LottoBall>
   @override
   void initState() {
     super.initState();
-    if (widget.isBonus && !widget.isMatched) {
+    // Pulse only for bonus balls in non-result mode (normal pick display)
+    if (widget.isBonus &&
+        !widget.isMatched &&
+        widget.resultState == BallResultState.none) {
       _pulse = AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 1200),
@@ -45,24 +58,44 @@ class _LottoBallState extends State<LottoBall>
 
   @override
   Widget build(BuildContext context) {
-    // Colour palette: matched=green, bonus=red, normal=amber
-    final List<Color> gradientColors = widget.isMatched
-        ? [const Color(0xFF81C784), const Color(0xFF2E7D32)]
-        : widget.isBonus
-            ? [const Color(0xFFFF6B35), const Color(0xFFD32F2F)]
-            : [const Color(0xFFFFE066), const Color(0xFFFFB300)];
+    final List<Color> gradientColors;
+    final Color shadowColor;
+    final Color textColor;
 
-    final Color shadowColor = widget.isMatched
-        ? Colors.green
-        : widget.isBonus
-            ? Colors.red
-            : Colors.amber;
+    switch (widget.resultState) {
+      case BallResultState.matchedMain:
+        gradientColors = [const Color(0xFFEF5350), const Color(0xFFC62828)];
+        shadowColor = const Color(0xFFC62828);
+        textColor = Colors.white;
+      case BallResultState.matchedSupp:
+        gradientColors = [const Color(0xFF42A5F5), const Color(0xFF1565C0)];
+        shadowColor = const Color(0xFF1565C0);
+        textColor = Colors.white;
+      case BallResultState.unmatched:
+        gradientColors = [const Color(0xFFE0E0E0), const Color(0xFFBDBDBD)];
+        shadowColor = Colors.grey;
+        textColor = Colors.grey.shade600;
+      case BallResultState.none:
+        // Default palette: matched=green, bonus=red-orange, normal=amber
+        if (widget.isMatched) {
+          gradientColors = [const Color(0xFF81C784), const Color(0xFF2E7D32)];
+          shadowColor = Colors.green;
+          textColor = Colors.white;
+        } else if (widget.isBonus) {
+          gradientColors = [const Color(0xFFFF6B35), const Color(0xFFD32F2F)];
+          shadowColor = Colors.red;
+          textColor = Colors.white;
+        } else {
+          gradientColors = [const Color(0xFFFFE066), const Color(0xFFFFB300)];
+          shadowColor = Colors.amber;
+          textColor = const Color(0xFF5D4000);
+        }
+    }
 
-    final Color textColor = widget.isMatched
-        ? Colors.white
-        : widget.isBonus
-            ? Colors.white
-            : const Color(0xFF5D4000);
+    final isResult = widget.resultState != BallResultState.none;
+    final isHighlighted = widget.resultState == BallResultState.matchedMain ||
+        widget.resultState == BallResultState.matchedSupp ||
+        widget.isMatched;
 
     final ball = Container(
       width: widget.size,
@@ -77,10 +110,11 @@ class _LottoBallState extends State<LottoBall>
         boxShadow: [
           BoxShadow(
             color: shadowColor.withAlpha(
-                widget.isMatched ? 180 : widget.isBonus ? 140 : 100),
-            blurRadius: widget.isMatched ? 12 : widget.isBonus ? 10 : 6,
+              isHighlighted ? 180 : isResult ? 60 : (widget.isBonus ? 140 : 100),
+            ),
+            blurRadius: isHighlighted ? 12 : isResult ? 4 : (widget.isBonus ? 10 : 6),
             offset: const Offset(0, 2),
-            spreadRadius: widget.isMatched ? 1 : 0,
+            spreadRadius: isHighlighted ? 1 : 0,
           ),
         ],
       ),

@@ -51,25 +51,31 @@ class PickMatchResult {
       matchedBonus * 2 +
       matchedBonusInDrawMain.length;
 
+  /// Total supp-category hits: pick.main∩draw.supp + pick.supp∩draw.main.
+  int suppCategoryHits(Lottery lottery) => lottery.bonusIsSupplementary
+      ? suppHits + matchedBonusInDrawMain.length
+      : 0;
+
   /// Total effective matches for level calculation.
   int _levelTotal(Lottery lottery) =>
       matchedMain +
-      (lottery.bonusIsSupplementary ? suppHits : matchedBonus);
+      (lottery.bonusIsSupplementary
+          ? suppHits + matchedBonusInDrawMain.length
+          : matchedBonus);
 
   /// Factual match summary — no prize or win language.
-  /// e.g. "3 main + 1 supp matched", "Matched 4 numbers + Powerball",
-  ///      "No numbers matched"
+  /// e.g. "3 matched", "4 matched (incl. 1 supp)", "1 matched (supp)",
+  ///      "No numbers matched", "4 matched + Powerball"
   String matchSummary(Lottery lottery) {
     if (isPending) return '';
 
     if (lottery.bonusIsSupplementary) {
-      final m = matchedMain;
-      final s = suppHits;
-      if (m == 0 && s == 0) return 'No numbers matched';
-      final parts = <String>[];
-      if (m > 0) parts.add('$m main');
-      if (s > 0) parts.add('$s supp');
-      return '${parts.join(' + ')} matched';
+      final totalSupp = suppCategoryHits(lottery);
+      final total = matchedMain + totalSupp;
+      if (total == 0) return 'No numbers matched';
+      if (matchedMain == 0) return '$total matched (supp)';
+      if (totalSupp == 0) return '$matchedMain matched';
+      return '$total matched (incl. $totalSupp supp)';
     }
 
     // Powerball / inline-bonus lotteries
@@ -78,8 +84,8 @@ class PickMatchResult {
     final label = lottery.bonusLabel ?? '+';
     if (m == 0 && !b) return 'No numbers matched';
     if (m == 0) return '$label matched';
-    if (!b) return 'Matched $m number${m == 1 ? '' : 's'}';
-    return 'Matched $m number${m == 1 ? '' : 's'} + $label';
+    if (!b) return '$m matched';
+    return '$m matched + $label';
   }
 
   /// Gamification level label based on total effective matches.

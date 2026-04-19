@@ -34,20 +34,23 @@ const _countryOrder = ['US', 'AU', 'OTHER'];
 class _PickStats {
   final int resolvedCount;
   final int bestMain;
-  final int bestBonus;
+  final int bestSupp;
   final String bestLotteryId;
-  final int totalHits;
+  final int totalMainHits;
+  final int totalSuppHits;
   final int luckScore;
 
   const _PickStats({
     required this.resolvedCount,
     required this.bestMain,
-    required this.bestBonus,
+    required this.bestSupp,
     required this.bestLotteryId,
-    required this.totalHits,
+    required this.totalMainHits,
+    required this.totalSuppHits,
     required this.luckScore,
   });
 
+  int get totalHits => totalMainHits + totalSuppHits;
   bool get hasAnyResult => resolvedCount > 0;
 }
 
@@ -221,9 +224,10 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
   _PickStats _computeStats() {
     int resolvedCount = 0;
     int bestMain = 0;
-    int bestBonus = 0;
+    int bestSupp = 0;
     String bestLotteryId = '';
-    int totalHits = 0;
+    int totalMainHits = 0;
+    int totalSuppHits = 0;
 
     for (final pick in _picks) {
       final lottery = LotteryService.instance.getLotteryById(pick.lotteryId);
@@ -231,24 +235,30 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
       final result = checkPickResult(pick, lottery, _drawsFor(pick.lotteryId));
       if (result == null || result.isPending) continue;
       resolvedCount++;
-      totalHits += result.matchedMain + result.suppHits + result.matchedBonus;
-      if (result.score > bestMain * 2 + bestBonus) {
-        bestMain = result.matchedMain;
-        bestBonus = result.matchedBonus;
+
+      final mainHits = result.matchedMain;
+      final suppHits = result.suppCategoryHits(lottery);
+      totalMainHits += mainHits;
+      totalSuppHits += suppHits;
+
+      if (result.score > bestMain * 2 + bestSupp) {
+        bestMain = mainHits;
+        bestSupp = suppHits;
         bestLotteryId = pick.lotteryId;
       }
     }
 
-    // Luck score: base 50, rises with hits and best match, capped at 99
     final luckScore =
-        (50 + totalHits * 2 + bestMain * 3 + bestBonus * 5).clamp(50, 99);
+        (50 + (totalMainHits + totalSuppHits) * 2 + bestMain * 3 + bestSupp * 2)
+            .clamp(50, 99);
 
     return _PickStats(
       resolvedCount: resolvedCount,
       bestMain: bestMain,
-      bestBonus: bestBonus,
+      bestSupp: bestSupp,
       bestLotteryId: bestLotteryId,
-      totalHits: totalHits,
+      totalMainHits: totalMainHits,
+      totalSuppHits: totalSuppHits,
       luckScore: luckScore,
     );
   }
@@ -337,20 +347,17 @@ class _StatsCard extends StatelessWidget {
 
   const _StatsCard({required this.stats});
 
-  String _bestText(BuildContext context) {
-    if (stats.bestMain == 0 && stats.bestBonus == 0) return 'None yet';
-    final bonus = stats.bestBonus > 0
-        ? ' + ${_bonusShort(stats.bestLotteryId)}'
-        : '';
-    return '${stats.bestMain}$bonus matched';
+  String _bestText() {
+    if (stats.bestMain == 0 && stats.bestSupp == 0) return 'None yet';
+    if (stats.bestSupp == 0) return '${stats.bestMain}';
+    if (stats.bestMain == 0) return '${stats.bestSupp} supp';
+    return '${stats.bestMain}+${stats.bestSupp}';
   }
 
-  String _bonusShort(String lotteryId) => switch (lotteryId) {
-        'us_powerball'    => 'PB',
-        'us_megamillions' => 'MB',
-        'au_powerball'    => 'PB',
-        _                 => '+',
-      };
+  String _totalText() {
+    if (stats.totalSuppHits == 0) return '${stats.totalMainHits}';
+    return '${stats.totalMainHits}m · ${stats.totalSuppHits}s';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -398,14 +405,14 @@ class _StatsCard extends StatelessWidget {
             children: [
               _StatCell(
                 icon: '🏆',
-                value: _bestText(context),
-                label: 'Best Match',
+                value: _bestText(),
+                label: 'Best',
                 theme: theme,
               ),
               _StatDivider(),
               _StatCell(
                 icon: '🎯',
-                value: '${stats.totalHits}',
+                value: _totalText(),
                 label: 'Total Hits',
                 theme: theme,
               ),
@@ -626,17 +633,25 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
     final ctrl = _revealCtrl;
     final lottery = _lottery;
 
-    // A main-row pick number is "matched" if it hit either draw.main OR draw.supp
-    final matchedMainSet = {
-      ...result.matchedMainNumbers,
-      ...result.matchedMainInDrawSupp,
-    };
-    // A bonus-row pick number is "matched" if it hit either draw.bonus OR draw.main
-    final matchedBonusSet = {
-      ...result.matchedBonusNumbers,
-      ...result.matchedBonusInDrawMain,
-    };
-    final totalMatched = matchedMainSet.length + matchedBonusSet.length;
+    // Determine three-state result color for each pick number.
+    // Main picks: red if hit draw.main, blue if hit draw.supp, grey otherwise.
+    // Supp picks: red if hit draw.main, blue if hit draw.supp, grey otherwise.
+    BallResultState mainState(int n) {
+      if (result.matchedMainNumbers.contains(n)) return BallResultState.matchedMain;
+      if (result.matchedMainInDrawSupp.contains(n)) return BallResultState.matchedSupp;
+      return BallResultState.unmatched;
+    }
+
+    BallResultState bonusState(int n) {
+      if (result.matchedBonusInDrawMain.contains(n)) return BallResultState.matchedMain;
+      if (result.matchedBonusNumbers.contains(n)) return BallResultState.matchedSupp;
+      return BallResultState.unmatched;
+    }
+
+    final totalMatched = result.matchedMainNumbers.length +
+        result.matchedMainInDrawSupp.length +
+        result.matchedBonusNumbers.length +
+        result.matchedBonusInDrawMain.length;
 
     final dimAnim = ctrl != null
         ? CurvedAnimation(
@@ -657,11 +672,11 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
       );
     }
 
-    Widget wrappedBall(int n, bool isBonus, {double size = 36}) {
-      final isMatched = isBonus ? matchedBonusSet.contains(n) : matchedMainSet.contains(n);
-      final ball = LottoBall(number: n, isBonus: isBonus, isMatched: isMatched, size: size);
+    Widget wrappedBall(int n, bool isSupp, BallResultState state, {double size = 36}) {
+      final isHit = state != BallResultState.unmatched;
+      final ball = LottoBall(number: n, isBonus: isSupp, resultState: state, size: size);
       if (ctrl == null) return ball;
-      if (isMatched) {
+      if (isHit) {
         final anim = nextMatchAnim();
         return AnimatedBuilder(
           animation: anim,
@@ -675,7 +690,7 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
         return AnimatedBuilder(
           animation: dimAnim!,
           builder: (_, child) =>
-              Opacity(opacity: (1.0 - 0.6 * dimAnim.value).clamp(0.4, 1.0), child: child),
+              Opacity(opacity: (1.0 - 0.5 * dimAnim.value).clamp(0.5, 1.0), child: child),
           child: ball,
         );
       }
@@ -700,48 +715,10 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
           : '';
       final mainStr = result.drawMainNumbers.join(' · ');
       final bonusStr = result.drawBonusNumbers?.isNotEmpty == true
-          ? '  ·  ${result.drawBonusNumbers!.join(' · ')}'
+          ? '  +  ${result.drawBonusNumbers!.join(' · ')}'
           : '';
       drawLine = 'Draw$datePart: $mainStr$bonusStr';
     }
-
-    // ── Ball rows ─────────────────────────────────────────────────────────────
-    Widget mainBallRow() => SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              for (var i = 0; i < mainNums.length; i++) ...[
-                wrappedBall(mainNums[i], false),
-                if (i < mainNums.length - 1) const SizedBox(width: 6),
-              ],
-            ],
-          ),
-        );
-
-    Widget bonusBallRow({double size = 32}) => SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                bLabel ?? 'Supp',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: const Color(0xFFD32F2F),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 11,
-                ),
-              ),
-              const SizedBox(width: 6),
-              for (var i = 0; i < bonusNums.length; i++) ...[
-                wrappedBall(bonusNums[i], true, size: size),
-                if (i < bonusNums.length - 1) const SizedBox(width: 6),
-              ],
-            ],
-          ),
-        );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -766,45 +743,40 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
 
         const SizedBox(height: 10),
 
-        // ── Highlighted pick balls ──────────────────────────────────────────
-        if (isSupp && bonusNums.isNotEmpty) ...[
-          // Supplementary lottery: two rows (main + Supp)
-          mainBallRow(),
-          const SizedBox(height: 6),
-          bonusBallRow(size: 32),
-        ] else if (bonusNums.isEmpty) ...[
-          mainBallRow(),
-        ] else ...[
-          // Powerball-style: inline
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                for (var i = 0; i < mainNums.length; i++) ...[
-                  wrappedBall(mainNums[i], false),
-                  if (i < mainNums.length - 1 || bonusNums.isNotEmpty)
-                    const SizedBox(width: 6),
-                ],
-                if (bLabel != null) ...[
-                  Text(
-                    bLabel,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: const Color(0xFFD32F2F),
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+        // ── ONE ROW: all pick numbers with result-state colors ──────────────
+        // Red = matched draw main, Blue = matched draw supp, Grey = no match.
+        // Supp picks shown slightly smaller after a separator.
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              for (var i = 0; i < mainNums.length; i++) ...[
+                wrappedBall(mainNums[i], false, mainState(mainNums[i])),
+                if (i < mainNums.length - 1 || bonusNums.isNotEmpty)
                   const SizedBox(width: 6),
-                ],
-                for (var i = 0; i < bonusNums.length; i++) ...[
-                  wrappedBall(bonusNums[i], true),
-                  if (i < bonusNums.length - 1) const SizedBox(width: 6),
-                ],
               ],
-            ),
+              // Powerball-style: label before bonus ball
+              if (bonusNums.isNotEmpty && !isSupp && bLabel != null) ...[
+                Text(
+                  bLabel,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withAlpha(120),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(width: 6),
+              ],
+              // Bonus/supp balls — slightly smaller for supplementary type
+              for (var i = 0; i < bonusNums.length; i++) ...[
+                wrappedBall(bonusNums[i], true, bonusState(bonusNums[i]),
+                    size: isSupp ? 30 : 36),
+                if (i < bonusNums.length - 1) const SizedBox(width: 6),
+              ],
+            ],
           ),
-        ],
+        ),
 
         // ── Draw result line ────────────────────────────────────────────────
         if (drawLine != null) ...[
@@ -839,7 +811,9 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
     final level = result.levelLabel(lottery);
     final summary = result.matchSummary(lottery);
     final total = result.matchedMain +
-        (lottery.bonusIsSupplementary ? result.suppHits : result.matchedBonus);
+        (lottery.bonusIsSupplementary
+            ? result.suppCategoryHits(lottery)
+            : result.matchedBonus);
     final isGood = total >= 2;
     final isGreat = total >= 4;
 
@@ -923,10 +897,10 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
               ),
             ),
           ),
-        if (lottery.bonusIsSupplementary && result.suppHits > 0) ...[
+        if (lottery.bonusIsSupplementary && result.suppCategoryHits(lottery) > 0) ...[
           const SizedBox(width: 5),
           Text(
-            '+${result.suppHits}s',
+            '+${result.suppCategoryHits(lottery)}s',
             style: theme.textTheme.labelSmall?.copyWith(
               color: const Color(0xFFD32F2F),
               fontSize: 9,
