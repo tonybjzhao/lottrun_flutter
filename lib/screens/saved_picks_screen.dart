@@ -197,7 +197,9 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
 
   List<GeneratedPick> _sortPicks(List<GeneratedPick> picks) {
     int group(GeneratedPick p) {
-      final result = checkPickResult(p, _drawsFor(p.lotteryId));
+      final lottery = LotteryService.instance.getLotteryById(p.lotteryId);
+      if (lottery == null) return 2;
+      final result = checkPickResult(p, lottery, _drawsFor(p.lotteryId));
       if (result == null) return 2;        // legacy — no draw context
       if (result.isPending) return 0;      // pending draw
       return 1;                            // resolved
@@ -224,10 +226,12 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
     int totalHits = 0;
 
     for (final pick in _picks) {
-      final result = checkPickResult(pick, _drawsFor(pick.lotteryId));
+      final lottery = LotteryService.instance.getLotteryById(pick.lotteryId);
+      if (lottery == null) continue;
+      final result = checkPickResult(pick, lottery, _drawsFor(pick.lotteryId));
       if (result == null || result.isPending) continue;
       resolvedCount++;
-      totalHits += result.matchedMain + result.matchedBonus;
+      totalHits += result.matchedMain + result.suppHits + result.matchedBonus;
       if (result.score > bestMain * 2 + bestBonus) {
         bestMain = result.matchedMain;
         bestBonus = result.matchedBonus;
@@ -253,7 +257,9 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
     int bestScore = 0;
     String? bestId;
     for (final pick in _picks) {
-      final result = checkPickResult(pick, _drawsFor(pick.lotteryId));
+      final lottery = LotteryService.instance.getLotteryById(pick.lotteryId);
+      if (lottery == null) continue;
+      final result = checkPickResult(pick, lottery, _drawsFor(pick.lotteryId));
       if (result == null || result.isPending) continue;
       if (result.score > bestScore) {
         bestScore = result.score;
@@ -551,7 +557,10 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
   @override
   void initState() {
     super.initState();
-    _result = checkPickResult(widget.pick, widget.draws);
+    final lottery = LotteryService.instance.getLotteryById(widget.pick.lotteryId);
+    _result = lottery != null
+        ? checkPickResult(widget.pick, lottery, widget.draws)
+        : null;
     if (_result != null && !_result.isPending) {
       _revealCtrl = AnimationController(
         vsync: this,
@@ -807,15 +816,14 @@ class _PickItemState extends State<_PickItem> with SingleTickerProviderStateMixi
   }
 
   Widget _emotionalRow(ThemeData theme, PickMatchResult result) {
-    final totalHits = result.matchedMain + result.suppHits + result.matchedBonus + result.matchedBonusInDrawMain.length;
     final isGood = result.matchedMain >= 3 || (result.matchedMain >= 2 && result.suppHits >= 1) || result.matchedBonus > 0;
     final isGreat = result.matchedMain >= 4 || (result.matchedMain >= 3 && result.suppHits >= 1);
-    final _ = totalHits; // used for future prize-tier styling
+    final lottery = _lottery;
     return Row(
       children: [
         Expanded(
           child: Text(
-            result.emotionalText(widget.pick.lotteryId),
+            lottery != null ? result.emotionalText(lottery) : '',
             style: theme.textTheme.labelMedium?.copyWith(
               color: isGreat
                   ? Colors.green.shade700

@@ -113,9 +113,13 @@ class _ResultPanelState extends State<ResultPanel>
   Widget? _buildMatchRow(ThemeData theme) {
     if (widget.recentDraw == null) return null;
     final draw = widget.recentDraw!;
-    final matched = widget.pick.mainNumbers
+    final mainMatched = widget.pick.mainNumbers
         .where((n) => draw.mainNumbers.contains(n))
         .toList();
+    final suppMatched = widget.lottery.bonusIsSupplementary && draw.bonusNumbers != null
+        ? widget.pick.mainNumbers.where((n) => draw.bonusNumbers!.contains(n)).toList()
+        : <int>[];
+    final matched = {...mainMatched, ...suppMatched}.toList();
     final bonusHit = widget.pick.bonusNumbers != null &&
         draw.bonusNumbers != null &&
         widget.pick.bonusNumbers!.any((n) => draw.bonusNumbers!.contains(n));

@@ -1,10 +1,6 @@
 import '../models/generated_pick.dart';
+import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
-
-/// Saturday Lotto and Oz Lotto — player picks only main numbers; the draw
-/// also reveals supplementary numbers that count toward lower prize divisions.
-bool _isSupplementaryLottery(String lotteryId) =>
-    lotteryId == 'au_saturday' || lotteryId == 'au_ozlotto';
 
 class PickMatchResult {
   final bool isPending;
@@ -58,26 +54,20 @@ class PickMatchResult {
       matchedBonus * 2 +
       matchedBonusInDrawMain.length;
 
-  String _bonusLabel(String lotteryId) => switch (lotteryId) {
-        'us_powerball'    => 'PB',
-        'us_megamillions' => 'MB',
-        'au_powerball'    => 'PB',
-        _                 => '+',
-      };
-
-  String emotionalText(String lotteryId) {
+  String emotionalText(Lottery lottery) {
     if (isPending) return '';
 
-    if (_isSupplementaryLottery(lotteryId)) {
-      return _emotionalTextSupp();
+    if (lottery.bonusIsSupplementary) {
+      return _emotionalTextSupp(lottery.mainCount);
     }
 
     // Powerball / inline-bonus lotteries
+    final label = lottery.bonusLabel ?? '+';
     final hasBonus = matchedBonus > 0;
-    final bp = hasBonus ? ' + ${_bonusLabel(lotteryId)}' : '';
+    final bp = hasBonus ? ' + $label' : '';
     return switch (matchedMain) {
       0 when !hasBonus => 'No match this time — luck is building 🤞',
-      0                => '${_bonusLabel(lotteryId)} matched! — keep going 🙌',
+      0                => '$label matched! — keep going 🙌',
       1 when !hasBonus => '1 matched — keep going 🙌',
       1                => '1$bp matched 😊',
       2                => '2$bp matched — almost! 🤞',
@@ -89,7 +79,7 @@ class PickMatchResult {
     };
   }
 
-  String _emotionalTextSupp() {
+  String _emotionalTextSupp(int mainCount) {
     final m = matchedMain;
     final s = suppHits;
     final bonusPickHit = matchedBonus > 0 || matchedBonusInDrawMain.isNotEmpty;
@@ -103,9 +93,10 @@ class PickMatchResult {
     if (s > 0) parts.add('$s supp');
     final hit = parts.join(' + ');
 
-    if (m >= 5 && s >= 1) return '🏆 Division 2! $hit matched!';
-    if (m >= 5) return '🔥 Division 3! $m main matched!';
-    if (m >= 4) return '😮 So close — $hit matched!';
+    if (m >= mainCount) return '🏆 Division 1! All $m matched!';
+    if (m >= mainCount - 1 && s >= 1) return '🏆 Division 2! $hit matched!';
+    if (m >= mainCount - 1) return '🔥 Division 3! $m main matched!';
+    if (m >= mainCount - 2) return '😮 So close — $hit matched!';
     if (m >= 3 && s >= 1) return '😮 $hit matched — almost!';
     if (m >= 3) return '3 main matched — almost! 🤞';
     if (hit.isNotEmpty) return '$hit matched — keep going 🙌';
@@ -117,7 +108,11 @@ class PickMatchResult {
 /// Returns null if the pick has no draw context (legacy pick).
 /// Returns [PickMatchResult.pending] if the draw result isn't in history yet.
 /// Returns full match detail once the draw is found.
-PickMatchResult? checkPickResult(GeneratedPick pick, List<LotteryDraw> draws) {
+PickMatchResult? checkPickResult(
+  GeneratedPick pick,
+  Lottery lottery,
+  List<LotteryDraw> draws,
+) {
   if (pick.drawDate == null) return null;
   final target = pick.drawDate!;
   final draw = draws.where((d) =>
@@ -134,8 +129,8 @@ PickMatchResult? checkPickResult(GeneratedPick pick, List<LotteryDraw> draws) {
   // pick.main vs draw.main
   final matchedMain = pick.mainNumbers.where(drawMainSet.contains).toList();
 
-  // pick.main vs draw.supp (prize-relevant for Saturday/Oz Lotto)
-  final matchedMainInDrawSupp = drawSuppSet.isNotEmpty
+  // pick.main vs draw.supp — only prize-relevant for supplementary lotteries
+  final matchedMainInDrawSupp = lottery.bonusIsSupplementary && drawSuppSet.isNotEmpty
       ? pick.mainNumbers.where(drawSuppSet.contains).toList()
       : <int>[];
 
