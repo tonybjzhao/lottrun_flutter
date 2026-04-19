@@ -101,9 +101,21 @@ class ShareCardGeneratorState extends State<ShareCardGenerator> {
   final _repaintKey = GlobalKey();
 
   /// Which template is currently active.
-  ShareCardTemplate get template =>
-      widget.templateOverride ??
-      selectTemplate(widget.pick, widget.result, widget.lottery);
+  ShareCardTemplate get template {
+    final resolvedResult = widget.result != null &&
+        !widget.result!.isPending &&
+        widget.result!.drawMainNumbers.isNotEmpty;
+    final requested =
+        widget.templateOverride ??
+        selectTemplate(widget.pick, widget.result, widget.lottery);
+
+    if (!resolvedResult &&
+        (requested == ShareCardTemplate.fire ||
+            requested == ShareCardTemplate.electric)) {
+      return ShareCardTemplate.warm;
+    }
+    return requested;
+  }
 
   /// Captures the card as raw PNG bytes.
   ///
@@ -142,7 +154,12 @@ class ShareCardGeneratorState extends State<ShareCardGenerator> {
     final Widget card = switch (template) {
       ShareCardTemplate.fire     => _FireTemplate(pick: widget.pick, lottery: widget.lottery, result: r!),
       ShareCardTemplate.electric => _ElectricTemplate(pick: widget.pick, lottery: widget.lottery, result: r!),
-      ShareCardTemplate.warm     => _WarmTemplate(pick: widget.pick, lottery: widget.lottery, result: hasResult ? r : null),
+      ShareCardTemplate.warm     => _WarmTemplate(
+          pick: widget.pick,
+          lottery: widget.lottery,
+          result: hasResult ? r : null,
+          forceFunnyFail: widget.templateOverride == ShareCardTemplate.warm,
+        ),
     };
 
     return RepaintBoundary(key: _repaintKey, child: card);
@@ -578,11 +595,13 @@ class _WarmTemplate extends StatelessWidget {
   final GeneratedPick pick;
   final Lottery lottery;
   final PickMatchResult? result;
+  final bool forceFunnyFail;
 
   const _WarmTemplate({
     required this.pick,
     required this.lottery,
     this.result,
+    this.forceFunnyFail = false,
   });
 
   @override
@@ -590,6 +609,7 @@ class _WarmTemplate extends StatelessWidget {
     final theme     = _styleThemeFor(pick.style);
     final isMiss    = result != null && !result!.isPending;
     final isPending = result?.isPending == true;
+    final isFunnyFail = isMiss || forceFunnyFail;
     final userMain  = pick.mainNumbers;
     final bonusNums = pick.bonusNumbers ?? [];
     final isSupp    = lottery.bonusIsSupplementary;
@@ -599,10 +619,10 @@ class _WarmTemplate extends StatelessWidget {
     final String subhead;
     final String? blurbText;
 
-    if (isMiss) {
+    if (isFunnyFail) {
       emoji    = '😂';
       headline = 'Not today';
-      subhead  = '0 matched';
+      subhead  = isMiss ? '0 matched' : 'Funny fail energy';
       blurbText = null;
     } else if (isPending) {
       emoji    = '⏳';
@@ -613,7 +633,7 @@ class _WarmTemplate extends StatelessWidget {
       emoji    = '🎯';
       headline = 'My Lucky Pick';
       subhead  = 'Let’s see what happens 👀';
-      blurbText = 'These are my numbers 👇';
+      blurbText = 'These are my numbers ↑';
     }
 
     final bonusLabel = switch (lottery.id) {
@@ -623,7 +643,7 @@ class _WarmTemplate extends StatelessWidget {
       _                 => 'Bonus',
     };
 
-    final List<Color> gradColors = isMiss
+    final List<Color> gradColors = isFunnyFail
         ? const [Color(0xFF4A0010), Color(0xFF8B0030), Color(0xFFB03050)]
         : theme.gradientColors;
 
@@ -652,7 +672,7 @@ class _WarmTemplate extends StatelessWidget {
                 ),
               ),
             ),
-            if (!isMiss) ..._confettiParticles(),
+            if (!isFunnyFail) ..._confettiParticles(),
 
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 22, 24, 26),
@@ -721,7 +741,7 @@ class _WarmTemplate extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // ── Bottom card (miss vs strategy) ────────────────────────
-                  if (isMiss)
+                  if (isFunnyFail)
                     _missCard()
                   else if (blurbText != null)
                     _strategyCard(blurbText, theme),
@@ -767,7 +787,7 @@ class _WarmTemplate extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '😂 Not today',
+              '😂 Funny fail',
               style: TextStyle(
                 color: Color(0xFF333333),
                 fontWeight: FontWeight.w800,
@@ -776,7 +796,7 @@ class _WarmTemplate extends StatelessWidget {
             ),
             SizedBox(height: 6),
             Text(
-              '0 matched',
+              'Not today',
               style: TextStyle(
                 color: Color(0xFF5F4339),
                 fontWeight: FontWeight.w700,
@@ -1053,7 +1073,12 @@ class PickShareCard extends StatelessWidget {
     return switch (template) {
       ShareCardTemplate.fire     => _FireTemplate(pick: pick, lottery: lottery, result: r!),
       ShareCardTemplate.electric => _ElectricTemplate(pick: pick, lottery: lottery, result: r!),
-      ShareCardTemplate.warm     => _WarmTemplate(pick: pick, lottery: lottery, result: hasResult ? r : null),
+      ShareCardTemplate.warm     => _WarmTemplate(
+          pick: pick,
+          lottery: lottery,
+          result: hasResult ? r : null,
+          forceFunnyFail: templateOverride == ShareCardTemplate.warm,
+        ),
     };
   }
 }
@@ -1102,6 +1127,11 @@ class _PickShareSheetState extends State<_PickShareSheet> {
 
   ShareCardTemplate get _effectiveTemplate =>
       _manualTemplate ?? _autoTemplate;
+
+  bool get _hasResolvedResult =>
+      widget.result != null &&
+      !widget.result!.isPending &&
+      widget.result!.drawMainNumbers.isNotEmpty;
 
   Future<void> _share(BuildContext buttonContext) async {
     if (_isSharing) return;
@@ -1210,9 +1240,14 @@ class _PickShareSheetState extends State<_PickShareSheet> {
                           ChoiceChip(
                             label: Text(_templateLabel(template)),
                             selected: _manualTemplate == template,
-                            onSelected: (_) {
-                              setState(() => _manualTemplate = template);
-                            },
+                            onSelected: (template == ShareCardTemplate.fire ||
+                                        template ==
+                                            ShareCardTemplate.electric) &&
+                                    !_hasResolvedResult
+                                ? null
+                                : (_) {
+                                    setState(() => _manualTemplate = template);
+                                  },
                           ),
                       ],
                     ),

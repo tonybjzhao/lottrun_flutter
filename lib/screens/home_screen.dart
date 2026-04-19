@@ -614,7 +614,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '✨ 1 in 5 users matched at least 2 numbers last week',
+                    '✨ Many players matched 2+ numbers last week 👀',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
                       color: theme.colorScheme.primary.withAlpha(160),
