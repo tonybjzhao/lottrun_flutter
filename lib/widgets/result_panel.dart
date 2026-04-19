@@ -331,6 +331,20 @@ class _ResultPanelState extends State<ResultPanel>
             Row(
               children: [
                 Expanded(
+                  child: Builder(
+                    builder: (btnCtx) => FilledButton.icon(
+                      onPressed: () => _shareCard(btnCtx),
+                      icon: const Icon(Icons.share_rounded, size: 15),
+                      label: const Text('Share'),
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        textStyle: const TextStyle(fontSize: 13),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () => _copy(context),
                     icon: const Icon(Icons.copy_rounded, size: 15),
@@ -338,20 +352,6 @@ class _ResultPanelState extends State<ResultPanel>
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 6),
                       textStyle: const TextStyle(fontSize: 13),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Builder(
-                    builder: (btnCtx) => OutlinedButton.icon(
-                      onPressed: () => _shareCard(btnCtx),
-                      icon: const Icon(Icons.share_rounded, size: 15),
-                      label: const Text('Share'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        textStyle: const TextStyle(fontSize: 13),
-                      ),
                     ),
                   ),
                 ),

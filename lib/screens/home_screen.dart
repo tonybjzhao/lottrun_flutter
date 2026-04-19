@@ -1042,37 +1042,37 @@ class _InlinePickCard extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _copy(context),
-                      icon: const Icon(Icons.copy_rounded, size: 14),
-                      label: const Text('Copy'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
-                        textStyle: const TextStyle(fontSize: 12),
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
                     child: Builder(
-                      builder: (btnCtx) => OutlinedButton.icon(
+                      builder: (btnCtx) => FilledButton.icon(
                         onPressed: () => _share(btnCtx),
                         icon: const Icon(Icons.share_rounded, size: 14),
                         label: const Text('Share'),
-                        style: OutlinedButton.styleFrom(
+                        style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 5),
                           textStyle: const TextStyle(fontSize: 12),
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                       ),
                     ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _copy(context),
+                    icon: const Icon(Icons.copy_rounded, size: 14),
+                    label: const Text('Copy'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      textStyle: const TextStyle(fontSize: 12),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: isSaved ? null : onSave,
-                      icon: Icon(
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: isSaved ? null : onSave,
+                    icon: Icon(
                         isSaved
                             ? Icons.bookmark
                             : Icons.bookmark_outline_rounded,
@@ -1325,12 +1325,12 @@ class _CompactPickBannerState extends State<_CompactPickBanner>
                           ),
                         ),
                         Builder(
-                          builder: (btnCtx) => TextButton.icon(
+                          builder: (btnCtx) => FilledButton.icon(
                             onPressed: () => _shareCard(btnCtx),
                             icon:
                                 const Icon(Icons.share_rounded, size: 14),
                             label: const Text('Share'),
-                            style: TextButton.styleFrom(
+                            style: FilledButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 4),
                               textStyle: const TextStyle(fontSize: 12),

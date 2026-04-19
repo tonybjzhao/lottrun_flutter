@@ -771,6 +771,23 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
                   Row(
                     children: [
                       Expanded(
+                        child: Builder(
+                          builder: (btnCtx) => FilledButton.icon(
+                            onPressed: lottery != null
+                                ? () => _shareCard(btnCtx)
+                                : null,
+                            icon: const Icon(Icons.share_rounded, size: 14),
+                            label: const Text('Share'),
+                            style: FilledButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 5),
+                              textStyle: const TextStyle(fontSize: 12),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
                         child: OutlinedButton.icon(
                           onPressed: () => _copy(context),
                           icon: const Icon(Icons.copy_rounded, size: 14),
@@ -779,23 +796,6 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
                             padding: const EdgeInsets.symmetric(vertical: 5),
                             textStyle: const TextStyle(fontSize: 12),
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Builder(
-                          builder: (btnCtx) => OutlinedButton.icon(
-                            onPressed: lottery != null
-                                ? () => _shareCard(btnCtx)
-                                : null,
-                            icon: const Icon(Icons.share_rounded, size: 14),
-                            label: const Text('Share'),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 5),
-                              textStyle: const TextStyle(fontSize: 12),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
                           ),
                         ),
                       ),

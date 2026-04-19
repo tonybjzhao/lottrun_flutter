@@ -761,12 +761,12 @@ class _WarmTemplate extends StatelessWidget {
       emoji    = '⏳';
       headline = 'Draw day incoming!';
       subhead  = 'Fingers crossed 🤞';
-      blurbText = pick.style.taglineSubtitle;
+      blurbText = 'Can you beat this? 👀';
     } else {
-      emoji    = _styleEmoji(pick.style);
-      headline = pick.style.label;
-      subhead  = 'AI-generated lucky numbers 🤖';
-      blurbText = pick.style.taglineSubtitle;
+      emoji    = '🎯';
+      headline = 'My Lucky Pick';
+      subhead  = 'Let’s see what happens 👀';
+      blurbText = 'These are my numbers 👇';
     }
 
     final bonusLabel = switch (lottery.id) {
@@ -885,16 +885,13 @@ class _WarmTemplate extends StatelessWidget {
                   const Divider(color: Colors.white12, height: 1),
                   const SizedBox(height: 10),
                   Text(
-                    isMiss
-                        ? 'Tomorrow is a new draw! Play again with LottoRun AI'
-                        : 'Try your luck with AI-powered picks 🍀',
-                    style: const TextStyle(color: Colors.white54, fontSize: 10),
+                    'Can you beat this? 👀',
+                    style: TextStyle(
+                      color: theme.accentColor,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
                     textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    "💜  Play responsibly. It's all about the fun.",
-                    style: TextStyle(color: Colors.white30, fontSize: 9),
                   ),
                 ],
               ),
@@ -971,13 +968,6 @@ class _WarmTemplate extends StatelessWidget {
                 fontSize: 11,
                 fontWeight: FontWeight.w600)),
       ]);
-
-  String _styleEmoji(PlayStyle style) => switch (style) {
-        PlayStyle.hot      => '🔥',
-        PlayStyle.cold     => '❄️',
-        PlayStyle.balanced => '⚖️',
-        PlayStyle.random   => '🎲',
-      };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1371,7 +1361,7 @@ class _PickShareSheetState extends State<_PickShareSheet> {
                       children: [
                         ChoiceChip(
                           label: Text(
-                            'Auto · ${_templateLabel(_autoTemplate)}',
+                            '⭐ Smart Pick',
                           ),
                           selected: _manualTemplate == null,
                           onSelected: (_) {
@@ -1563,9 +1553,9 @@ String _shareText(PickMatchResult? result, Lottery? lottery) {
 }
 
 String _templateLabel(ShareCardTemplate template) => switch (template) {
-      ShareCardTemplate.fire => 'Fire',
-      ShareCardTemplate.electric => 'Electric',
-      ShareCardTemplate.warm => 'Warm',
+      ShareCardTemplate.fire => '🔥 Feeling Hot',
+      ShareCardTemplate.electric => '⚡ Lucky Shot',
+      ShareCardTemplate.warm => '🍀 Feeling Lucky',
     };
 
 String _templateDescription(ShareCardTemplate template) => switch (template) {
