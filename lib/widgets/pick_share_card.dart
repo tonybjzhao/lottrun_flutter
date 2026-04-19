@@ -83,12 +83,14 @@ class ShareCardGenerator extends StatefulWidget {
   final GeneratedPick pick;
   final Lottery lottery;
   final PickMatchResult? result;
+  final ShareCardTemplate? templateOverride;
 
   const ShareCardGenerator({
     super.key,
     required this.pick,
     required this.lottery,
     this.result,
+    this.templateOverride,
   });
 
   @override
@@ -100,6 +102,7 @@ class ShareCardGeneratorState extends State<ShareCardGenerator> {
 
   /// Which template is currently active.
   ShareCardTemplate get template =>
+      widget.templateOverride ??
       selectTemplate(widget.pick, widget.result, widget.lottery);
 
   /// Captures the card as raw PNG bytes.
@@ -403,7 +406,7 @@ class _FireTemplate extends StatelessWidget {
             style: TextStyle(color: Colors.white30, fontSize: 10)),
         SizedBox(height: 4),
         Text("Play responsibly. It's all about the fun.",
-            style: TextStyle(color: Colors.white15, fontSize: 9)),
+            style: TextStyle(color: Color(0x26FFFFFF), fontSize: 9)),
       ]);
 }
 
@@ -946,7 +949,7 @@ class _WarmTemplate extends StatelessWidget {
         child: Text(
           copy,
           style: const TextStyle(
-              color: Colors.white80, fontSize: 13, height: 1.4),
+              color: Color(0xCCFFFFFF), fontSize: 13, height: 1.4),
           textAlign: TextAlign.center,
         ),
       );
@@ -1203,23 +1206,254 @@ class PickShareCard extends StatelessWidget {
   final GeneratedPick pick;
   final Lottery lottery;
   final PickMatchResult? result;
+  final ShareCardTemplate? templateOverride;
 
   const PickShareCard({
     super.key,
     required this.pick,
     required this.lottery,
     this.result,
+    this.templateOverride,
   });
 
   @override
   Widget build(BuildContext context) {
     final r         = result;
     final hasResult = r != null && !r.isPending && r.drawMainNumbers.isNotEmpty;
-    return switch (selectTemplate(pick, r, lottery)) {
+    final template =
+        templateOverride ?? selectTemplate(pick, r, lottery);
+    return switch (template) {
       ShareCardTemplate.fire     => _FireTemplate(pick: pick, lottery: lottery, result: r!),
       ShareCardTemplate.electric => _ElectricTemplate(pick: pick, lottery: lottery, result: r!),
       ShareCardTemplate.warm     => _WarmTemplate(pick: pick, lottery: lottery, result: hasResult ? r : null),
     };
+  }
+}
+
+Future<void> showPickShareSheet({
+  required BuildContext context,
+  required GeneratedPick pick,
+  required Lottery lottery,
+  PickMatchResult? result,
+}) {
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => _PickShareSheet(
+      pick: pick,
+      lottery: lottery,
+      result: result,
+    ),
+  );
+}
+
+class _PickShareSheet extends StatefulWidget {
+  final GeneratedPick pick;
+  final Lottery lottery;
+  final PickMatchResult? result;
+
+  const _PickShareSheet({
+    required this.pick,
+    required this.lottery,
+    this.result,
+  });
+
+  @override
+  State<_PickShareSheet> createState() => _PickShareSheetState();
+}
+
+class _PickShareSheetState extends State<_PickShareSheet> {
+  final _generatorKey = GlobalKey<ShareCardGeneratorState>();
+  ShareCardTemplate? _manualTemplate;
+  bool _isSharing = false;
+
+  ShareCardTemplate get _autoTemplate =>
+      selectTemplate(widget.pick, widget.result, widget.lottery);
+
+  ShareCardTemplate get _effectiveTemplate =>
+      _manualTemplate ?? _autoTemplate;
+
+  Future<void> _share(BuildContext buttonContext) async {
+    if (_isSharing) return;
+    final box = buttonContext.findRenderObject() as RenderBox?;
+    final origin = box == null ? null : box.localToGlobal(Offset.zero) & box.size;
+
+    setState(() => _isSharing = true);
+    try {
+      await _generatorKey.currentState?.share(sharePositionOrigin: origin);
+      if (mounted) Navigator.of(context).pop();
+    } finally {
+      if (mounted) setState(() => _isSharing = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return FractionallySizedBox(
+      heightFactor: 0.94,
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(30),
+              blurRadius: 22,
+              offset: const Offset(0, -6),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            Container(
+              width: 46,
+              height: 5,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.onSurface.withAlpha(40),
+                borderRadius: BorderRadius.circular(999),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Share Card Preview',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Pick a style or keep the auto recommendation for ${widget.lottery.name}.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: FittedBox(
+                        child: ShareCardGenerator(
+                          key: _generatorKey,
+                          pick: widget.pick,
+                          lottery: widget.lottery,
+                          result: widget.result,
+                          templateOverride: _manualTemplate,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Template',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        ChoiceChip(
+                          label: Text(
+                            'Auto · ${_templateLabel(_autoTemplate)}',
+                          ),
+                          selected: _manualTemplate == null,
+                          onSelected: (_) {
+                            setState(() => _manualTemplate = null);
+                          },
+                        ),
+                        for (final template in ShareCardTemplate.values)
+                          ChoiceChip(
+                            label: Text(_templateLabel(template)),
+                            selected: _manualTemplate == template,
+                            onSelected: (_) {
+                              setState(() => _manualTemplate = template);
+                            },
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest
+                            .withAlpha(180),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        _templateDescription(_effectiveTemplate),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          height: 1.35,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _isSharing
+                          ? null
+                          : () => Navigator.of(context).pop(),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(0, 52),
+                      ),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Builder(
+                      builder: (buttonContext) => FilledButton.icon(
+                        onPressed: _isSharing
+                            ? null
+                            : () => _share(buttonContext),
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size(0, 52),
+                        ),
+                        icon: _isSharing
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.share_rounded),
+                        label: Text(
+                          _isSharing ? 'Preparing...' : 'Share PNG',
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -1327,3 +1561,18 @@ String _shareText(PickMatchResult? result, Lottery? lottery) {
         : 'My AI lottery pick 🎯 — Generated by LottoRun AI',
   };
 }
+
+String _templateLabel(ShareCardTemplate template) => switch (template) {
+      ShareCardTemplate.fire => 'Fire',
+      ShareCardTemplate.electric => 'Electric',
+      ShareCardTemplate.warm => 'Warm',
+    };
+
+String _templateDescription(ShareCardTemplate template) => switch (template) {
+      ShareCardTemplate.fire =>
+        'Dramatic gold-on-dark card for close calls and strong hit streaks.',
+      ShareCardTemplate.electric =>
+        'Clean neon stats card for smaller wins and partial matches.',
+      ShareCardTemplate.warm =>
+        'Playful motivational card for pending draws, misses, or pick-only sharing.',
+    };

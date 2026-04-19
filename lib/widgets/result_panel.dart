@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
+import '../services/pick_result_service.dart';
 import 'lotto_ball.dart';
 import 'pick_share_card.dart';
 
@@ -105,7 +106,18 @@ class _ResultPanelState extends State<ResultPanel>
 
   Future<void> _shareCard(BuildContext btnCtx) async {
     HapticFeedback.lightImpact();
-    await sharePickCard(repaintKey: _shareCardKey, btnContext: btnCtx);
+    await showPickShareSheet(
+      context: btnCtx,
+      pick: widget.pick,
+      lottery: widget.lottery,
+      result: widget.recentDraw == null
+          ? null
+          : checkPickResult(
+              widget.pick,
+              widget.lottery,
+              [widget.recentDraw!],
+            ),
+    );
   }
 
   // ── Match check ──────────────────────────────────────────────────────────

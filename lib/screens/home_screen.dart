@@ -939,7 +939,11 @@ class _InlinePickCard extends StatelessWidget {
 
   Future<void> _share(BuildContext btnCtx) async {
     HapticFeedback.lightImpact();
-    await sharePickCard(repaintKey: shareCardKey, btnContext: btnCtx);
+    await showPickShareSheet(
+      context: btnCtx,
+      pick: pick,
+      lottery: lottery,
+    );
   }
 
   @override
@@ -1258,7 +1262,11 @@ class _CompactPickBannerState extends State<_CompactPickBanner>
 
   Future<void> _shareCard(BuildContext btnCtx) async {
     HapticFeedback.lightImpact();
-    await sharePickCard(repaintKey: _shareCardKey, btnContext: btnCtx);
+    await showPickShareSheet(
+      context: btnCtx,
+      pick: widget.pick,
+      lottery: widget.lottery,
+    );
   }
 
   @override

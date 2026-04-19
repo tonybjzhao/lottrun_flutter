@@ -602,11 +602,13 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
 
   Future<void> _shareCard(BuildContext btnCtx) async {
     HapticFeedback.lightImpact();
-    await sharePickCard(
-      repaintKey: _shareCardKey,
-      btnContext: btnCtx,
+    final lottery = _lottery;
+    if (lottery == null) return;
+    await showPickShareSheet(
+      context: btnCtx,
+      pick: widget.pick,
+      lottery: lottery,
       result: _result,
-      lottery: _lottery,
     );
   }
 
