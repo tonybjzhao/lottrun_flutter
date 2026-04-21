@@ -35,8 +35,6 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>This identifier will be used to deliver personalised ads to you.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

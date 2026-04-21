@@ -40,7 +40,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       _bannerAd = BannerAd(
         adUnitId: AdMobIds.historyBanner,
         size: AdSize.banner,
-        request: const AdRequest(),
+        request: const AdRequest(nonPersonalizedAds: true),
         listener: BannerAdListener(
           onAdLoaded: (ad) {
             if (mounted) setState(() => _isBannerAdLoaded = true);

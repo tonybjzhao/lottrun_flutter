@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,21 +14,17 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   unawaited(NotificationService.instance.init());
   AnalyticsService.init(_initFirebase());
-  if (Platform.isIOS) await _requestTrackingPermission();
   await _initAds();
   runApp(const LottFunApp());
-}
-
-Future<void> _requestTrackingPermission() async {
-  final status = await AppTrackingTransparency.trackingAuthorizationStatus;
-  if (status == TrackingStatus.notDetermined) {
-    await AppTrackingTransparency.requestTrackingAuthorization();
-  }
 }
 
 /// Initializes AdMob and registers test device IDs in debug builds
 /// so banner ads fill during development.
 Future<void> _initAds() async {
+  if (Platform.isIOS) {
+    // Disable same app key on iOS for the most conservative review posture.
+    await MobileAds.instance.setSameAppKeyEnabled(false);
+  }
   await MobileAds.instance.initialize();
   if (kDebugMode) {
     // Device ID from the log: "To get test ads on this device, set: ..."
