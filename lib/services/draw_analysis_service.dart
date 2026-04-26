@@ -5,16 +5,15 @@ import '../models/lottery_draw.dart';
 
 class RecentDrawTrends {
   final int drawCount;
-  final List<int> topFrequent; // top 5
-  final List<int> bottomFrequent; // bottom 5
+  final List<int> topFrequent;
+  final List<int> bottomFrequent;
   final double averageSum;
-  final String mostCommonOddEven; // e.g. "3 odd / 3 even"
-  final String mostCommonLowHigh; // e.g. "3 low / 3 high"
+  final String mostCommonOddEven;
+  final String mostCommonLowHigh;
   final double avgConsecutivePairs;
   final int mostCommonConsecutiveCount;
   final TrendStrength trendStrength;
-  final String summaryEn;
-  final String summaryZh;
+  final String summary;
 
   const RecentDrawTrends({
     required this.drawCount,
@@ -26,21 +25,19 @@ class RecentDrawTrends {
     required this.avgConsecutivePairs,
     required this.mostCommonConsecutiveCount,
     required this.trendStrength,
-    required this.summaryEn,
-    required this.summaryZh,
+    required this.summary,
   });
 }
 
 enum TrendStrength { strong, balanced, random }
 
 class SavedPicksAnalysis {
-  final String? bestMatchDrawDate; // ISO date string
+  final String? bestMatchDrawDate;
   final int bestMatchCount;
   final double averageMatchCount;
-  final List<int> frequentlyPickedNumbers; // top 5
-  final List<int> recentlyAppearedNumbers; // saved numbers seen in recent draws
-  final String summaryEn;
-  final String summaryZh;
+  final List<int> frequentlyPickedNumbers;
+  final List<int> recentlyAppearedNumbers;
+  final String summary;
 
   const SavedPicksAnalysis({
     required this.bestMatchDrawDate,
@@ -48,13 +45,12 @@ class SavedPicksAnalysis {
     required this.averageMatchCount,
     required this.frequentlyPickedNumbers,
     required this.recentlyAppearedNumbers,
-    required this.summaryEn,
-    required this.summaryZh,
+    required this.summary,
   });
 }
 
 class HistoricalPatternMatch {
-  final int historicalMatchScore; // 0-100
+  final int historicalMatchScore;
   final int trendScore;
   final int hotColdAlignmentScore;
   final int oddEvenStructureScore;
@@ -69,8 +65,7 @@ class HistoricalPatternMatch {
   final String sumRangeLabel;
   final int consecutiveNumberCount;
   final List<SimilarDraw> similarPastDraws;
-  final String shortEnglishSummary;
-  final String shortChineseSummary;
+  final String summary;
 
   const HistoricalPatternMatch({
     required this.historicalMatchScore,
@@ -88,8 +83,7 @@ class HistoricalPatternMatch {
     required this.sumRangeLabel,
     required this.consecutiveNumberCount,
     required this.similarPastDraws,
-    required this.shortEnglishSummary,
-    required this.shortChineseSummary,
+    required this.summary,
   });
 }
 
@@ -119,7 +113,7 @@ class DrawAnalysisService {
   }) {
     final recent = draws.take(drawCount).toList();
     if (recent.isEmpty) {
-      return RecentDrawTrends(
+      return const RecentDrawTrends(
         drawCount: 0,
         topFrequent: [],
         bottomFrequent: [],
@@ -129,8 +123,7 @@ class DrawAnalysisService {
         avgConsecutivePairs: 0,
         mostCommonConsecutiveCount: 0,
         trendStrength: TrendStrength.random,
-        summaryEn: 'Not enough draw history for analysis.',
-        summaryZh: '暂无足够的开奖记录进行分析。',
+        summary: 'Not enough draw history for analysis.',
       );
     }
 
@@ -159,7 +152,7 @@ class DrawAnalysisService {
 
     final strength = _trendStrength(freq, recent.length, lottery.mainCount);
 
-    final (summaryEn, summaryZh) =
+    final summary =
         _recentTrendSummary(strength, topFrequent, lottery.mainMin, lottery.mainMax);
 
     return RecentDrawTrends(
@@ -172,8 +165,7 @@ class DrawAnalysisService {
       avgConsecutivePairs: avgConsec,
       mostCommonConsecutiveCount: mostCommonConsec,
       trendStrength: strength,
-      summaryEn: summaryEn,
-      summaryZh: summaryZh,
+      summary: summary,
     );
   }
 
@@ -187,18 +179,16 @@ class DrawAnalysisService {
     final draws = recentDraws.take(compareDrawCount).toList();
 
     if (savedMainNumbers.isEmpty || draws.isEmpty) {
-      return SavedPicksAnalysis(
+      return const SavedPicksAnalysis(
         bestMatchDrawDate: null,
         bestMatchCount: 0,
         averageMatchCount: 0,
         frequentlyPickedNumbers: [],
         recentlyAppearedNumbers: [],
-        summaryEn: 'No saved picks or draw history to compare.',
-        summaryZh: '暂无保存的号码或开奖记录可供比较。',
+        summary: 'No saved picks or draw history to compare.',
       );
     }
 
-    // Best matched draw across all saved picks
     String? bestDate;
     int bestCount = 0;
     int totalMatches = 0;
@@ -219,7 +209,6 @@ class DrawAnalysisService {
 
     final avgMatch = comparisons > 0 ? totalMatches / comparisons : 0.0;
 
-    // Frequently picked numbers
     final pickFreq = <int, int>{};
     for (final pick in savedMainNumbers) {
       for (final n in pick) {
@@ -230,16 +219,12 @@ class DrawAnalysisService {
       ..sort((a, b) => b.value.compareTo(a.value));
     final frequentPicked = sortedPick.take(5).map((e) => e.key).toList();
 
-    // Recently appeared saved numbers
-    final recentDrawNumbers =
-        draws.expand((d) => d.mainNumbers).toSet();
-    final allSavedNumbers =
-        savedMainNumbers.expand((p) => p).toSet();
+    final recentDrawNumbers = draws.expand((d) => d.mainNumbers).toSet();
+    final allSavedNumbers = savedMainNumbers.expand((p) => p).toSet();
     final recentlyAppeared =
         allSavedNumbers.intersection(recentDrawNumbers).toList()..sort();
 
-    final (summaryEn, summaryZh) =
-        _savedPicksSummary(avgMatch, recentlyAppeared.length);
+    final summary = _savedPicksSummary(avgMatch, recentlyAppeared.length);
 
     return SavedPicksAnalysis(
       bestMatchDrawDate: bestDate,
@@ -247,8 +232,7 @@ class DrawAnalysisService {
       averageMatchCount: avgMatch,
       frequentlyPickedNumbers: frequentPicked,
       recentlyAppearedNumbers: recentlyAppeared,
-      summaryEn: summaryEn,
-      summaryZh: summaryZh,
+      summary: summary,
     );
   }
 
@@ -261,8 +245,8 @@ class DrawAnalysisService {
     required Lottery lottery,
     required LotteryDraw targetDraw,
     required List<LotteryDraw> allDraws,
+    int similarDrawsLimit = 3,
   }) {
-    // Filter to same game, exclude target draw itself, within 5 years
     final cutoff = targetDraw.drawDate.subtract(const Duration(days: 365 * 5));
     final history = allDraws
         .where((d) =>
@@ -270,7 +254,7 @@ class DrawAnalysisService {
             d.drawDate.isBefore(targetDraw.drawDate) &&
             d.drawDate.isAfter(cutoff))
         .toList()
-      ..sort((a, b) => b.drawDate.compareTo(a.drawDate)); // newest first
+      ..sort((a, b) => b.drawDate.compareTo(a.drawDate));
 
     if (history.length < _minHistoryRequired) return null;
 
@@ -293,7 +277,6 @@ class DrawAnalysisService {
 
     final finalScore = rawScore.round().clamp(0, 100);
 
-    // Hot/cold classification
     final longTermFreq = _frequencyMap(history);
     final allNums = List.generate(
         lottery.mainMax - lottery.mainMin + 1, (i) => lottery.mainMin + i);
@@ -315,12 +298,16 @@ class DrawAnalysisService {
     final consecCount = _consecutivePairs(main);
 
     final currentSum = main.fold(0, (s, n) => s + n);
-    final historicalSums = history.map((d) => d.mainNumbers.fold(0, (s, n) => s + n)).toList()..sort();
+    final historicalSums = history
+        .map((d) => d.mainNumbers.fold(0, (s, n) => s + n))
+        .toList()
+      ..sort();
     final sumLabel = _sumRangeLabel(currentSum, historicalSums);
 
-    final similar = _findSimilarDraws(targetDraw, history, midpoint);
+    final similar =
+        _findSimilarDraws(targetDraw, history, midpoint, similarDrawsLimit);
 
-    final (summaryEn, summaryZh) = _historicalSummary(finalScore, hotCount, coldCount);
+    final summary = _historicalSummary(finalScore);
 
     return HistoricalPatternMatch(
       historicalMatchScore: finalScore,
@@ -338,8 +325,7 @@ class DrawAnalysisService {
       sumRangeLabel: sumLabel,
       consecutiveNumberCount: consecCount,
       similarPastDraws: similar,
-      shortEnglishSummary: summaryEn,
-      shortChineseSummary: summaryZh,
+      summary: summary,
     );
   }
 
@@ -404,7 +390,8 @@ class DrawAnalysisService {
     if (freq.isEmpty || drawCount == 0) return TrendStrength.random;
     final totalAppearances = drawCount * mainCount;
     final uniqueNumbers = freq.length;
-    final expectedAvg = uniqueNumbers > 0 ? totalAppearances / uniqueNumbers : 1.0;
+    final expectedAvg =
+        uniqueNumbers > 0 ? totalAppearances / uniqueNumbers : 1.0;
     final maxFreq = freq.values.reduce((a, b) => a > b ? a : b).toDouble();
     final ratio = maxFreq / expectedAvg;
     if (ratio >= 2.0) return TrendStrength.strong;
@@ -416,7 +403,6 @@ class DrawAnalysisService {
 
   static double _calcTrendScore(
       List<int> main, List<LotteryDraw> history, Lottery lottery) {
-    // Time-decay weighted frequency
     final weightedFreq = <int, double>{};
     for (int i = 0; i < history.length; i++) {
       final weight = i < 12 ? 0.6 : (i < 52 ? 0.3 : 0.1);
@@ -547,7 +533,8 @@ class DrawAnalysisService {
   }
 
   static List<SimilarDraw> _findSimilarDraws(
-      LotteryDraw target, List<LotteryDraw> history, double midpoint) {
+      LotteryDraw target, List<LotteryDraw> history, double midpoint,
+      int limit) {
     final targetMain = target.mainNumbers.toSet();
     final targetOdd = target.mainNumbers.where((n) => n.isOdd).length;
     final targetLow = target.mainNumbers.where((n) => n <= midpoint).length;
@@ -585,78 +572,50 @@ class DrawAnalysisService {
     }).toList()
       ..sort((a, b) => b.similarityScore.compareTo(a.similarityScore));
 
-    return scored.take(3).toList();
+    return scored.take(limit).toList();
   }
 
   // ── Summary text generators ───────────────────────────────────────────────
 
-  static (String, String) _recentTrendSummary(
+  static String _recentTrendSummary(
       TrendStrength strength, List<int> topNums, int minVal, int maxVal) {
-    final topInMid = topNums.where((n) => n > minVal + (maxVal - minVal) * 0.25 &&
-        n < maxVal - (maxVal - minVal) * 0.25).length;
+    final topInMid = topNums
+        .where((n) =>
+            n > minVal + (maxVal - minVal) * 0.25 &&
+            n < maxVal - (maxVal - minVal) * 0.25)
+        .length;
 
     switch (strength) {
       case TrendStrength.strong:
-        return (
-          'Recent draws show higher activity among a few numbers — a notable concentration in this period.',
-          '近期开奖中部分号码出现频率明显偏高，呈现一定集中趋势。',
-        );
+        return 'Recent draws show higher activity among a few numbers — a notable concentration in this period.';
       case TrendStrength.balanced:
         if (topInMid >= 3) {
-          return (
-            'This period shows higher activity among several mid-range numbers.',
-            '这一阶段中段号码出现相对更活跃。',
-          );
+          return 'This period shows higher activity among several mid-range numbers.';
         }
-        return (
-          'Recent draws are fairly balanced with a moderate spread across numbers.',
-          '近期开奖分布较为均衡，号码分布适中。',
-        );
+        return 'Recent draws are fairly balanced with a moderate spread across numbers.';
       case TrendStrength.random:
-        return (
-          'Recent draws are fairly balanced with no strong pattern detected.',
-          '近期开奖整体较均衡，未发现明显集中趋势。',
-        );
+        return 'Recent draws are fairly balanced with no strong pattern detected.';
     }
   }
 
-  static (String, String) _savedPicksSummary(
+  static String _savedPicksSummary(
       double avgMatch, int recentlyAppearedCount) {
     if (avgMatch >= 2.5) {
-      return (
-        'Your saved picks have matched recent draws moderately.',
-        '你保存的号码与近期开奖有中等程度重合。',
-      );
+      return 'Your saved picks have matched recent draws moderately.';
     }
     if (recentlyAppearedCount >= 3) {
-      return (
-        'Several numbers you saved appeared in recent results.',
-        '你保存的一些号码近期曾出现在开奖结果中。',
-      );
+      return 'Several numbers you saved appeared in recent results.';
     }
-    return (
-      'Your saved picks show limited overlap with recent draw results.',
-      '你保存的号码与近期开奖结果重合较少。',
-    );
+    return 'Your saved picks show limited overlap with recent draw results.';
   }
 
-  static (String, String) _historicalSummary(
-      int score, int hotCount, int coldCount) {
+  static String _historicalSummary(int score) {
     if (score >= 70) {
-      return (
-        'This draw aligns well with historical patterns from the past 5 years.',
-        '本期开奖与过去5年的历史规律较为吻合。',
-      );
+      return 'This draw aligns well with historical patterns from the past 5 years.';
     }
     if (score >= 45) {
-      return (
-        'This draw shows moderate alignment with historical distribution patterns.',
-        '本期开奖与历史分布规律有一定程度的吻合。',
-      );
+      return 'This draw shows moderate alignment with historical distribution patterns.';
     }
-    return (
-        'This draw shows limited alignment with typical historical patterns.',
-        '本期开奖与历史常见规律吻合度较低。',
-    );
+    return 'This draw shows limited alignment with typical historical patterns.';
   }
 }

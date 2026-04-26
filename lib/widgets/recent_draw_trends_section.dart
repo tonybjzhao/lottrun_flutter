@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import '../services/draw_analysis_service.dart';
+import '../services/premium_service.dart';
+import 'premium_paywall_sheet.dart';
 
 class RecentDrawTrendsSection extends StatefulWidget {
   final Lottery lottery;
@@ -52,15 +54,21 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
                       ),
                     ),
                     Text(
-                      'Based on last ${trends.drawCount} draws · for entertainment and analysis only',
+                      'Based on last ${trends.drawCount} draws',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface.withAlpha(120),
+                      ),
+                    ),
+                    Text(
+                      'Trends, not predictions',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withAlpha(80),
+                        fontStyle: FontStyle.italic,
                       ),
                     ),
                   ],
                 ),
               ),
-              // Draw count selector
               _DrawCountSelector(
                 value: _drawCount,
                 options: _options,
@@ -74,9 +82,10 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
           if (trends.drawCount == 0)
             _emptyState(theme)
           else ...[
-            // ── Hot / Cold numbers ───────────────────────────────
+            // ── Hot numbers ──────────────────────────────────────
             _MetricRow(
               label: 'Hot numbers',
+              tooltip: 'Appeared more often in recent draws',
               child: _NumberChips(
                 numbers: trends.topFrequent,
                 indicator: '🔥',
@@ -85,8 +94,11 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
               ),
             ),
             const SizedBox(height: 8),
+
+            // ── Cold numbers ─────────────────────────────────────
             _MetricRow(
               label: 'Cold numbers',
+              tooltip: 'Appeared less often in recent draws',
               child: _NumberChips(
                 numbers: trends.bottomFrequent,
                 indicator: '❄️',
@@ -132,7 +144,8 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
                   theme: theme,
                 ),
                 const SizedBox(width: 8),
-                _TrendStrengthChip(strength: trends.trendStrength, theme: theme),
+                _TrendStrengthChip(
+                    strength: trends.trendStrength, theme: theme),
               ],
             ),
 
@@ -141,7 +154,12 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
             const SizedBox(height: 10),
 
             // ── Summary ──────────────────────────────────────────
-            _SummaryText(en: trends.summaryEn, zh: trends.summaryZh, theme: theme),
+            _SummaryBox(text: trends.summary, theme: theme),
+
+            const SizedBox(height: 10),
+
+            // ── Premium teaser ───────────────────────────────────
+            _PremiumTeaser(theme: theme),
           ],
         ],
       ),
@@ -157,6 +175,54 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
           ),
         ),
       );
+}
+
+// ── Premium teaser ────────────────────────────────────────────────────────────
+
+class _PremiumTeaser extends StatelessWidget {
+  final ThemeData theme;
+  const _PremiumTeaser({required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: PremiumService.instance,
+      builder: (context, _) {
+        if (PremiumService.instance.isPremium) return const SizedBox.shrink();
+        return GestureDetector(
+          onTap: () => showPremiumPaywall(context),
+          child: Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF7C3AED).withAlpha(12),
+              border: Border.all(
+                  color: const Color(0xFF7C3AED).withAlpha(50), width: 1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                const Text('✨', style: TextStyle(fontSize: 14)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Unlock deeper trends — Advanced Analysis',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: const Color(0xFF7C3AED),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded,
+                    size: 16,
+                    color: const Color(0xFF7C3AED).withAlpha(180)),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 // ── Draw count selector ───────────────────────────────────────────────────────
@@ -184,7 +250,8 @@ class _DrawCountSelector extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
             margin: const EdgeInsets.only(left: 4),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: selected
                   ? theme.colorScheme.primary
@@ -264,9 +331,14 @@ class _NumberChips extends StatelessWidget {
 
 class _MetricRow extends StatelessWidget {
   final String label;
+  final String tooltip;
   final Widget child;
 
-  const _MetricRow({required this.label, required this.child});
+  const _MetricRow({
+    required this.label,
+    required this.tooltip,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -278,10 +350,23 @@ class _MetricRow extends StatelessWidget {
           width: 90,
           child: Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: Text(
-              label,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha(140),
+            child: Tooltip(
+              message: tooltip,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    label,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withAlpha(140),
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  Icon(Icons.info_outline_rounded,
+                      size: 10,
+                      color:
+                          theme.colorScheme.onSurface.withAlpha(80)),
+                ],
               ),
             ),
           ),
@@ -346,14 +431,18 @@ class _TrendStrengthChip extends StatelessWidget {
   final TrendStrength strength;
   final ThemeData theme;
 
-  const _TrendStrengthChip({required this.strength, required this.theme});
+  const _TrendStrengthChip(
+      {required this.strength, required this.theme});
 
   @override
   Widget build(BuildContext context) {
     final (label, icon, color) = switch (strength) {
-      TrendStrength.strong => ('Strong trend', '📈', Colors.orange.shade700),
-      TrendStrength.balanced => ('Balanced', '⚖️', Colors.teal.shade600),
-      TrendStrength.random => ('Random-like', '🎲', Colors.grey.shade600),
+      TrendStrength.strong =>
+        ('Strong trend', '📈', Colors.orange.shade700),
+      TrendStrength.balanced =>
+        ('Balanced', '⚖️', Colors.teal.shade600),
+      TrendStrength.random =>
+        ('Random-like', '🎲', Colors.grey.shade600),
     };
 
     return Container(
@@ -381,14 +470,13 @@ class _TrendStrengthChip extends StatelessWidget {
   }
 }
 
-// ── Summary text ──────────────────────────────────────────────────────────────
+// ── Summary box ───────────────────────────────────────────────────────────────
 
-class _SummaryText extends StatelessWidget {
-  final String en;
-  final String zh;
+class _SummaryBox extends StatelessWidget {
+  final String text;
   final ThemeData theme;
 
-  const _SummaryText({required this.en, required this.zh, required this.theme});
+  const _SummaryBox({required this.text, required this.theme});
 
   @override
   Widget build(BuildContext context) {
@@ -399,23 +487,11 @@ class _SummaryText extends StatelessWidget {
         color: theme.colorScheme.surfaceContainerHighest.withAlpha(160),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            en,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withAlpha(180),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            zh,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withAlpha(140),
-            ),
-          ),
-        ],
+      child: Text(
+        text,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurface.withAlpha(180),
+        ),
       ),
     );
   }

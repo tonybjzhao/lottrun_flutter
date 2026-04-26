@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery_draw.dart';
 import '../services/draw_analysis_service.dart';
+import '../services/premium_service.dart';
+import 'premium_paywall_sheet.dart';
 
 class SavedPicksAnalysisSection extends StatelessWidget {
   final List<GeneratedPick> picks;
@@ -15,11 +17,6 @@ class SavedPicksAnalysisSection extends StatelessWidget {
   });
 
   SavedPicksAnalysis _compute() {
-    // Collect all main number lists from saved picks
-    final allMainNumbers = picks.map((p) => p.mainNumbers).toList();
-
-    // Use draws from the first lottery that has data (cross-lottery comparison
-    // is not meaningful, so we use the most common lottery among saved picks)
     final lotteryFreq = <String, int>{};
     for (final p in picks) {
       lotteryFreq[p.lotteryId] = (lotteryFreq[p.lotteryId] ?? 0) + 1;
@@ -34,14 +31,16 @@ class SavedPicksAnalysisSection extends StatelessWidget {
         lotteryFreq.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
     final recentDraws = drawsByLottery[dominantId] ?? [];
 
-    // Only include picks for the dominant lottery in the analysis
     final filteredMains = picks
         .where((p) => p.lotteryId == dominantId)
         .map((p) => p.mainNumbers)
         .toList();
 
+    final allMainNumbers = picks.map((p) => p.mainNumbers).toList();
+
     return DrawAnalysisService.analyzeSavedPicks(
-      savedMainNumbers: filteredMains.isNotEmpty ? filteredMains : allMainNumbers,
+      savedMainNumbers:
+          filteredMains.isNotEmpty ? filteredMains : allMainNumbers,
       recentDraws: recentDraws,
     );
   }
@@ -99,6 +98,11 @@ class SavedPicksAnalysisSection extends StatelessWidget {
 
           const SizedBox(height: 8),
 
+          // ── Match level chip ─────────────────────────────────────
+          _MatchLevelChip(avg: analysis.averageMatchCount, theme: theme),
+
+          const SizedBox(height: 8),
+
           // ── Frequently picked numbers ────────────────────────────
           if (analysis.frequentlyPickedNumbers.isNotEmpty) ...[
             _MetricRow(
@@ -129,11 +133,12 @@ class SavedPicksAnalysisSection extends StatelessWidget {
           const SizedBox(height: 10),
 
           // ── Summary ──────────────────────────────────────────────
-          _SummaryText(
-            en: analysis.summaryEn,
-            zh: analysis.summaryZh,
-            theme: theme,
-          ),
+          _SummaryBox(text: analysis.summary, theme: theme),
+
+          const SizedBox(height: 10),
+
+          // ── Premium teaser ───────────────────────────────────────
+          _PremiumTeaser(theme: theme),
         ],
       ),
     );
@@ -146,6 +151,88 @@ class SavedPicksAnalysisSection extends StatelessWidget {
     } catch (_) {
       return iso;
     }
+  }
+}
+
+// ── Match level chip ──────────────────────────────────────────────────────────
+
+class _MatchLevelChip extends StatelessWidget {
+  final double avg;
+  final ThemeData theme;
+
+  const _MatchLevelChip({required this.avg, required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    final (label, color) = avg >= 2.0
+        ? ('Match level: High', Colors.green.shade600)
+        : avg >= 1.0
+            ? ('Match level: Medium', Colors.orange.shade600)
+            : ('Match level: Low', Colors.grey.shade500);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withAlpha(18),
+        border: Border.all(color: color.withAlpha(60), width: 1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: color,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
+
+// ── Premium teaser ────────────────────────────────────────────────────────────
+
+class _PremiumTeaser extends StatelessWidget {
+  final ThemeData theme;
+  const _PremiumTeaser({required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: PremiumService.instance,
+      builder: (context, _) {
+        if (PremiumService.instance.isPremium) return const SizedBox.shrink();
+        return GestureDetector(
+          onTap: () => showPremiumPaywall(context),
+          child: Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF7C3AED).withAlpha(12),
+              border: Border.all(
+                  color: const Color(0xFF7C3AED).withAlpha(50), width: 1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                const Text('✨', style: TextStyle(fontSize: 14)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Track saved picks over time — Advanced Analysis',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: const Color(0xFF7C3AED),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded,
+                    size: 16,
+                    color: const Color(0xFF7C3AED).withAlpha(180)),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -276,14 +363,13 @@ class _NumberChips extends StatelessWidget {
   }
 }
 
-// ── Summary text ──────────────────────────────────────────────────────────────
+// ── Summary box ───────────────────────────────────────────────────────────────
 
-class _SummaryText extends StatelessWidget {
-  final String en;
-  final String zh;
+class _SummaryBox extends StatelessWidget {
+  final String text;
   final ThemeData theme;
 
-  const _SummaryText({required this.en, required this.zh, required this.theme});
+  const _SummaryBox({required this.text, required this.theme});
 
   @override
   Widget build(BuildContext context) {
@@ -294,23 +380,11 @@ class _SummaryText extends StatelessWidget {
         color: theme.colorScheme.surfaceContainerHighest.withAlpha(160),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            en,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withAlpha(180),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            zh,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withAlpha(140),
-            ),
-          ),
-        ],
+      child: Text(
+        text,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurface.withAlpha(180),
+        ),
       ),
     );
   }

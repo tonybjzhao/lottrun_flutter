@@ -258,8 +258,7 @@ void main() {
       final lottery = _makeLottery();
       final result = DrawAnalysisService.analyzeRecentTrends(
           lottery: lottery, draws: [], drawCount: 20);
-      expect(result.summaryEn, isNotEmpty);
-      expect(result.summaryZh, isNotEmpty);
+      expect(result.summary, isNotEmpty);
       expect(result.drawCount, 0);
     });
 
@@ -291,7 +290,7 @@ void main() {
         savedMainNumbers: [],
         recentDraws: draws,
       );
-      expect(result.summaryEn, isNotEmpty);
+      expect(result.summary, isNotEmpty);
       expect(result.averageMatchCount, 0);
     });
 
@@ -302,7 +301,7 @@ void main() {
         ],
         recentDraws: [],
       );
-      expect(result.summaryEn, isNotEmpty);
+      expect(result.summary, isNotEmpty);
       expect(result.averageMatchCount, 0);
     });
   });

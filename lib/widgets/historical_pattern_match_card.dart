@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import '../services/draw_analysis_service.dart';
+import '../services/premium_service.dart';
+import 'premium_paywall_sheet.dart';
 
 class HistoricalPatternMatchCard extends StatelessWidget {
   final Lottery lottery;
@@ -19,10 +21,13 @@ class HistoricalPatternMatchCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isPremium = PremiumService.instance.isPremium;
+
     final result = DrawAnalysisService.analyzeHistoricalPattern(
       lottery: lottery,
       targetDraw: targetDraw,
       allDraws: allDraws,
+      similarDrawsLimit: isPremium ? 10 : 3,
     );
 
     if (result == null) {
@@ -44,6 +49,7 @@ class HistoricalPatternMatchCard extends StatelessWidget {
         children: [
           // ── Score header ─────────────────────────────────────────
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Column(
@@ -61,10 +67,19 @@ class HistoricalPatternMatchCard extends StatelessWidget {
                         color: theme.colorScheme.onSurface.withAlpha(120),
                       ),
                     ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _scoreLabel(result.historicalMatchScore),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: _scoreColor(result.historicalMatchScore),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              _ScoreBadge(score: result.historicalMatchScore, theme: theme),
+              _ScoreBadge(
+                  score: result.historicalMatchScore, theme: theme),
             ],
           ),
 
@@ -72,67 +87,60 @@ class HistoricalPatternMatchCard extends StatelessWidget {
 
           // ── Component scores ─────────────────────────────────────
           _ComponentScoreRow(
-            label: 'Trend alignment',
-            score: result.trendScore,
-            theme: theme,
-          ),
+              label: 'Trend alignment',
+              score: result.trendScore,
+              theme: theme),
           _ComponentScoreRow(
-            label: 'Hot/cold alignment',
-            score: result.hotColdAlignmentScore,
-            theme: theme,
-          ),
+              label: 'Hot/cold alignment',
+              score: result.hotColdAlignmentScore,
+              theme: theme),
           _ComponentScoreRow(
-            label: 'Odd/even structure',
-            score: result.oddEvenStructureScore,
-            theme: theme,
-          ),
+              label: 'Odd/even structure',
+              score: result.oddEvenStructureScore,
+              theme: theme),
           _ComponentScoreRow(
-            label: 'Low/high structure',
-            score: result.lowHighStructureScore,
-            theme: theme,
-          ),
+              label: 'Low/high structure',
+              score: result.lowHighStructureScore,
+              theme: theme),
           _ComponentScoreRow(
-            label: 'Sum range',
-            score: result.sumRangeScore,
-            theme: theme,
-          ),
+              label: 'Sum range',
+              score: result.sumRangeScore,
+              theme: theme),
           _ComponentScoreRow(
-            label: 'Consecutive pairs',
-            score: result.consecutiveScore,
-            theme: theme,
-          ),
+              label: 'Consecutive pairs',
+              score: result.consecutiveScore,
+              theme: theme),
 
           const SizedBox(height: 10),
           const Divider(height: 1),
           const SizedBox(height: 10),
 
-          // ── Draw structure ───────────────────────────────────────
+          // ── Draw structure chips ──────────────────────────────────
           Wrap(
             spacing: 8,
             runSpacing: 6,
             children: [
               _InfoChip(
-                label: result.oddEvenPattern,
-                icon: Icons.balance_rounded,
-                theme: theme,
-              ),
+                  label: result.oddEvenPattern,
+                  icon: Icons.balance_rounded,
+                  theme: theme),
               _InfoChip(
-                label: result.lowHighPattern,
-                icon: Icons.bar_chart_rounded,
-                theme: theme,
-              ),
+                  label: result.lowHighPattern,
+                  icon: Icons.bar_chart_rounded,
+                  theme: theme),
               _InfoChip(
-                label: result.sumRangeLabel,
-                icon: Icons.functions_rounded,
-                theme: theme,
-              ),
+                  label: result.sumRangeLabel,
+                  icon: Icons.functions_rounded,
+                  theme: theme),
               _InfoChip(
-                label: '${result.consecutiveNumberCount} consec pair${result.consecutiveNumberCount == 1 ? '' : 's'}',
+                label:
+                    '${result.consecutiveNumberCount} consec pair${result.consecutiveNumberCount == 1 ? '' : 's'}',
                 icon: Icons.link_rounded,
                 theme: theme,
               ),
               _InfoChip(
-                label: '🔥 ${result.hotNumberCount} hot · ❄️ ${result.coldNumberCount} cold',
+                label:
+                    '🔥 ${result.hotNumberCount} hot · ❄️ ${result.coldNumberCount} cold',
                 icon: null,
                 theme: theme,
               ),
@@ -144,17 +152,45 @@ class HistoricalPatternMatchCard extends StatelessWidget {
             const SizedBox(height: 12),
             const Divider(height: 1),
             const SizedBox(height: 10),
-            Text(
-              'Similar past draws',
-              style: theme.textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: theme.colorScheme.onSurface.withAlpha(160),
-              ),
+            Row(
+              children: [
+                Text(
+                  'Similar past draws',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface.withAlpha(160),
+                  ),
+                ),
+                if (isPremium) ...[
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF7C3AED).withAlpha(18),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'Top 10',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: const Color(0xFF7C3AED),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
             const SizedBox(height: 8),
-            ...result.similarPastDraws.map(
-              (s) => _SimilarDrawRow(similar: s, theme: theme),
-            ),
+            ...result.similarPastDraws
+                .map((s) => _SimilarDrawRow(similar: s, theme: theme)),
+          ],
+
+          // ── Premium teaser (free users) ──────────────────────────
+          if (!isPremium) ...[
+            const SizedBox(height: 8),
+            _PremiumTeaser(theme: theme),
           ],
 
           const SizedBox(height: 12),
@@ -162,14 +198,22 @@ class HistoricalPatternMatchCard extends StatelessWidget {
           const SizedBox(height: 10),
 
           // ── Summary ──────────────────────────────────────────────
-          _SummaryText(
-            en: result.shortEnglishSummary,
-            zh: result.shortChineseSummary,
-            theme: theme,
-          ),
+          _SummaryBox(text: result.summary, theme: theme),
         ],
       ),
     );
+  }
+
+  String _scoreLabel(int score) {
+    if (score >= 70) return 'Strong alignment with historical patterns';
+    if (score >= 45) return 'Moderate alignment with historical patterns';
+    return 'Limited alignment with historical patterns';
+  }
+
+  Color _scoreColor(int score) {
+    if (score >= 70) return Colors.green.shade600;
+    if (score >= 45) return Colors.orange.shade600;
+    return Colors.grey.shade500;
   }
 }
 
@@ -235,9 +279,10 @@ class _ComponentScoreRow extends StatelessWidget {
     required this.theme,
   });
 
+  // Color by score value, not by metric type
   Color _barColor() {
-    if (score >= 70) return Colors.green.shade500;
-    if (score >= 45) return Colors.orange.shade400;
+    if (score >= 80) return Colors.green.shade500;
+    if (score >= 60) return Colors.orange.shade400;
     return Colors.grey.shade400;
   }
 
@@ -293,7 +338,8 @@ class _InfoChip extends StatelessWidget {
   final IconData? icon;
   final ThemeData theme;
 
-  const _InfoChip({required this.label, required this.icon, required this.theme});
+  const _InfoChip(
+      {required this.label, required this.icon, required this.theme});
 
   @override
   Widget build(BuildContext context) {
@@ -307,7 +353,8 @@ class _InfoChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 12,
+            Icon(icon,
+                size: 12,
                 color: theme.colorScheme.onSurface.withAlpha(140)),
             const SizedBox(width: 4),
           ],
@@ -367,14 +414,14 @@ class _SimilarDrawRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${similar.sharedNumbers} shared',
+                '${similar.sharedNumbers} numbers matched',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               Text(
-                '${similar.similarityScore.toStringAsFixed(0)}% similar',
+                '${similar.similarityScore.toStringAsFixed(0)}% structural similarity',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onSurface.withAlpha(120),
                   fontSize: 10,
@@ -388,14 +435,54 @@ class _SimilarDrawRow extends StatelessWidget {
   }
 }
 
-// ── Summary text ──────────────────────────────────────────────────────────────
+// ── Premium teaser ────────────────────────────────────────────────────────────
 
-class _SummaryText extends StatelessWidget {
-  final String en;
-  final String zh;
+class _PremiumTeaser extends StatelessWidget {
+  final ThemeData theme;
+  const _PremiumTeaser({required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => showPremiumPaywall(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF7C3AED).withAlpha(12),
+          border: Border.all(
+              color: const Color(0xFF7C3AED).withAlpha(50), width: 1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            const Text('✨', style: TextStyle(fontSize: 14)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'See top 10 similar draws and trend timeline — Advanced Analysis',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: const Color(0xFF7C3AED),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded,
+                size: 16,
+                color: const Color(0xFF7C3AED).withAlpha(180)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Summary box ───────────────────────────────────────────────────────────────
+
+class _SummaryBox extends StatelessWidget {
+  final String text;
   final ThemeData theme;
 
-  const _SummaryText({required this.en, required this.zh, required this.theme});
+  const _SummaryBox({required this.text, required this.theme});
 
   @override
   Widget build(BuildContext context) {
@@ -406,23 +493,11 @@ class _SummaryText extends StatelessWidget {
         color: theme.colorScheme.surfaceContainerHighest.withAlpha(160),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            en,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withAlpha(180),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            zh,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withAlpha(140),
-            ),
-          ),
-        ],
+      child: Text(
+        text,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurface.withAlpha(180),
+        ),
       ),
     );
   }
