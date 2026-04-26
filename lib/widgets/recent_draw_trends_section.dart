@@ -60,7 +60,7 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
                       ),
                     ),
                     Text(
-                      'Trends, not predictions',
+                      'Trends, not predictions · Based on past results',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface.withAlpha(80),
                         fontStyle: FontStyle.italic,

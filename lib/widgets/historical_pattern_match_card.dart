@@ -205,14 +205,14 @@ class HistoricalPatternMatchCard extends StatelessWidget {
   }
 
   String _scoreLabel(int score) {
-    if (score >= 70) return 'Strong alignment with historical patterns';
-    if (score >= 45) return 'Moderate alignment with historical patterns';
+    if (score >= 80) return 'Strong alignment with historical patterns';
+    if (score >= 60) return 'Moderate alignment with historical patterns';
     return 'Limited alignment with historical patterns';
   }
 
   Color _scoreColor(int score) {
-    if (score >= 70) return Colors.green.shade600;
-    if (score >= 45) return Colors.orange.shade600;
+    if (score >= 80) return Colors.green.shade600;
+    if (score >= 60) return Colors.orange.shade600;
     return Colors.grey.shade500;
   }
 }
@@ -226,8 +226,8 @@ class _ScoreBadge extends StatelessWidget {
   const _ScoreBadge({required this.score, required this.theme});
 
   Color _color() {
-    if (score >= 70) return Colors.green.shade600;
-    if (score >= 45) return Colors.orange.shade600;
+    if (score >= 80) return Colors.green.shade600;
+    if (score >= 60) return Colors.orange.shade600;
     return Colors.grey.shade500;
   }
 

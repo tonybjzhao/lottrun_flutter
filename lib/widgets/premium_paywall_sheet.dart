@@ -25,8 +25,8 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
     final result = await PremiumService.instance.purchase();
     if (!mounted) return;
     if (result == PurchaseResult.unavailable) {
-      setState(() => _errorMessage =
-          'Premium is currently unavailable. Please try again later.');
+      // Neutral, non-alarming — no red box
+      setState(() => _errorMessage = 'Temporarily unavailable. Please try again later.');
     } else if (result == PurchaseResult.error) {
       setState(() => _errorMessage = 'Something went wrong. Please try again.');
     }
@@ -38,8 +38,7 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
     final result = await PremiumService.instance.restore();
     if (!mounted) return;
     if (result == PurchaseResult.error) {
-      setState(
-          () => _errorMessage = 'Restore failed. Please try again.');
+      setState(() => _errorMessage = 'Restore failed. Please try again.');
     }
   }
 
@@ -96,23 +95,16 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
                     ..._kFeatures.map(
                         (f) => _FeatureRow(feature: f, theme: theme)),
                     const SizedBox(height: 20),
+                    // ── Error message (neutral, no red box) ──────────
                     if (_errorMessage != null) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.errorContainer,
-                          borderRadius: BorderRadius.circular(10),
+                      Text(
+                        _errorMessage!,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withAlpha(120),
                         ),
-                        child: Text(
-                          _errorMessage!,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onErrorContainer,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                     ],
                     // CTA
                     SizedBox(
@@ -134,12 +126,22 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
                                     color: Colors.white),
                               )
                             : Text(
-                                'Unlock Lifetime — ${svc.displayPrice}',
+                                'Unlock Advanced Analysis — ${svc.displayPrice}',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    // One-time payment reassurance
+                    Center(
+                      child: Text(
+                        'One-time payment · No subscription',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withAlpha(120),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 8),
