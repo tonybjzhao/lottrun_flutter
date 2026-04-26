@@ -11,7 +11,9 @@ import '../models/lottery_draw.dart';
 import '../models/lottery_history_result.dart';
 import '../data/seed_lotteries.dart';
 import '../services/lottery_history_csv_service.dart';
+import '../widgets/historical_pattern_match_card.dart';
 import '../widgets/lotto_ball.dart';
+import '../widgets/recent_draw_trends_section.dart';
 
 class HistoryScreen extends StatefulWidget {
   final Lottery lottery;
@@ -166,16 +168,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   onRefresh: _refresh,
                   child: ListView.separated(
                     padding: EdgeInsets.only(bottom: 16 + bottomPadding),
-                    itemCount: draws.length + 1,
-                    separatorBuilder: (context, index) =>
-                        const Divider(height: 1, indent: 16, endIndent: 16),
+                    itemCount: draws.length + 2,
+                    separatorBuilder: (context, index) {
+                      // No divider between status banner and trends section
+                      if (index == 0) return const SizedBox.shrink();
+                      // Divider between trends section and first draw
+                      if (index == 1) return const Divider(height: 1);
+                      return const Divider(height: 1, indent: 16, endIndent: 16);
+                    },
                     itemBuilder: (context, index) {
                       if (index == 0) {
                         return _historyStatusBanner(theme, history);
                       }
-
-                      final draw = draws[index - 1];
-                      return _DrawTile(draw: draw, lottery: _lottery);
+                      if (index == 1) {
+                        return RecentDrawTrendsSection(
+                          lottery: _lottery,
+                          draws: draws,
+                        );
+                      }
+                      final draw = draws[index - 2];
+                      return _DrawTile(draw: draw, lottery: _lottery, allDraws: draws);
                     },
                   ),
                 );
@@ -304,8 +316,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
 class _DrawTile extends StatelessWidget {
   final LotteryDraw draw;
   final Lottery lottery;
+  final List<LotteryDraw> allDraws;
 
-  const _DrawTile({required this.draw, required this.lottery});
+  const _DrawTile({
+    required this.draw,
+    required this.lottery,
+    required this.allDraws,
+  });
 
   static const _ballSize = 30.0;
   static const _ballSpacing = 5.0;
@@ -321,6 +338,56 @@ class _DrawTile extends StatelessWidget {
     );
   }
 
+  void _showDetail(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.6,
+        minChildSize: 0.4,
+        maxChildSize: 0.92,
+        builder: (_, controller) => SingleChildScrollView(
+          controller: controller,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 12, bottom: 8),
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.onSurface.withAlpha(40),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                child: Text(
+                  DateFormat('d MMM yyyy').format(draw.drawDate),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              const Divider(height: 1),
+              HistoricalPatternMatchCard(
+                lottery: lottery,
+                targetDraw: draw,
+                allDraws: allDraws,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -330,57 +397,66 @@ class _DrawTile extends StatelessWidget {
     final bonusNums = draw.bonusNumbers ?? [];
     final bonusLabel = lottery.bonusLabel; // null = supplementary
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Date column ───────────────────────────────────
-          SizedBox(
-            width: 72,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 7),
-              child: Text(
-                dateStr,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withAlpha(150),
-                  fontWeight: FontWeight.w600,
+    return InkWell(
+      onTap: () => _showDetail(context),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Date column ───────────────────────────────────
+            SizedBox(
+              width: 72,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 7),
+                child: Text(
+                  dateStr,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withAlpha(150),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
                 ),
-                maxLines: 1,
               ),
             ),
-          ),
-          // ── Ball rows ─────────────────────────────────────
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _ballRow(mainNums),
-              if (bonusNums.isNotEmpty) ...[
-                const SizedBox(height: 5),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      bonusLabel ?? 'Supp',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: const Color(0xFFD32F2F),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 10,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    _ballRow(
-                      bonusNums,
-                      bonus: true,
-                      // Supp balls slightly smaller; powerball keeps same size
-                      size: bonusLabel == null ? _ballSize - 2 : _ballSize,
+            // ── Ball rows ─────────────────────────────────────
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _ballRow(mainNums),
+                  if (bonusNums.isNotEmpty) ...[
+                    const SizedBox(height: 5),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          bonusLabel ?? 'Supp',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: const Color(0xFFD32F2F),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 10,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        _ballRow(
+                          bonusNums,
+                          bonus: true,
+                          size: bonusLabel == null ? _ballSize - 2 : _ballSize,
+                        ),
+                      ],
                     ),
                   ],
-                ),
-              ],
-            ],
-          ),
-        ],
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 18,
+              color: theme.colorScheme.onSurface.withAlpha(60),
+            ),
+          ],
+        ),
       ),
     );
   }

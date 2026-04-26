@@ -12,6 +12,7 @@ import '../services/pick_result_service.dart';
 import '../widgets/ball_row.dart';
 import '../widgets/draw_reveal_panel.dart';
 import '../widgets/pick_share_card.dart';
+import '../widgets/saved_picks_analysis_section.dart';
 
 // Country helpers ──────────────────────────────────────────────────────────────
 
@@ -294,6 +295,17 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
         child: _StatsCard(stats: stats),
       ));
     }
+
+    // ── Saved picks analysis ────────────────────────────────────────────────
+    items.add(const Divider(height: 1));
+    items.add(Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: SavedPicksAnalysisSection(
+        picks: _picks,
+        drawsByLottery: _drawsByLottery,
+      ),
+    ));
+    items.add(const Divider(height: 1));
 
     items.add(Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
