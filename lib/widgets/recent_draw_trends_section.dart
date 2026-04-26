@@ -355,17 +355,19 @@ class _MetricRow extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    label,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withAlpha(140),
+                  Flexible(
+                    child: Text(
+                      label,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withAlpha(140),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 2),
                   Icon(Icons.info_outline_rounded,
                       size: 10,
-                      color:
-                          theme.colorScheme.onSurface.withAlpha(80)),
+                      color: theme.colorScheme.onSurface.withAlpha(80)),
                 ],
               ),
             ),

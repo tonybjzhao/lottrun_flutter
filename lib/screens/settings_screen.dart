@@ -77,7 +77,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'Premium unlocked · Thank you for your support',
+                              'Premium unlocked ✓  Thank you for your support',
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: Colors.green.shade700,
                                 fontWeight: FontWeight.w600,
