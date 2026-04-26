@@ -19,6 +19,7 @@ class _PremiumPaywallSheet extends StatefulWidget {
 
 class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
   String? _errorMessage;
+  bool _didShowSuccess = false;
 
   Future<void> _purchase() async {
     setState(() => _errorMessage = null);
@@ -29,7 +30,7 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
     } else if (result == PurchaseResult.error) {
       setState(() => _errorMessage = 'Something went wrong. Please try again.');
     }
-    // pending → purchaseStream callback will unlock and close
+    // pending → purchaseStream callback will unlock → build() shows success dialog
   }
 
   Future<void> _restore() async {
@@ -43,17 +44,52 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
     }
   }
 
+  void _showSuccessAndClose(BuildContext context) {
+    _didShowSuccess = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      // Close the paywall sheet first
+      Navigator.pop(context);
+      // Then show our success dialog (suppresses system "You're all set" confusion)
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text(
+            'Premium unlocked 🎉\nPremium 已解锁 🎉',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+          ),
+          content: const Text(
+            'You now have access to advanced analysis features.\n\n你现在可以使用高级分析功能。',
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.pop(context),
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF7C3AED),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text('Got it'),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: PremiumService.instance,
       builder: (context, _) {
         final svc = PremiumService.instance;
-        // Auto-close on successful unlock
-        if (svc.isPremium) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) Navigator.pop(context);
-          });
+        if (svc.isPremium && !_didShowSuccess) {
+          _showSuccessAndClose(context);
         }
         return _buildSheet(context, svc);
       },
@@ -66,6 +102,7 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
     final loadState = svc.loadState;
     final productUnavailable = loadState == ProductLoadState.notFound ||
         loadState == ProductLoadState.storeUnavailable;
+    final alreadyPremium = svc.isPremium;
 
     return Container(
       decoration: BoxDecoration(
@@ -100,99 +137,128 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
                         (f) => _FeatureRow(feature: f, theme: theme)),
                     const SizedBox(height: 20),
 
-                    // ── Error / status message ────────────────────────
-                    if (_errorMessage != null) ...[
-                      Text(
-                        _errorMessage!,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withAlpha(120),
+                    // ── Already premium ───────────────────────────────
+                    if (alreadyPremium) ...[
+                      SizedBox(
+                        height: 52,
+                        child: FilledButton(
+                          onPressed: null,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.green.shade600,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: Colors.green.shade600,
+                            disabledForegroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
+                          ),
+                          child: const Text(
+                            "You're Premium ✓",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 8),
-                    ] else if (productUnavailable) ...[
-                      Text(
-                        'Store product is still loading. Please try again later.',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withAlpha(120),
+                      const SizedBox(height: 12),
+                      Center(
+                        child: TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            'Close',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.onSurface.withAlpha(100),
+                            ),
+                          ),
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 8),
-                    ],
+                    ] else ...[
+                      // ── Error / status message ──────────────────────
+                      if (_errorMessage != null) ...[
+                        Text(
+                          _errorMessage!,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withAlpha(120),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                      ] else if (productUnavailable) ...[
+                        Text(
+                          'Store product is still loading. Please try again later.',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withAlpha(120),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                      ],
 
-                    // ── CTA button ────────────────────────────────────
-                    SizedBox(
-                      height: 52,
-                      child: FilledButton(
-                        onPressed: svc.canPurchase ? _purchase : null,
-                        style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFF7C3AED),
-                          foregroundColor: Colors.white,
-                          disabledBackgroundColor:
-                              theme.colorScheme.onSurface.withAlpha(20),
-                          disabledForegroundColor:
-                              theme.colorScheme.onSurface.withAlpha(80),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16)),
-                        ),
-                        child: svc.isPurchasing
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    color: Colors.white),
-                              )
-                            : Text(
-                                productUnavailable
-                                    ? 'Premium temporarily unavailable'
-                                    : loadState == ProductLoadState.loading
-                                        ? 'Loading…'
-                                        : 'Unlock Advanced Analysis — ${svc.displayPrice}',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
+                      // ── CTA button ──────────────────────────────────
+                      SizedBox(
+                        height: 52,
+                        child: FilledButton(
+                          onPressed: svc.canPurchase ? _purchase : null,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: const Color(0xFF7C3AED),
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor:
+                                theme.colorScheme.onSurface.withAlpha(20),
+                            disabledForegroundColor:
+                                theme.colorScheme.onSurface.withAlpha(80),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
+                          ),
+                          child: svc.isPurchasing
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.white),
+                                )
+                              : Text(
+                                  'Unlock Advanced Analysis — ${svc.displayPrice}',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
-                              ),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    // One-time payment reassurance
-                    Center(
-                      child: Text(
-                        'One-time payment · No subscription',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withAlpha(120),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Center(
-                      child: TextButton(
-                        // Restore works independently of product load state
-                        onPressed: svc.isPurchasing ? null : _restore,
+                      const SizedBox(height: 6),
+                      Center(
                         child: Text(
-                          'Restore Purchase',
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color:
-                                theme.colorScheme.onSurface.withAlpha(140),
+                          'One-time payment · No subscription',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withAlpha(120),
                           ),
                         ),
                       ),
-                    ),
-                    Center(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(
-                          'Maybe later',
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color:
-                                theme.colorScheme.onSurface.withAlpha(100),
+                      const SizedBox(height: 8),
+                      Center(
+                        child: TextButton(
+                          onPressed: svc.isPurchasing ? null : _restore,
+                          child: Text(
+                            'Restore Purchase',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.onSurface.withAlpha(140),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                      Center(
+                        child: TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            'Maybe later',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.onSurface.withAlpha(100),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 4),
                     Text(
                       'Post-draw analysis only. Premium does not predict results or improve odds.',

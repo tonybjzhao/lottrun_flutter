@@ -53,6 +53,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: _loaded
           ? ListView(
               children: [
+                // ── Premium banner (shown when unlocked) ───────────
+                ListenableBuilder(
+                  listenable: PremiumService.instance,
+                  builder: (context, _) {
+                    if (!PremiumService.instance.isPremium) {
+                      return const SizedBox.shrink();
+                    }
+                    return Container(
+                      margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade50,
+                        border: Border.all(
+                            color: Colors.green.shade300, width: 1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.check_circle_rounded,
+                              size: 18, color: Colors.green.shade700),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Premium unlocked · Thank you for your support',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: Colors.green.shade700,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+
                 // ── Premium section ────────────────────────────────
                 _SectionHeader(label: 'Analysis', theme: theme),
                 ListenableBuilder(
