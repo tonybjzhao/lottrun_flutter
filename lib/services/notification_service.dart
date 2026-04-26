@@ -16,6 +16,8 @@ class NotificationService {
   static const _channelId = 'result_ready';
   static const _channelName = 'Result Ready';
   static const _notifId = 42;
+  static const _insightNotifId = 43;
+  static const _weeklyNotifId = 44;
 
   Future<void> init() async {
     if (_initialized) return;
@@ -49,8 +51,7 @@ class NotificationService {
     return details?.didNotificationLaunchApp ?? false;
   }
 
-  /// Requests OS permission and shows the notification.
-  /// Silently skips if the user has denied permission.
+  /// Requests OS permission and shows the result-ready notification.
   Future<void> showResultReady(int count) async {
     final granted = await _requestPermission();
     if (!granted) return;
@@ -75,6 +76,58 @@ class NotificationService {
       _notifId,
       title,
       'Your saved lottery numbers are ready to check',
+      const NotificationDetails(android: androidDetails, iOS: iosDetails),
+    );
+  }
+
+  /// Shows a daily insight notification.
+  Future<void> showDailyInsight(String body) async {
+    final granted = await _requestPermission();
+    if (!granted) return;
+
+    const androidDetails = AndroidNotificationDetails(
+      'insights',
+      'Daily Insights',
+      channelDescription: 'Daily draw trend observations',
+      importance: Importance.defaultImportance,
+      priority: Priority.defaultPriority,
+    );
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: false,
+      presentSound: false,
+    );
+
+    await _plugin.show(
+      _insightNotifId,
+      "Today's Insight 📊",
+      body,
+      const NotificationDetails(android: androidDetails, iOS: iosDetails),
+    );
+  }
+
+  /// Shows a weekly summary notification.
+  Future<void> showWeeklySummary(String body) async {
+    final granted = await _requestPermission();
+    if (!granted) return;
+
+    const androidDetails = AndroidNotificationDetails(
+      'weekly_summary',
+      'Weekly Summary',
+      channelDescription: 'Weekly draw pattern summary',
+      importance: Importance.defaultImportance,
+      priority: Priority.defaultPriority,
+    );
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: false,
+      presentSound: false,
+    );
+
+    await _plugin.show(
+      _weeklyNotifId,
+      'Weekly Summary 📅',
+      body,
       const NotificationDetails(android: androidDetails, iOS: iosDetails),
     );
   }

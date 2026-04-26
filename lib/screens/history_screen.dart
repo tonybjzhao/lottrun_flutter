@@ -12,6 +12,7 @@ import '../models/lottery_history_result.dart';
 import '../data/seed_lotteries.dart';
 import '../services/lottery_history_csv_service.dart';
 import '../services/premium_service.dart';
+import '../widgets/daily_insight_banner.dart';
 import '../widgets/historical_pattern_match_card.dart';
 import '../widgets/lotto_ball.dart';
 import '../widgets/recent_draw_trends_section.dart';
@@ -170,12 +171,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   onRefresh: _refresh,
                   child: ListView.separated(
                     padding: EdgeInsets.only(bottom: 16 + bottomPadding),
-                    itemCount: draws.length + 2,
+                    itemCount: draws.length + 3,
                     separatorBuilder: (context, index) {
-                      // No divider between status banner and trends section
-                      if (index == 0) return const SizedBox.shrink();
-                      // Divider between trends section and first draw
-                      if (index == 1) return const Divider(height: 1);
+                      if (index <= 1) return const SizedBox.shrink();
+                      if (index == 2) return const Divider(height: 1);
                       return const Divider(height: 1, indent: 16, endIndent: 16);
                     },
                     itemBuilder: (context, index) {
@@ -183,12 +182,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         return _historyStatusBanner(theme, history);
                       }
                       if (index == 1) {
+                        return DailyInsightBanner(
+                          lottery: _lottery,
+                          draws: draws,
+                        );
+                      }
+                      if (index == 2) {
                         return RecentDrawTrendsSection(
                           lottery: _lottery,
                           draws: draws,
                         );
                       }
-                      final draw = draws[index - 2];
+                      final draw = draws[index - 3];
                       return _DrawTile(draw: draw, lottery: _lottery, allDraws: draws);
                     },
                   ),
