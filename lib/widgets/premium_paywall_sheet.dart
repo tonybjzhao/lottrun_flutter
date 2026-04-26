@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../navigator_key.dart';
 import '../services/premium_service.dart';
 
 Future<void> showPremiumPaywall(BuildContext context) {
@@ -48,13 +49,15 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
     _didShowSuccess = true;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
-      // Close the paywall sheet first
+      // Close the paywall sheet
       Navigator.pop(context);
-      // Then show our success dialog (suppresses system "You're all set" confusion)
+      // Use the global navigator so the dialog context is always valid
+      final navContext = globalNavigatorKey.currentContext;
+      if (navContext == null) return;
       await showDialog<void>(
-        context: context,
+        context: navContext,
         barrierDismissible: false,
-        builder: (_) => AlertDialog(
+        builder: (dialogContext) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Text(
             'Premium unlocked 🎉',
@@ -68,7 +71,7 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
           actionsAlignment: MainAxisAlignment.center,
           actions: [
             FilledButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFF7C3AED),
                 shape: RoundedRectangleBorder(
