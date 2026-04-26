@@ -28,9 +28,11 @@ class ResultNotificationService {
   }
 
   Future<void> _checkResults() async {
-    final enabled = await InsightService.instance
+    final resultsEnabled = await InsightService.instance
         .getNotifPref(kNotifKeyResults);
-    if (!enabled) return;
+    final myPicksEnabled = await InsightService.instance
+        .getNotifPref(kNotifKeyMyPicks);
+    if (!resultsEnabled || !myPicksEnabled) return;
 
     final picks = await LocalStorageService.instance.getSavedPicks();
     final newlyResolved = <String>[];
