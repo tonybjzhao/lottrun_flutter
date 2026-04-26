@@ -57,12 +57,12 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
         builder: (_) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Text(
-            'Premium unlocked 🎉\nPremium 已解锁 🎉',
+            'Premium unlocked 🎉',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
           ),
           content: const Text(
-            'You now have access to advanced analysis features.\n\n你现在可以使用高级分析功能。',
+            'You now have access to advanced analysis features.',
             textAlign: TextAlign.center,
           ),
           actionsAlignment: MainAxisAlignment.center,
