@@ -11,6 +11,7 @@ import '../models/lottery_draw.dart';
 import '../models/lottery_history_result.dart';
 import '../data/seed_lotteries.dart';
 import '../services/lottery_history_csv_service.dart';
+import '../services/premium_service.dart';
 import '../widgets/historical_pattern_match_card.dart';
 import '../widgets/lotto_ball.dart';
 import '../widgets/recent_draw_trends_section.dart';
@@ -38,7 +39,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     _historyFuture = _loadDraws(_lottery);
     unawaited(AnalyticsService.logHistoryOpened(lottery: _lottery.id));
 
-    if (kShowHistoryBannerAd && !kIsSimulatorOrEmulator) {
+    if (kShowHistoryBannerAd && !kIsSimulatorOrEmulator &&
+        !PremiumService.instance.isPremium) {
       _bannerAd = BannerAd(
         adUnitId: AdMobIds.historyBanner,
         size: AdSize.banner,
@@ -160,7 +162,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 }
 
                 // Add bottom padding for banner ad if enabled and loaded
-                final double bottomPadding = (kShowHistoryBannerAd && !kIsSimulatorOrEmulator && _isBannerAdLoaded)
+                final double bottomPadding = (kShowHistoryBannerAd && !kIsSimulatorOrEmulator && _isBannerAdLoaded && !PremiumService.instance.isPremium)
                     ? 52.0
                     : 0.0;
 
@@ -196,7 +198,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
 
           // ── Ad banner ──────────────────────────────────────────
-          if (kShowHistoryBannerAd && !kIsSimulatorOrEmulator && _isBannerAdLoaded && _bannerAd != null)
+          if (kShowHistoryBannerAd && !kIsSimulatorOrEmulator && _isBannerAdLoaded && _bannerAd != null && !PremiumService.instance.isPremium)
             SafeArea(
               top: false,
               child: SizedBox(

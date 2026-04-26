@@ -20,6 +20,7 @@ import '../widgets/result_panel.dart';
 import '../widgets/style_chip_group.dart';
 import 'history_screen.dart';
 import 'saved_picks_screen.dart';
+import 'settings_screen.dart';
 
 // ── Home screen ───────────────────────────────────────────────────────────────
 
@@ -460,6 +461,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ),
             icon: const Icon(Icons.history_rounded),
             tooltip: 'History',
+          ),
+          IconButton(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SettingsScreen()),
+            ),
+            icon: const Icon(Icons.settings_rounded),
+            tooltip: 'Settings',
           ),
         ],
       ),
