@@ -25,7 +25,6 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
     final result = await PremiumService.instance.purchase();
     if (!mounted) return;
     if (result == PurchaseResult.unavailable) {
-      // Neutral, non-alarming — no red box
       setState(() => _errorMessage = 'Temporarily unavailable. Please try again later.');
     } else if (result == PurchaseResult.error) {
       setState(() => _errorMessage = 'Something went wrong. Please try again.');
@@ -37,7 +36,9 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
     setState(() => _errorMessage = null);
     final result = await PremiumService.instance.restore();
     if (!mounted) return;
-    if (result == PurchaseResult.error) {
+    if (result == PurchaseResult.unavailable) {
+      setState(() => _errorMessage = 'Store unavailable. Please try again later.');
+    } else if (result == PurchaseResult.error) {
       setState(() => _errorMessage = 'Restore failed. Please try again.');
     }
   }
@@ -62,6 +63,9 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
   Widget _buildSheet(BuildContext context, PremiumService svc) {
     final theme = Theme.of(context);
     final mq = MediaQuery.of(context);
+    final loadState = svc.loadState;
+    final productUnavailable = loadState == ProductLoadState.notFound ||
+        loadState == ProductLoadState.storeUnavailable;
 
     return Container(
       decoration: BoxDecoration(
@@ -95,7 +99,8 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
                     ..._kFeatures.map(
                         (f) => _FeatureRow(feature: f, theme: theme)),
                     const SizedBox(height: 20),
-                    // ── Error message (neutral, no red box) ──────────
+
+                    // ── Error / status message ────────────────────────
                     if (_errorMessage != null) ...[
                       Text(
                         _errorMessage!,
@@ -105,19 +110,33 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
+                    ] else if (productUnavailable) ...[
+                      Text(
+                        'Store product is still loading. Please try again later.',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withAlpha(120),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
                     ],
-                    // CTA
+
+                    // ── CTA button ────────────────────────────────────
                     SizedBox(
                       height: 52,
                       child: FilledButton(
-                        onPressed: svc.isLoading ? null : _purchase,
+                        onPressed: svc.canPurchase ? _purchase : null,
                         style: FilledButton.styleFrom(
                           backgroundColor: const Color(0xFF7C3AED),
                           foregroundColor: Colors.white,
+                          disabledBackgroundColor:
+                              theme.colorScheme.onSurface.withAlpha(20),
+                          disabledForegroundColor:
+                              theme.colorScheme.onSurface.withAlpha(80),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16)),
                         ),
-                        child: svc.isLoading
+                        child: svc.isPurchasing
                             ? const SizedBox(
                                 width: 22,
                                 height: 22,
@@ -126,7 +145,11 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
                                     color: Colors.white),
                               )
                             : Text(
-                                'Unlock Advanced Analysis — ${svc.displayPrice}',
+                                productUnavailable
+                                    ? 'Premium temporarily unavailable'
+                                    : loadState == ProductLoadState.loading
+                                        ? 'Loading…'
+                                        : 'Unlock Advanced Analysis — ${svc.displayPrice}',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
@@ -147,7 +170,8 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
                     const SizedBox(height: 8),
                     Center(
                       child: TextButton(
-                        onPressed: svc.isLoading ? null : _restore,
+                        // Restore works independently of product load state
+                        onPressed: svc.isPurchasing ? null : _restore,
                         child: Text(
                           'Restore Purchase',
                           style: theme.textTheme.labelMedium?.copyWith(
