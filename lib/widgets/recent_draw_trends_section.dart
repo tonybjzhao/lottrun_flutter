@@ -441,7 +441,7 @@ class _TrendStrengthChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final (label, icon, color) = switch (strength) {
       TrendStrength.strong =>
-        ('Strong trend', '📈', Colors.orange.shade700),
+        (PlatformText.t('Strong trend', 'Notable pattern'), '📈', Colors.orange.shade700),
       TrendStrength.balanced =>
         ('Balanced', '⚖️', Colors.teal.shade600),
       TrendStrength.random =>

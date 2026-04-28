@@ -59,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   ];
   static const _kThreePicksWindows = [100, 60, 30];
   static final _kThreePicksLabels = [
-    '⭐ Your Best Pick Today',
+    PlatformText.t('⭐ Your Best Pick Today', '⭐ Featured Pick Today'),
     PlatformText.t('🔥 Hot Right Now', '🔥 Recent Pattern'),
     PlatformText.t('🎲 Lucky Surprise', '🎲 Random Surprise'),
   ];
@@ -548,7 +548,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Smart Number Picks',
+                    PlatformText.t('Smart Number Picks', 'Number Picks'),
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -648,7 +648,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '✨ Many players matched 2+ numbers last week 👀',
+                    PlatformText.t('✨ Many players matched 2+ numbers last week 👀', '✨ Some selections matched multiple numbers in recent results 👀'),
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
                       color: theme.colorScheme.primary.withAlpha(160),
