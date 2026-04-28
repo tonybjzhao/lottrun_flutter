@@ -69,9 +69,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     'Random',
   ];
   static final _kThreePicksMicrocopy = [
-    'Most promising today 👀',
+    PlatformText.t('Most promising today 👀', 'Balanced selection for today 👀'),
     PlatformText.t('These numbers are on fire 🔥', 'These numbers appeared often recently'),
-    'You never know… 🍀',
+    PlatformText.t('You never know… 🍀', 'Random selection each time 🎲'),
   ];
   static const _kThreePicksColors = [
     Color(0xFFF59E0B), // amber  — Best Pick
@@ -1167,7 +1167,7 @@ class _LuckBar extends StatelessWidget {
     return Row(
       children: [
         Text(
-          '🍀 ${PlatformText.t('Today\'s luck', 'Today\'s pick score')}: $_luckPct%',
+          '${PlatformText.t('🍀', '📊')} ${PlatformText.t('Today\'s luck', 'Today\'s pick score')}: $_luckPct%',
           style: theme.textTheme.labelMedium?.copyWith(
             color: theme.colorScheme.primary,
             fontWeight: FontWeight.w700,
