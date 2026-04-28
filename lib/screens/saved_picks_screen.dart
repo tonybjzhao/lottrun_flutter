@@ -9,6 +9,7 @@ import '../services/local_storage_service.dart';
 import '../services/lottery_history_csv_service.dart';
 import '../services/lottery_service.dart';
 import '../services/pick_result_service.dart';
+import '../utils/platform_text.dart';
 import '../widgets/ball_row.dart';
 import '../widgets/draw_reveal_panel.dart';
 import '../widgets/pick_share_card.dart';
@@ -432,7 +433,7 @@ class _StatsCard extends StatelessWidget {
               _StatCell(
                 icon: '🍀',
                 value: '${stats.luckScore}',
-                label: 'Luck Score',
+                label: PlatformText.t('Luck Score', 'Pick Score'),
                 theme: theme,
                 highlight: stats.luckScore >= 80,
               ),
@@ -598,7 +599,7 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
         (widget.pick.bonusNumbers != null && widget.pick.bonusNumbers!.isNotEmpty)
             ? '\n+ $bonusLabel: ${widget.pick.bonusNumbers!.join(' ')}'
             : '';
-    return '🎯 My AI $_lotteryName Pick\n${widget.pick.displayLabel}\n\n$main$bonus\n\nGenerated for fun — LottoRun AI';
+    return '🎯 My ${PlatformText.t('AI', 'Smart')} $_lotteryName Pick\n${widget.pick.displayLabel}\n\n$main$bonus\n\nGenerated for fun — ${PlatformText.t('LottoRun AI', 'NumberRun')}';
   }
 
   Future<void> _copy(BuildContext context) async {

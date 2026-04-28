@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../utils/platform_text.dart';
 import '../widgets/ball_row.dart';
 import '../widgets/pick_share_card.dart';
 import '../models/generated_pick.dart';
@@ -57,15 +58,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     PlayStyle.random,
   ];
   static const _kThreePicksWindows = [100, 60, 30];
-  static const _kThreePicksLabels = [
+  static final _kThreePicksLabels = [
     '⭐ Your Best Pick Today',
-    '🔥 Hot Right Now',
-    '🎲 Lucky Surprise',
+    PlatformText.t('🔥 Hot Right Now', '🔥 Recent Pattern'),
+    PlatformText.t('🎲 Lucky Surprise', '🎲 Random Surprise'),
   ];
-  static const _kThreePicksBadges = ['Balanced', 'Hot', 'Random'];
-  static const _kThreePicksMicrocopy = [
+  static final _kThreePicksBadges = [
+    'Balanced',
+    PlatformText.t('Hot', 'Popular'),
+    'Random',
+  ];
+  static final _kThreePicksMicrocopy = [
     'Most promising today 👀',
-    'These numbers are on fire 🔥',
+    PlatformText.t('These numbers are on fire 🔥', 'These numbers appeared often recently'),
     'You never know… 🍀',
   ];
   static const _kThreePicksColors = [
@@ -262,25 +267,25 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }).toList();
   }
 
-  static const _insightMessages = {
+  static final _insightMessages = {
     PlayStyle.balanced: [
-      'AI sees a balanced spread for today',
+      PlatformText.t('AI sees a balanced spread for today', 'Smart analysis sees a balanced spread for today'),
       'History points to an even distribution',
       'Balanced picks look stronger today',
     ],
     PlayStyle.hot: [
-      'Hot trend is active tonight 🔥',
+      PlatformText.t('Hot trend is active tonight 🔥', 'Recent pattern is active tonight 🔥'),
       'Recent draws favour these numbers',
-      'AI detects a hot-number streak',
+      PlatformText.t('AI detects a hot-number streak', 'Smart analysis detects a frequent-number pattern'),
     ],
     PlayStyle.cold: [
-      'AI sees a cold-number comeback today ❄️',
+      PlatformText.t('AI sees a cold-number comeback today ❄️', 'Smart analysis found less-frequent numbers ❄️'),
       'Overdue numbers are in your corner',
-      'Cold picks may be ready to break out',
+      PlatformText.t('Cold picks may be ready to break out', 'Less-frequent numbers from past draws'),
     ],
     PlayStyle.random: [
-      'Sometimes pure luck is all you need 🎲',
-      'Chaos is a strategy too',
+      PlatformText.t('Sometimes pure luck is all you need 🎲', 'Sometimes randomness is fun 🎲'),
+      PlatformText.t('Chaos is a pattern too', 'Chaos is a pattern too'),
       'Pure randomness — trust the universe',
     ],
   };
@@ -399,7 +404,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               text: TextSpan(
                 children: [
                   TextSpan(
-                    text: 'LottoRun ',
+                    text: PlatformText.t('LottoRun ', 'NumberRun '),
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -407,7 +412,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     ),
                   ),
                   TextSpan(
-                    text: 'AI',
+                    text: PlatformText.t('AI', ''),
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -418,7 +423,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ),
             ),
             Text(
-              'Smart picks from real draw history',
+              PlatformText.t('Smart picks from real draw history', 'Number sets from past records'),
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w400,
@@ -481,7 +486,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             const SizedBox(height: 16),
 
             // ── Lottery selector ──────────────────────────────────
-            Text('Lottery', style: theme.textTheme.labelMedium),
+            Text(PlatformText.t('Lottery', 'Number selection'), style: theme.textTheme.labelMedium),
             const SizedBox(height: 6),
             InputDecorator(
               decoration: InputDecoration(
@@ -551,7 +556,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Choose one style, or generate 3 curated picks',
+                    PlatformText.t('Choose one style, or generate 3 curated picks', 'Choose one style, or generate 3 number sets'),
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 13,
                       color: theme.colorScheme.onSurface.withAlpha(140),
@@ -619,7 +624,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       label: Text(
                         _isThreePicksLoading
                             ? 'Generating…'
-                            : '🎲 Try My Luck (3 Picks)',
+                            : PlatformText.t('🎲 Try My Luck (3 Picks)', '🎲 Generate 3 Number Sets'),
                         style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w700),
                       ),
@@ -635,7 +640,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    '3 Smart Picks combines Balanced + Hot + Random for variety.',
+                    PlatformText.t('3 Smart Picks combines Balanced + Hot + Random for variety.', '3 Number Sets combine Balanced + Popular + Random for variety.'),
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
                       color: theme.colorScheme.onSurface.withAlpha(110),
@@ -705,7 +710,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             Expanded(
                               child: Text(
                                 _showReadyFlash
-                                    ? '✨ Your AI pick is ready'
+                                    ? PlatformText.t('✨ Your AI pick is ready', '✨ Your Smart pick is ready')
                                     : _insightText,
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   color: _showReadyFlash
@@ -751,7 +756,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                     theme.colorScheme.onSurface.withAlpha(55)),
                             const SizedBox(height: 12),
                             Text(
-                              'Try a fun pick based on real draw history 🎲',
+                              PlatformText.t('Try a fun pick based on real draw history 🎲', 'Generate a number set from past records 🎲'),
                               textAlign: TextAlign.center,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: theme.colorScheme.onSurface
@@ -888,7 +893,7 @@ class _InlinePickCard extends StatelessWidget {
         (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
             ? ' + ${pick.bonusNumbers!.join(' ')}'
             : '';
-    return '$label\n${lottery.name}: $main$bonus\nGenerated for fun — LottoRun AI 🎯';
+    return '$label\n${lottery.name}: $main$bonus\nGenerated for fun — ${PlatformText.t('LottoRun AI', 'NumberRun')} 🎯';
   }
 
   Future<void> _copy(BuildContext context) async {
@@ -1162,7 +1167,7 @@ class _LuckBar extends StatelessWidget {
     return Row(
       children: [
         Text(
-          '🍀 Today\'s luck: $_luckPct%',
+          '🍀 ${PlatformText.t('Today\'s luck', 'Today\'s pick score')}: $_luckPct%',
           style: theme.textTheme.labelMedium?.copyWith(
             color: theme.colorScheme.primary,
             fontWeight: FontWeight.w700,
@@ -1288,7 +1293,7 @@ class _CompactPickBannerState extends State<_CompactPickBanner>
                       children: [
                         Expanded(
                           child: Text(
-                            'AI Pick · ${widget.pick.style.tagline}',
+                            '${PlatformText.t('AI', 'Smart')} Pick · ${widget.pick.style.tagline}',
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.primary,
                               fontWeight: FontWeight.w700,

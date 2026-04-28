@@ -4,6 +4,7 @@ import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import '../services/draw_analysis_service.dart';
 import '../services/premium_service.dart';
+import '../utils/platform_text.dart';
 import 'premium_paywall_sheet.dart';
 
 class HistoricalPatternMatchCard extends StatelessWidget {
@@ -91,7 +92,7 @@ class HistoricalPatternMatchCard extends StatelessWidget {
               score: result.trendScore,
               theme: theme),
           _ComponentScoreRow(
-              label: 'Hot/cold alignment',
+              label: PlatformText.t('Hot/cold alignment', 'Popular/less-frequent alignment'),
               score: result.hotColdAlignmentScore,
               theme: theme),
           _ComponentScoreRow(
@@ -140,7 +141,7 @@ class HistoricalPatternMatchCard extends StatelessWidget {
               ),
               _InfoChip(
                 label:
-                    '🔥 ${result.hotNumberCount} hot · ❄️ ${result.coldNumberCount} cold',
+                    '🔥 ${result.hotNumberCount} ${PlatformText.t('hot', 'popular')} · ❄️ ${result.coldNumberCount} ${PlatformText.t('cold', 'less frequent')}',
                 icon: null,
                 theme: theme,
               ),

@@ -1,3 +1,5 @@
+import '../utils/platform_text.dart';
+
 enum PickSource { generated, manual }
 
 enum PlayStyle {
@@ -11,9 +13,9 @@ enum PlayStyle {
       case PlayStyle.balanced:
         return 'Balanced';
       case PlayStyle.hot:
-        return 'Hot';
+        return PlatformText.t('Hot', 'Popular');
       case PlayStyle.cold:
-        return 'Cold';
+        return PlatformText.t('Cold', 'Less frequent');
       case PlayStyle.random:
         return 'Random';
     }
@@ -25,11 +27,11 @@ enum PlayStyle {
       case PlayStyle.balanced:
         return '⚖️ Balanced Pick';
       case PlayStyle.hot:
-        return '🔥 Hot Trend Pick';
+        return PlatformText.t('🔥 Hot Trend Pick', '🔥 Popular Pattern Pick');
       case PlayStyle.cold:
-        return '❄️ Cold Comeback Pick';
+        return PlatformText.t('❄️ Cold Comeback Pick', '❄️ Less Frequent Pick');
       case PlayStyle.random:
-        return '🎲 Pure Luck Pick';
+        return PlatformText.t('🎲 Pure Luck Pick', '🎲 Random Pick');
     }
   }
 
@@ -39,11 +41,17 @@ enum PlayStyle {
       case PlayStyle.balanced:
         return 'Even spread across all number ranges.';
       case PlayStyle.hot:
-        return 'These numbers have been trending recently.';
+        return PlatformText.t(
+          'These numbers have been trending recently.',
+          'These numbers appear more often in recent draws.',
+        );
       case PlayStyle.cold:
-        return "These numbers haven't appeared in a while.";
+        return PlatformText.t(
+          "These numbers haven't appeared in a while.",
+          'These numbers appear less often in recent draws.',
+        );
       case PlayStyle.random:
-        return 'Completely random — pure chance!';
+        return PlatformText.t('Completely random — pure chance!', 'Completely random selection. Just for fun.');
     }
   }
 

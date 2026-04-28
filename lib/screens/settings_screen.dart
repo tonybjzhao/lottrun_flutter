@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/insight_service.dart';
 import '../services/premium_service.dart';
+import '../utils/platform_text.dart';
 import '../widgets/premium_paywall_sheet.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -193,7 +194,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   title: const Text('Post-draw analysis only'),
                   subtitle: Text(
-                    'All analysis is based on historical draw data. Nothing here predicts results or improves odds.',
+                    PlatformText.t(
+                      'All analysis is based on historical draw data. Nothing here predicts results or improves odds.',
+                      'All analysis is based on historical draw data. Nothing here suggests results or improves outcomes.',
+                    ),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withAlpha(140),
                     ),

@@ -12,6 +12,7 @@ import '../models/lottery_history_result.dart';
 import '../data/seed_lotteries.dart';
 import '../services/lottery_history_csv_service.dart';
 import '../services/premium_service.dart';
+import '../utils/platform_text.dart';
 import '../widgets/daily_insight_banner.dart';
 import '../widgets/historical_pattern_match_card.dart';
 import '../widgets/lotto_ball.dart';
@@ -99,7 +100,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: InputDecorator(
               decoration: InputDecoration(
-                labelText: 'Lottery',
+                labelText: PlatformText.t('Lottery', 'Number selection'),
                 contentPadding: const EdgeInsets.symmetric(
                     horizontal: 14, vertical: 4),
                 border: OutlineInputBorder(
@@ -281,7 +282,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final friendlyMessage = message.contains(
       'No internet connection and no saved lottery history yet.',
     )
-        ? 'No internet connection and no saved lottery history yet.'
+        ? PlatformText.t(
+            'No internet connection and no saved lottery history yet.',
+            'No internet connection and no saved draw history yet.',
+          )
         : message;
 
     return Center(

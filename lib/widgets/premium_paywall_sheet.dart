@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../navigator_key.dart';
 import '../services/premium_service.dart';
+import '../utils/platform_text.dart';
 
 Future<void> showPremiumPaywall(BuildContext context) {
   return showModalBottomSheet(
@@ -264,7 +265,10 @@ class _PremiumPaywallSheetState extends State<_PremiumPaywallSheet> {
                     ],
                     const SizedBox(height: 4),
                     Text(
-                      'Post-draw analysis only. Premium does not predict results or improve odds.',
+                      PlatformText.t(
+                        'Post-draw analysis only. Premium does not predict results or improve odds.',
+                        'Post-draw analysis only. Premium does not suggest results or improve outcomes.',
+                      ),
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface.withAlpha(80),
                         fontSize: 10,

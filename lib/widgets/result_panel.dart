@@ -5,6 +5,7 @@ import '../models/generated_pick.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import '../services/pick_result_service.dart';
+import '../utils/platform_text.dart';
 import 'lotto_ball.dart';
 import 'pick_share_card.dart';
 
@@ -83,10 +84,10 @@ class _ResultPanelState extends State<ResultPanel>
         (widget.pick.bonusNumbers != null && widget.pick.bonusNumbers!.isNotEmpty)
             ? '\n+ ${_bonusLabel()}: ${widget.pick.bonusNumbers!.join(' ')}'
             : '';
-    return '🎯 My AI ${widget.lottery.name} Pick\n'
+    return '🎯 My ${PlatformText.t('AI', 'Smart')} ${widget.lottery.name} Pick\n'
         '${widget.pick.style.tagline}\n\n'
         '$main$bonusLine\n\n'
-        'Generated for fun — LottoRun AI';
+        'Generated for fun — ${PlatformText.t('LottoRun AI', 'NumberRun')}';
   }
 
   String _bonusLabel() => widget.lottery.bonusLabel ?? 'Supp';

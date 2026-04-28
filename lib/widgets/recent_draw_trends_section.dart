@@ -3,6 +3,7 @@ import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import '../services/draw_analysis_service.dart';
 import '../services/premium_service.dart';
+import '../utils/platform_text.dart';
 import 'premium_paywall_sheet.dart';
 
 class RecentDrawTrendsSection extends StatefulWidget {
@@ -60,7 +61,7 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
                       ),
                     ),
                     Text(
-                      'Trends, not predictions · Based on past results',
+                      PlatformText.t('Trends, not predictions · Based on past results', 'Patterns, not suggestions · Based on past results'),
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface.withAlpha(80),
                         fontStyle: FontStyle.italic,
@@ -84,7 +85,7 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
           else ...[
             // ── Hot numbers ──────────────────────────────────────
             _MetricRow(
-              label: 'Hot numbers',
+              label: PlatformText.t('Hot numbers', 'Popular numbers'),
               tooltip: 'Appeared more often in recent draws',
               child: _NumberChips(
                 numbers: trends.topFrequent,
@@ -97,7 +98,7 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
 
             // ── Cold numbers ─────────────────────────────────────
             _MetricRow(
-              label: 'Cold numbers',
+              label: PlatformText.t('Cold numbers', 'Less frequent numbers'),
               tooltip: 'Appeared less often in recent draws',
               child: _NumberChips(
                 numbers: trends.bottomFrequent,

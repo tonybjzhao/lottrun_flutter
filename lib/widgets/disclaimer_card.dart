@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 
 class DisclaimerCard extends StatelessWidget {
@@ -27,6 +28,16 @@ class DisclaimerCard extends StatelessWidget {
                         .bodySmall
                         ?.copyWith(color: const Color(0xFF7B5800)),
                   ),
+                  if (Platform.isIOS) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      'This app is for entertainment and number-selection assistance only. It does not provide gambling services, sell tickets, accept payments for draws, suggest results, improve odds, or guarantee outcomes.',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(color: const Color(0xFF7B5800)),
+                    ),
+                  ],
                 ],
               ),
             ),
