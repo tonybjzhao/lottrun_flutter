@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery.dart';
 import '../services/pick_result_service.dart';
-import '../utils/platform_text.dart';
 
 /// Animated draw-result reveal panel.
 ///
@@ -618,7 +617,7 @@ class _MatchSummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            PlatformText.t('Check official results for prize details', 'Check official results for draw details'),
+            'Check official results for details',
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurface.withAlpha(75),
               fontStyle: FontStyle.italic,

@@ -3,8 +3,6 @@ import 'package:intl/intl.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery_draw.dart';
 import '../services/draw_analysis_service.dart';
-import '../services/premium_service.dart';
-import 'premium_paywall_sheet.dart';
 
 class SavedPicksAnalysisSection extends StatelessWidget {
   final List<GeneratedPick> picks;
@@ -63,7 +61,7 @@ class SavedPicksAnalysisSection extends StatelessWidget {
             ),
           ),
           Text(
-            'Compared with recent 20 draws · post-draw analysis only',
+            'Compared with recent 20 past results · post-result comparison only',
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurface.withAlpha(120),
             ),
@@ -75,7 +73,7 @@ class SavedPicksAnalysisSection extends StatelessWidget {
           Row(
             children: [
               _StatCard(
-                label: 'Best match',
+                label: 'Best overlap',
                 value: analysis.bestMatchCount > 0
                     ? '${analysis.bestMatchCount} numbers'
                     : '—',
@@ -86,11 +84,11 @@ class SavedPicksAnalysisSection extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               _StatCard(
-                label: 'Avg match',
+                label: 'Avg overlap',
                 value: analysis.averageMatchCount > 0
                     ? analysis.averageMatchCount.toStringAsFixed(1)
                     : '—',
-                sub: 'per draw',
+                sub: 'per past result',
                 theme: theme,
               ),
             ],
@@ -134,11 +132,6 @@ class SavedPicksAnalysisSection extends StatelessWidget {
 
           // ── Summary ──────────────────────────────────────────────
           _SummaryBox(text: analysis.summary, theme: theme),
-
-          const SizedBox(height: 10),
-
-          // ── Premium teaser ───────────────────────────────────────
-          _PremiumTeaser(theme: theme),
         ],
       ),
     );
@@ -165,10 +158,10 @@ class _MatchLevelChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, color) = avg >= 2.0
-        ? ('Match level: High', Colors.green.shade600)
+        ? ('Overlap level: High', Colors.green.shade600)
         : avg >= 1.0
-            ? ('Match level: Medium', Colors.orange.shade600)
-            : ('Match level: Low', Colors.grey.shade500);
+            ? ('Overlap level: Medium', Colors.orange.shade600)
+            : ('Overlap level: Low', Colors.grey.shade500);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -184,54 +177,6 @@ class _MatchLevelChip extends StatelessWidget {
           fontWeight: FontWeight.w700,
         ),
       ),
-    );
-  }
-}
-
-// ── Premium teaser ────────────────────────────────────────────────────────────
-
-class _PremiumTeaser extends StatelessWidget {
-  final ThemeData theme;
-  const _PremiumTeaser({required this.theme});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: PremiumService.instance,
-      builder: (context, _) {
-        if (PremiumService.instance.isPremium) return const SizedBox.shrink();
-        return GestureDetector(
-          onTap: () => showPremiumPaywall(context),
-          child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF7C3AED).withAlpha(12),
-              border: Border.all(
-                  color: const Color(0xFF7C3AED).withAlpha(50), width: 1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              children: [
-                const Text('✨', style: TextStyle(fontSize: 14)),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Track saved picks over time — Advanced Analysis',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: const Color(0xFF7C3AED),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Icon(Icons.chevron_right_rounded,
-                    size: 16,
-                    color: const Color(0xFF7C3AED).withAlpha(180)),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/insight_service.dart';
-import '../services/premium_service.dart';
-import '../utils/platform_text.dart';
-import '../widgets/premium_paywall_sheet.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -54,84 +51,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: _loaded
           ? ListView(
               children: [
-                // ── Premium banner (shown when unlocked) ───────────
-                ListenableBuilder(
-                  listenable: PremiumService.instance,
-                  builder: (context, _) {
-                    if (!PremiumService.instance.isPremium) {
-                      return const SizedBox.shrink();
-                    }
-                    return Container(
-                      margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade50,
-                        border: Border.all(
-                            color: Colors.green.shade300, width: 1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.check_circle_rounded,
-                              size: 18, color: Colors.green.shade700),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Premium unlocked ✓  Thank you for your support',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: Colors.green.shade700,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-
-                // ── Premium section ────────────────────────────────
-                _SectionHeader(label: 'Analysis', theme: theme),
-                ListenableBuilder(
-                  listenable: PremiumService.instance,
-                  builder: (context, _) {
-                    final isPremium = PremiumService.instance.isPremium;
-                    return ListTile(
-                      leading: _LeadingIcon(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF7C3AED), Color(0xFF4F46E5)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        icon: Icons.analytics_rounded,
-                      ),
-                      title: const Text('Advanced Analysis Mode'),
-                      subtitle: Text(
-                        isPremium
-                            ? 'Unlocked — deeper patterns, top 10 similar draws, no ads'
-                            : 'Deeper historical analysis, saved picks tracking, no ads',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withAlpha(140),
-                        ),
-                      ),
-                      trailing: isPremium
-                          ? _UnlockedBadge(theme: theme)
-                          : const Icon(Icons.chevron_right_rounded),
-                      onTap: isPremium
-                          ? null
-                          : () => showPremiumPaywall(context),
-                    );
-                  },
-                ),
-                const Divider(indent: 16, endIndent: 16),
-
                 // ── Notifications section ──────────────────────────
                 _SectionHeader(label: 'Notifications', theme: theme),
                 _NotifTile(
                   icon: Icons.notifications_rounded,
                   title: 'Results',
-                  subtitle: 'When draw results are available for your saved picks',
+                  subtitle: 'When past results are available for your saved picks',
                   value: _notifResults,
                   onChanged: (v) {
                     setState(() => _notifResults = v);
@@ -192,12 +117,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     icon: Icons.info_outline_rounded,
                     iconColor: theme.colorScheme.onSurface.withAlpha(160),
                   ),
-                  title: const Text('Post-draw analysis only'),
+                  title: const Text('Post-result comparison only'),
                   subtitle: Text(
-                    PlatformText.t(
-                      'All analysis is based on historical draw data. Nothing here predicts results or improves odds.',
-                      'All analysis is based on historical draw data. Nothing here suggests results or improves outcomes.',
-                    ),
+                    'All analysis is based on historical result data. Nothing here suggests results or improves outcomes.',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withAlpha(140),
                     ),
@@ -234,13 +156,11 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _LeadingIcon extends StatelessWidget {
-  final Gradient? gradient;
   final Color? color;
   final IconData icon;
   final Color? iconColor;
 
   const _LeadingIcon({
-    this.gradient,
     this.color,
     required this.icon,
     this.iconColor,
@@ -252,7 +172,6 @@ class _LeadingIcon extends StatelessWidget {
       width: 36,
       height: 36,
       decoration: BoxDecoration(
-        gradient: gradient,
         color: color,
         borderRadius: BorderRadius.circular(10),
       ),
@@ -261,29 +180,6 @@ class _LeadingIcon extends StatelessWidget {
   }
 }
 
-class _UnlockedBadge extends StatelessWidget {
-  final ThemeData theme;
-  const _UnlockedBadge({required this.theme});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.green.shade50,
-        border: Border.all(color: Colors.green.shade300, width: 1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        'Unlocked',
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: Colors.green.shade700,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
 
 class _NotifTile extends StatelessWidget {
   final IconData icon;

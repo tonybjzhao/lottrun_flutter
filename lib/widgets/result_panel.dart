@@ -5,7 +5,6 @@ import '../models/generated_pick.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import '../services/pick_result_service.dart';
-import '../utils/platform_text.dart';
 import 'lotto_ball.dart';
 import 'pick_share_card.dart';
 
@@ -84,10 +83,10 @@ class _ResultPanelState extends State<ResultPanel>
         (widget.pick.bonusNumbers != null && widget.pick.bonusNumbers!.isNotEmpty)
             ? '\n+ ${_bonusLabel()}: ${widget.pick.bonusNumbers!.join(' ')}'
             : '';
-    return '🎯 My ${PlatformText.t('AI', 'Smart')} ${widget.lottery.name} Pick\n'
+    return '🎯 My Smart ${widget.lottery.name} Pick\n'
         '${widget.pick.style.tagline}\n\n'
         '$main$bonusLine\n\n'
-        'Generated for fun — ${PlatformText.t('LottoRun AI', 'NumberRun')}';
+        'Generated for fun — NumberRun';
   }
 
   String _bonusLabel() => widget.lottery.bonusLabel ?? 'Supp';
@@ -143,13 +142,13 @@ class _ResultPanelState extends State<ResultPanel>
     final String label;
     final Color color;
     if (matched.isEmpty && !bonusHit) {
-      label = 'No match last draw ($dateStr)';
+      label = 'No overlap in last past result ($dateStr)';
       color = theme.colorScheme.onSurface.withAlpha(100);
     } else if (matched.isEmpty) {
-      label = '$bonusLabel matched last draw ($dateStr)';
+      label = '$bonusLabel appeared in last past result ($dateStr)';
       color = theme.colorScheme.onSurface.withAlpha(140);
     } else {
-      label = 'Matched ${matched.length}$bonusSuffix last draw ($dateStr)';
+      label = '${matched.length}$bonusSuffix overlapped in last past result ($dateStr)';
       color = matched.length >= 3
           ? theme.colorScheme.primary
           : theme.colorScheme.onSurface.withAlpha(140);

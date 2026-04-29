@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import '../services/draw_analysis_service.dart';
-import '../services/premium_service.dart';
-import '../utils/platform_text.dart';
-import 'premium_paywall_sheet.dart';
 
 class RecentDrawTrendsSection extends StatefulWidget {
   final Lottery lottery;
@@ -49,19 +46,19 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Recent Draw Trends',
+                      'Recent Past Result Trends',
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     Text(
-                      'Based on last ${trends.drawCount} draws',
+                      'Based on last ${trends.drawCount} past results',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface.withAlpha(120),
                       ),
                     ),
                     Text(
-                      PlatformText.t('Trends, not predictions · Based on past results', 'Patterns, not suggestions · Based on past results'),
+                      'Patterns, not suggestions · Based on past results',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface.withAlpha(80),
                         fontStyle: FontStyle.italic,
@@ -85,8 +82,8 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
           else ...[
             // ── Hot numbers ──────────────────────────────────────
             _MetricRow(
-              label: PlatformText.t('Hot numbers', 'Popular numbers'),
-              tooltip: 'Appeared more often in recent draws',
+              label: 'Popular numbers',
+              tooltip: 'Appeared more often in recent past results',
               child: _NumberChips(
                 numbers: trends.topFrequent,
                 indicator: '🔥',
@@ -98,8 +95,8 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
 
             // ── Cold numbers ─────────────────────────────────────
             _MetricRow(
-              label: PlatformText.t('Cold numbers', 'Less frequent numbers'),
-              tooltip: 'Appeared less often in recent draws',
+              label: 'Less frequent numbers',
+              tooltip: 'Appeared less often in recent past results',
               child: _NumberChips(
                 numbers: trends.bottomFrequent,
                 indicator: '❄️',
@@ -156,11 +153,6 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
 
             // ── Summary ──────────────────────────────────────────
             _SummaryBox(text: trends.summary, theme: theme),
-
-            const SizedBox(height: 10),
-
-            // ── Premium teaser ───────────────────────────────────
-            _PremiumTeaser(theme: theme),
           ],
         ],
       ),
@@ -170,60 +162,12 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
   Widget _emptyState(ThemeData theme) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Text(
-          'Not enough draw history for analysis.',
+          'Not enough past result history for analysis.',
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurface.withAlpha(120),
           ),
         ),
       );
-}
-
-// ── Premium teaser ────────────────────────────────────────────────────────────
-
-class _PremiumTeaser extends StatelessWidget {
-  final ThemeData theme;
-  const _PremiumTeaser({required this.theme});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: PremiumService.instance,
-      builder: (context, _) {
-        if (PremiumService.instance.isPremium) return const SizedBox.shrink();
-        return GestureDetector(
-          onTap: () => showPremiumPaywall(context),
-          child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF7C3AED).withAlpha(12),
-              border: Border.all(
-                  color: const Color(0xFF7C3AED).withAlpha(50), width: 1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              children: [
-                const Text('✨', style: TextStyle(fontSize: 14)),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Unlock deeper trends — Advanced Analysis',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: const Color(0xFF7C3AED),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Icon(Icons.chevron_right_rounded,
-                    size: 16,
-                    color: const Color(0xFF7C3AED).withAlpha(180)),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 }
 
 // ── Draw count selector ───────────────────────────────────────────────────────
@@ -441,7 +385,7 @@ class _TrendStrengthChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final (label, icon, color) = switch (strength) {
       TrendStrength.strong =>
-        (PlatformText.t('Strong trend', 'Notable pattern'), '📈', Colors.orange.shade700),
+        ('Notable pattern', '📈', Colors.orange.shade700),
       TrendStrength.balanced =>
         ('Balanced', '⚖️', Colors.teal.shade600),
       TrendStrength.random =>

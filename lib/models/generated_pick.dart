@@ -1,5 +1,3 @@
-import '../utils/platform_text.dart';
-
 enum PickSource { generated, manual }
 
 enum PlayStyle {
@@ -13,9 +11,9 @@ enum PlayStyle {
       case PlayStyle.balanced:
         return 'Balanced';
       case PlayStyle.hot:
-        return PlatformText.t('Hot', 'Popular');
+        return 'Popular';
       case PlayStyle.cold:
-        return PlatformText.t('Cold', 'Less frequent');
+        return 'Less frequent';
       case PlayStyle.random:
         return 'Random';
     }
@@ -27,11 +25,11 @@ enum PlayStyle {
       case PlayStyle.balanced:
         return '⚖️ Balanced Pick';
       case PlayStyle.hot:
-        return PlatformText.t('🔥 Hot Trend Pick', '🔥 Popular Pattern Pick');
+        return '🔥 Popular Pattern Pick';
       case PlayStyle.cold:
-        return PlatformText.t('❄️ Cold Comeback Pick', '❄️ Less Frequent Pick');
+        return '❄️ Less Frequent Pick';
       case PlayStyle.random:
-        return PlatformText.t('🎲 Pure Luck Pick', '🎲 Random Pick');
+        return '🎲 Random Pick';
     }
   }
 
@@ -41,17 +39,11 @@ enum PlayStyle {
       case PlayStyle.balanced:
         return 'Even spread across all number ranges.';
       case PlayStyle.hot:
-        return PlatformText.t(
-          'These numbers have been trending recently.',
-          'These numbers appear more often in recent draws.',
-        );
+        return 'These numbers appear more often in recent past results.';
       case PlayStyle.cold:
-        return PlatformText.t(
-          "These numbers haven't appeared in a while.",
-          'These numbers appear less often in recent draws.',
-        );
+        return 'These numbers appear less often in recent past results.';
       case PlayStyle.random:
-        return PlatformText.t('Completely random — pure chance!', 'Completely random selection. Just for fun.');
+        return 'Completely random selection. Just for fun.';
     }
   }
 
@@ -77,7 +69,7 @@ enum PlayStyle {
       case PlayStyle.hot:
         return 'Favors recently frequent numbers';
       case PlayStyle.cold:
-        return 'Favors numbers overdue for a draw';
+        return 'Favors numbers less frequent in recent past results';
       case PlayStyle.random:
         return 'Pure random selection';
     }

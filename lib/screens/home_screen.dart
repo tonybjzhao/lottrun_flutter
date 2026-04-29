@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../utils/platform_text.dart';
 import '../widgets/ball_row.dart';
 import '../widgets/pick_share_card.dart';
 import '../models/generated_pick.dart';
@@ -59,19 +58,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   ];
   static const _kThreePicksWindows = [100, 60, 30];
   static final _kThreePicksLabels = [
-    PlatformText.t('⭐ Your Best Pick Today', '⭐ Featured Pick Today'),
-    PlatformText.t('🔥 Hot Right Now', '🔥 Recent Pattern'),
-    PlatformText.t('🎲 Lucky Surprise', '🎲 Random Surprise'),
+    '⭐ Featured Pick Today',
+    '🔥 Recent Pattern',
+    '🎲 Random Surprise',
   ];
   static final _kThreePicksBadges = [
     'Balanced',
-    PlatformText.t('Hot', 'Popular'),
+    'Popular',
     'Random',
   ];
   static final _kThreePicksMicrocopy = [
-    PlatformText.t('Most promising today 👀', 'Balanced selection for today 👀'),
-    PlatformText.t('These numbers are on fire 🔥', 'These numbers appeared often recently'),
-    PlatformText.t('You never know… 🍀', 'Random selection each time 🎲'),
+    'Balanced selection for today 👀',
+    'These numbers appeared often recently',
+    'Random selection each time 🎲',
   ];
   static const _kThreePicksColors = [
     Color(0xFFF59E0B), // amber  — Best Pick
@@ -269,23 +268,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   static final _insightMessages = {
     PlayStyle.balanced: [
-      PlatformText.t('AI sees a balanced spread for today', 'Smart analysis sees a balanced spread for today'),
+      'Smart analysis sees a balanced spread for today',
       'History points to an even distribution',
       'Balanced picks look stronger today',
     ],
     PlayStyle.hot: [
-      PlatformText.t('Hot trend is active tonight 🔥', 'Recent pattern is active tonight 🔥'),
-      'Recent draws favour these numbers',
-      PlatformText.t('AI detects a hot-number streak', 'Smart analysis detects a frequent-number pattern'),
+      'Recent pattern is active tonight 🔥',
+      'Recent past results favour these numbers',
+      'Smart analysis detects a frequent-number pattern',
     ],
     PlayStyle.cold: [
-      PlatformText.t('AI sees a cold-number comeback today ❄️', 'Smart analysis found less-frequent numbers ❄️'),
-      'Overdue numbers are in your corner',
-      PlatformText.t('Cold picks may be ready to break out', 'Less-frequent numbers from past draws'),
+      'Smart analysis found less-frequent numbers ❄️',
+      'Less-frequent numbers from past results',
+      'Less-frequent numbers from past results',
     ],
     PlayStyle.random: [
-      PlatformText.t('Sometimes pure luck is all you need 🎲', 'Sometimes randomness is fun 🎲'),
-      PlatformText.t('Chaos is a pattern too', 'Chaos is a pattern too'),
+      'Sometimes randomness is fun 🎲',
+      'Chaos is a pattern too',
       'Pure randomness — trust the universe',
     ],
   };
@@ -404,7 +403,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               text: TextSpan(
                 children: [
                   TextSpan(
-                    text: PlatformText.t('LottoRun ', 'NumberRun '),
+                    text: 'NumberRun ',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -412,7 +411,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     ),
                   ),
                   TextSpan(
-                    text: PlatformText.t('AI', ''),
+                    text: '',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -423,7 +422,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ),
             ),
             Text(
-              PlatformText.t('Smart picks from real draw history', 'Number sets from past records'),
+              'Number sets from past records',
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w400,
@@ -486,7 +485,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             const SizedBox(height: 16),
 
             // ── Lottery selector ──────────────────────────────────
-            Text(PlatformText.t('Lottery', 'Number selection'), style: theme.textTheme.labelMedium),
+            Text('Number selection', style: theme.textTheme.labelMedium),
             const SizedBox(height: 6),
             InputDecorator(
               decoration: InputDecoration(
@@ -548,7 +547,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    PlatformText.t('Smart Number Picks', 'Number Picks'),
+                    'Number Picks',
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -556,7 +555,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    PlatformText.t('Choose one style, or generate 3 curated picks', 'Choose one style, or generate 3 number sets'),
+                    'Choose one style, or generate 3 number sets',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 13,
                       color: theme.colorScheme.onSurface.withAlpha(140),
@@ -624,7 +623,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       label: Text(
                         _isThreePicksLoading
                             ? 'Generating…'
-                            : PlatformText.t('🎲 Try My Luck (3 Picks)', '🎲 Generate 3 Number Sets'),
+                            : '🎲 Generate 3 Number Sets',
                         style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w700),
                       ),
@@ -640,7 +639,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    PlatformText.t('3 Smart Picks combines Balanced + Hot + Random for variety.', '3 Number Sets combine Balanced + Popular + Random for variety.'),
+                    '3 Number Sets combine Balanced + Popular + Random for variety.',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
                       color: theme.colorScheme.onSurface.withAlpha(110),
@@ -648,7 +647,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    PlatformText.t('✨ Many players matched 2+ numbers last week 👀', '✨ Some selections matched multiple numbers in recent results 👀'),
+                    '✨ Some selections overlapped multiple numbers in recent past results 👀',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
                       color: theme.colorScheme.primary.withAlpha(160),
@@ -710,7 +709,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             Expanded(
                               child: Text(
                                 _showReadyFlash
-                                    ? PlatformText.t('✨ Your AI pick is ready', '✨ Your Smart pick is ready')
+                                    ? '✨ Your Smart pick is ready'
                                     : _insightText,
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   color: _showReadyFlash
@@ -756,7 +755,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                     theme.colorScheme.onSurface.withAlpha(55)),
                             const SizedBox(height: 12),
                             Text(
-                              PlatformText.t('Try a fun pick based on real draw history 🎲', 'Generate a number set from past records 🎲'),
+                              'Generate a number set from past records 🎲',
                               textAlign: TextAlign.center,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: theme.colorScheme.onSurface
@@ -893,7 +892,7 @@ class _InlinePickCard extends StatelessWidget {
         (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
             ? ' + ${pick.bonusNumbers!.join(' ')}'
             : '';
-    return '$label\n${lottery.name}: $main$bonus\nGenerated for fun — ${PlatformText.t('LottoRun AI', 'NumberRun')} 🎯';
+    return '$label\n${lottery.name}: $main$bonus\nGenerated for fun — NumberRun 🎯';
   }
 
   Future<void> _copy(BuildContext context) async {
@@ -1112,9 +1111,9 @@ class _LuckBar extends StatelessWidget {
         next = next.add(const Duration(days: 7));
       }
       final diff = next.difference(now);
-      if (diff.inDays >= 2) return 'Next draw in ${diff.inDays}d';
-      if (diff.inHours >= 1) return 'Next draw in ${diff.inHours}h';
-      return 'Draw soon!';
+      if (diff.inDays >= 2) return 'Next result update in ${diff.inDays}d';
+      if (diff.inHours >= 1) return 'Next result update in ${diff.inHours}h';
+      return 'Result update soon!';
     }
 
     final usDrawDays = switch (lottery.id) {
@@ -1145,9 +1144,9 @@ class _LuckBar extends StatelessWidget {
       }
       if (nearest != null) {
         final diff = nearest.difference(now);
-        if (diff.inDays >= 2) return 'Next draw in ${diff.inDays}d';
-        if (diff.inHours >= 1) return 'Next draw in ${diff.inHours}h';
-        return 'Draw soon!';
+        if (diff.inDays >= 2) return 'Next result update in ${diff.inDays}d';
+        if (diff.inHours >= 1) return 'Next result update in ${diff.inHours}h';
+        return 'Result update soon!';
       }
     }
 
@@ -1167,7 +1166,7 @@ class _LuckBar extends StatelessWidget {
     return Row(
       children: [
         Text(
-          '${PlatformText.t('🍀', '📊')} ${PlatformText.t('Today\'s luck', 'Today\'s pick score')}: $_luckPct%',
+          '📊 Today\'s pick score: $_luckPct%',
           style: theme.textTheme.labelMedium?.copyWith(
             color: theme.colorScheme.primary,
             fontWeight: FontWeight.w700,
@@ -1293,7 +1292,7 @@ class _CompactPickBannerState extends State<_CompactPickBanner>
                       children: [
                         Expanded(
                           child: Text(
-                            '${PlatformText.t('AI', 'Smart')} Pick · ${widget.pick.style.tagline}',
+                            'Smart Pick · ${widget.pick.style.tagline}',
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.primary,
                               fontWeight: FontWeight.w700,

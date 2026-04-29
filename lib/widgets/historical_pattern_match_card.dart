@@ -3,9 +3,6 @@ import 'package:intl/intl.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import '../services/draw_analysis_service.dart';
-import '../services/premium_service.dart';
-import '../utils/platform_text.dart';
-import 'premium_paywall_sheet.dart';
 
 class HistoricalPatternMatchCard extends StatelessWidget {
   final Lottery lottery;
@@ -22,13 +19,12 @@ class HistoricalPatternMatchCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isPremium = PremiumService.instance.isPremium;
 
     final result = DrawAnalysisService.analyzeHistoricalPattern(
       lottery: lottery,
       targetDraw: targetDraw,
       allDraws: allDraws,
-      similarDrawsLimit: isPremium ? 10 : 3,
+      similarDrawsLimit: 10,
     );
 
     if (result == null) {
@@ -63,7 +59,7 @@ class HistoricalPatternMatchCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Post-draw analysis · based on past 5 years',
+                      'Post-result comparison · based on past 5 years',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface.withAlpha(120),
                       ),
@@ -91,8 +87,8 @@ class HistoricalPatternMatchCard extends StatelessWidget {
               label: 'Trend alignment',
               score: result.trendScore,
               theme: theme),
-          _ComponentScoreRow(
-              label: PlatformText.t('Hot/cold alignment', 'Popular/less-frequent alignment'),
+              _ComponentScoreRow(
+              label: 'Popular/less-frequent alignment',
               score: result.hotColdAlignmentScore,
               theme: theme),
           _ComponentScoreRow(
@@ -141,14 +137,14 @@ class HistoricalPatternMatchCard extends StatelessWidget {
               ),
               _InfoChip(
                 label:
-                    '🔥 ${result.hotNumberCount} ${PlatformText.t('hot', 'popular')} · ❄️ ${result.coldNumberCount} ${PlatformText.t('cold', 'less frequent')}',
+                    '🔥 ${result.hotNumberCount} popular · ❄️ ${result.coldNumberCount} less frequent',
                 icon: null,
                 theme: theme,
               ),
             ],
           ),
 
-          // ── Similar past draws ───────────────────────────────────
+          // ── Similar past results ─────────────────────────────────
           if (result.similarPastDraws.isNotEmpty) ...[
             const SizedBox(height: 12),
             const Divider(height: 1),
@@ -156,42 +152,17 @@ class HistoricalPatternMatchCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  'Similar past draws',
+                  'Top 10 similar past results',
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: theme.colorScheme.onSurface.withAlpha(160),
                   ),
                 ),
-                if (isPremium) ...[
-                  const SizedBox(width: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF7C3AED).withAlpha(18),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'Top 10',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: const Color(0xFF7C3AED),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ),
-                ],
               ],
             ),
             const SizedBox(height: 8),
             ...result.similarPastDraws
                 .map((s) => _SimilarDrawRow(similar: s, theme: theme)),
-          ],
-
-          // ── Premium teaser (free users) ──────────────────────────
-          if (!isPremium) ...[
-            const SizedBox(height: 8),
-            _PremiumTeaser(theme: theme),
           ],
 
           const SizedBox(height: 12),
@@ -415,7 +386,7 @@ class _SimilarDrawRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${similar.sharedNumbers} numbers matched',
+                '${similar.sharedNumbers} numbers overlapped',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w700,
@@ -431,47 +402,6 @@ class _SimilarDrawRow extends StatelessWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-// ── Premium teaser ────────────────────────────────────────────────────────────
-
-class _PremiumTeaser extends StatelessWidget {
-  final ThemeData theme;
-  const _PremiumTeaser({required this.theme});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => showPremiumPaywall(context),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: const Color(0xFF7C3AED).withAlpha(12),
-          border: Border.all(
-              color: const Color(0xFF7C3AED).withAlpha(50), width: 1),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          children: [
-            const Text('✨', style: TextStyle(fontSize: 14)),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'See top 10 similar draws and trend timeline — Advanced Analysis',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: const Color(0xFF7C3AED),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Icon(Icons.chevron_right_rounded,
-                size: 16,
-                color: const Color(0xFF7C3AED).withAlpha(180)),
-          ],
-        ),
       ),
     );
   }

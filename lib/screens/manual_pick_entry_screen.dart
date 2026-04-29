@@ -137,7 +137,7 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
                             color: theme.colorScheme.primary.withAlpha(160)),
                         const SizedBox(width: 5),
                         Text(
-                          'Tracking draw: ${nextDrawLabel(_lottery.id)}',
+                          'Tracking result: ${nextDrawLabel(_lottery.id)}',
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: theme.colorScheme.primary.withAlpha(160),
                           ),

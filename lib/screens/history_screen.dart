@@ -11,8 +11,6 @@ import '../models/lottery_draw.dart';
 import '../models/lottery_history_result.dart';
 import '../data/seed_lotteries.dart';
 import '../services/lottery_history_csv_service.dart';
-import '../services/premium_service.dart';
-import '../utils/platform_text.dart';
 import '../widgets/daily_insight_banner.dart';
 import '../widgets/historical_pattern_match_card.dart';
 import '../widgets/lotto_ball.dart';
@@ -41,8 +39,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     _historyFuture = _loadDraws(_lottery);
     unawaited(AnalyticsService.logHistoryOpened(lottery: _lottery.id));
 
-    if (kShowHistoryBannerAd && !kIsSimulatorOrEmulator &&
-        !PremiumService.instance.isPremium) {
+    if (kShowHistoryBannerAd && !kIsSimulatorOrEmulator) {
       _bannerAd = BannerAd(
         adUnitId: AdMobIds.historyBanner,
         size: AdSize.banner,
@@ -100,7 +97,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: InputDecorator(
               decoration: InputDecoration(
-                labelText: PlatformText.t('Lottery', 'Number selection'),
+                labelText: 'Number selection',
                 contentPadding: const EdgeInsets.symmetric(
                     horizontal: 14, vertical: 4),
                 border: OutlineInputBorder(
@@ -131,7 +128,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 children: [
                   Text(
                     snapshot.hasData
-                        ? '${snapshot.data!.draws.length} draws'
+                        ? '${snapshot.data!.draws.length} past results'
                         : 'Loading...',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.onSurface.withAlpha(120),
@@ -164,7 +161,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 }
 
                 // Add bottom padding for banner ad if enabled and loaded
-                final double bottomPadding = (kShowHistoryBannerAd && !kIsSimulatorOrEmulator && _isBannerAdLoaded && !PremiumService.instance.isPremium)
+                final double bottomPadding = (kShowHistoryBannerAd && !kIsSimulatorOrEmulator && _isBannerAdLoaded)
                     ? 52.0
                     : 0.0;
 
@@ -204,7 +201,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
 
           // ── Ad banner ──────────────────────────────────────────
-          if (kShowHistoryBannerAd && !kIsSimulatorOrEmulator && _isBannerAdLoaded && _bannerAd != null && !PremiumService.instance.isPremium)
+          if (kShowHistoryBannerAd && !kIsSimulatorOrEmulator && _isBannerAdLoaded && _bannerAd != null)
             SafeArea(
               top: false,
               child: SizedBox(
@@ -282,10 +279,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final friendlyMessage = message.contains(
       'No internet connection and no saved lottery history yet.',
     )
-        ? PlatformText.t(
-            'No internet connection and no saved lottery history yet.',
-            'No internet connection and no saved draw history yet.',
-          )
+        ? 'No internet connection and no saved result history yet.'
         : message;
 
     return Center(

@@ -9,12 +9,10 @@ import 'app.dart';
 import 'firebase_options.dart';
 import 'services/analytics_service.dart';
 import 'services/notification_service.dart';
-import 'services/premium_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   unawaited(NotificationService.instance.init());
-  unawaited(PremiumService.instance.init());
   AnalyticsService.init(_initFirebase());
   await _initAds();
   runApp(const LottFunApp());
