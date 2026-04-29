@@ -25,7 +25,7 @@ enum PlayStyle {
       case PlayStyle.balanced:
         return '⚖️ Balanced Pick';
       case PlayStyle.hot:
-        return '🔥 Popular Pattern Pick';
+        return 'Common Pattern Pick';
       case PlayStyle.cold:
         return '❄️ Less Frequent Pick';
       case PlayStyle.random:
