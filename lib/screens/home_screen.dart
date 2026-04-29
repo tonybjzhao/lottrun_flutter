@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   ];
   static const _kThreePicksWindows = [100, 60, 30];
   static final _kThreePicksLabels = [
-    '⭐ Featured Pick Today',
+    '⭐ Generated Pick',
     '🔥 Recent Pattern',
     '🎲 Random Surprise',
   ];
@@ -273,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       'Balanced picks look stronger today',
     ],
     PlayStyle.hot: [
-      'Recent pattern is active tonight 🔥',
+      'Recent pattern observed',
       'Recent past results favour these numbers',
       'Smart analysis detects a frequent-number pattern',
     ],
@@ -1166,7 +1166,7 @@ class _LuckBar extends StatelessWidget {
     return Row(
       children: [
         Text(
-          '📊 Today\'s pick score: $_luckPct%',
+          '📊 Historical similarity score: $_luckPct%',
           style: theme.textTheme.labelMedium?.copyWith(
             color: theme.colorScheme.primary,
             fontWeight: FontWeight.w700,
