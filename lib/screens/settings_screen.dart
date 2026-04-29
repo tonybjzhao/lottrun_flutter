@@ -117,9 +117,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     icon: Icons.info_outline_rounded,
                     iconColor: theme.colorScheme.onSurface.withAlpha(160),
                   ),
-                  title: const Text('Post-result comparison only'),
+                  title: const Text('Historical results only'),
                   subtitle: Text(
-                    'All analysis is based on historical result data. Nothing here suggests results or improves outcomes.',
+                    'All analysis is based on historical results. This app does not provide predictions or improve outcomes.',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withAlpha(140),
                     ),

@@ -1188,7 +1188,7 @@ class _PickShareSheetState extends State<_PickShareSheet> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Pick a style or keep the auto recommendation for ${widget.lottery.name}.',
+                    'Pick a style or keep the default option for ${widget.lottery.name}.',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                       height: 1.35,
@@ -1228,7 +1228,7 @@ class _PickShareSheetState extends State<_PickShareSheet> {
                       children: [
                         ChoiceChip(
                           label: Text(
-                            '⭐ Smart Pick',
+                            '⭐ Reference Pick',
                           ),
                           selected: _manualTemplate == null,
                           onSelected: (_) {

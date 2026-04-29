@@ -572,7 +572,7 @@ class _MatchSummaryCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    '🏆 Best',
+                    '🏆 Top',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: Colors.amber.shade900,
                       fontWeight: FontWeight.w800,

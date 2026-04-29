@@ -46,19 +46,19 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Recent Past Result Trends',
+                      'Recent Past Result Patterns',
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     Text(
-                      'Based on last ${trends.drawCount} past results',
+                      'Based on the last ${trends.drawCount} past results',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface.withAlpha(120),
                       ),
                     ),
                     Text(
-                      'Patterns, not suggestions · Based on past results',
+                      'Historical comparison only · no guarantee of outcomes',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface.withAlpha(80),
                         fontStyle: FontStyle.italic,
@@ -82,8 +82,8 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
           else ...[
             // ── Hot numbers ──────────────────────────────────────
             _MetricRow(
-              label: 'Popular numbers',
-              tooltip: 'Appeared more often in recent past results',
+              label: 'Frequently observed numbers',
+              tooltip: 'Observed more often in past results',
               child: _NumberChips(
                 numbers: trends.topFrequent,
                 indicator: '🔥',
@@ -95,8 +95,8 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
 
             // ── Cold numbers ─────────────────────────────────────
             _MetricRow(
-              label: 'Less frequent numbers',
-              tooltip: 'Appeared less often in recent past results',
+              label: 'Less common numbers',
+              tooltip: 'Observed less often in past results',
               child: _NumberChips(
                 numbers: trends.bottomFrequent,
                 indicator: '❄️',

@@ -53,13 +53,13 @@ class HistoricalPatternMatchCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Historical Pattern Match',
+                      'Historical Pattern Comparison',
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     Text(
-                      'Post-result comparison · based on past 5 years',
+                      'Based on past results from the last 5 years',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface.withAlpha(120),
                       ),
@@ -84,11 +84,11 @@ class HistoricalPatternMatchCard extends StatelessWidget {
 
           // ── Component scores ─────────────────────────────────────
           _ComponentScoreRow(
-              label: 'Trend alignment',
+              label: 'Trend comparison',
               score: result.trendScore,
               theme: theme),
               _ComponentScoreRow(
-              label: 'Popular/less-frequent alignment',
+              label: 'Observed/less-common comparison',
               score: result.hotColdAlignmentScore,
               theme: theme),
           _ComponentScoreRow(
@@ -137,7 +137,7 @@ class HistoricalPatternMatchCard extends StatelessWidget {
               ),
               _InfoChip(
                 label:
-                    '🔥 ${result.hotNumberCount} popular · ❄️ ${result.coldNumberCount} less frequent',
+                    '🔥 ${result.hotNumberCount} observed more often · ❄️ ${result.coldNumberCount} less common',
                 icon: null,
                 theme: theme,
               ),
@@ -152,7 +152,7 @@ class HistoricalPatternMatchCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  'Top 10 similar past results',
+                  'Top 10 similar past results (for reference only)',
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: theme.colorScheme.onSurface.withAlpha(160),
@@ -177,9 +177,9 @@ class HistoricalPatternMatchCard extends StatelessWidget {
   }
 
   String _scoreLabel(int score) {
-    if (score >= 80) return 'Strong alignment with historical patterns';
-    if (score >= 60) return 'Moderate alignment with historical patterns';
-    return 'Limited alignment with historical patterns';
+    if (score >= 80) return 'Strong comparison with historical patterns (for reference only)';
+    if (score >= 60) return 'Moderate comparison with historical patterns (for reference only)';
+    return 'Limited comparison with historical patterns (for reference only)';
   }
 
   Color _scoreColor(int score) {

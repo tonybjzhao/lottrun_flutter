@@ -83,7 +83,7 @@ class _ResultPanelState extends State<ResultPanel>
         (widget.pick.bonusNumbers != null && widget.pick.bonusNumbers!.isNotEmpty)
             ? '\n+ ${_bonusLabel()}: ${widget.pick.bonusNumbers!.join(' ')}'
             : '';
-    return '🎯 My Smart ${widget.lottery.name} Pick\n'
+    return '🎯 My ${widget.lottery.name} Number Set\n'
         '${widget.pick.style.tagline}\n\n'
         '$main$bonusLine\n\n'
         'Generated for fun — NumberRun';

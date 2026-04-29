@@ -11,9 +11,9 @@ enum PlayStyle {
       case PlayStyle.balanced:
         return 'Balanced';
       case PlayStyle.hot:
-        return 'Popular';
+        return 'Observed Pattern';
       case PlayStyle.cold:
-        return 'Less frequent';
+        return 'Less common';
       case PlayStyle.random:
         return 'Random';
     }
@@ -25,9 +25,9 @@ enum PlayStyle {
       case PlayStyle.balanced:
         return '⚖️ Balanced Pick';
       case PlayStyle.hot:
-        return 'Common Pattern Pick';
+        return 'Example Pattern Pick';
       case PlayStyle.cold:
-        return '❄️ Less Frequent Pick';
+        return '❄️ Historical Number Example';
       case PlayStyle.random:
         return '🎲 Random Pick';
     }
@@ -39,9 +39,9 @@ enum PlayStyle {
       case PlayStyle.balanced:
         return 'Even spread across all number ranges.';
       case PlayStyle.hot:
-        return 'These numbers appear more often in recent past results.';
+        return 'These numbers were observed more often in past results.';
       case PlayStyle.cold:
-        return 'These numbers appear less often in recent past results.';
+        return 'These numbers were observed less often in past results.';
       case PlayStyle.random:
         return 'Completely random selection. Just for fun.';
     }
@@ -67,11 +67,11 @@ enum PlayStyle {
       case PlayStyle.balanced:
         return 'Even spread across the number range';
       case PlayStyle.hot:
-        return 'Favors recently frequent numbers';
+        return 'Based on recent frequency in past results (for reference only)';
       case PlayStyle.cold:
-        return 'Favors numbers less frequent in recent past results';
+        return 'Based on less frequent historical numbers (for reference only)';
       case PlayStyle.random:
-        return 'Pure random selection';
+        return 'Random selection (for reference only)';
     }
   }
 }

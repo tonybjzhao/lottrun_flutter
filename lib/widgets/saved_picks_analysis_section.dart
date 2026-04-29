@@ -73,7 +73,7 @@ class SavedPicksAnalysisSection extends StatelessWidget {
           Row(
             children: [
               _StatCard(
-                label: 'Best overlap',
+                label: 'Top overlap',
                 value: analysis.bestMatchCount > 0
                     ? '${analysis.bestMatchCount} numbers'
                     : '—',

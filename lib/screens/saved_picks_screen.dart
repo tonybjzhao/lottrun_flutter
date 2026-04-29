@@ -418,7 +418,7 @@ class _StatsCard extends StatelessWidget {
               _StatCell(
                 icon: '🏆',
                 value: _bestText(),
-                label: 'Best',
+                label: 'Top',
                 theme: theme,
               ),
               _StatDivider(),
@@ -432,7 +432,7 @@ class _StatsCard extends StatelessWidget {
               _StatCell(
                 icon: '🍀',
                 value: '${stats.luckScore}',
-                label: 'Pick Score',
+                label: 'Similarity Score',
                 theme: theme,
                 highlight: stats.luckScore >= 80,
               ),
@@ -598,7 +598,7 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
         (widget.pick.bonusNumbers != null && widget.pick.bonusNumbers!.isNotEmpty)
             ? '\n+ $bonusLabel: ${widget.pick.bonusNumbers!.join(' ')}'
             : '';
-    return '🎯 My Smart $_lotteryName Pick\n${widget.pick.displayLabel}\n\n$main$bonus\n\nGenerated for fun — NumberRun';
+    return '🎯 My $_lotteryName Number Set\n${widget.pick.displayLabel}\n\n$main$bonus\n\nGenerated for fun — NumberRun';
   }
 
   Future<void> _copy(BuildContext context) async {

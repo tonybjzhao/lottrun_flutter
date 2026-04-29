@@ -22,7 +22,7 @@ class DisclaimerCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '🍀 Just for fun — play responsibly.',
+                    'Just for fun — play responsibly.',
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall
@@ -31,7 +31,7 @@ class DisclaimerCard extends StatelessWidget {
                   if (Platform.isIOS) ...[
                     const SizedBox(height: 4),
                     Text(
-                      'This app is for entertainment and number-selection assistance only. It does not provide gambling services, sell tickets, accept payments for draws, suggest results, improve odds, or guarantee outcomes.',
+                      'This app provides number selections based on historical data only. It does NOT predict results, improve odds, or guarantee outcomes.',
                       style: Theme.of(context)
                           .textTheme
                           .bodySmall

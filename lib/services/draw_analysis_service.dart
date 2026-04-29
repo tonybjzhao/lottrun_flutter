@@ -611,11 +611,11 @@ class DrawAnalysisService {
 
   static String _historicalSummary(int score) {
     if (score >= 70) {
-      return 'This draw aligns well with historical patterns from the past 5 years.';
+      return 'This draw shows a strong comparison with historical patterns from the past 5 years.';
     }
     if (score >= 45) {
-      return 'This draw shows moderate alignment with historical distribution patterns.';
+      return 'This draw shows a moderate comparison with historical distribution patterns.';
     }
-    return 'This draw shows limited alignment with typical historical patterns.';
+    return 'This draw shows a limited comparison with typical historical patterns.';
   }
 }

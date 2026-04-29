@@ -58,19 +58,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   ];
   static const _kThreePicksWindows = [100, 60, 30];
   static final _kThreePicksLabels = [
-    '⭐ Generated Pick',
+    '⭐ Example Pick',
     'Common Pattern',
     '🎲 Random Surprise',
   ];
   static final _kThreePicksBadges = [
     'Balanced',
-    'Popular',
+    'Observed Pattern',
     'Random',
   ];
   static final _kThreePicksMicrocopy = [
-    'Balanced selection for today 👀',
-    'These numbers appeared often recently',
-    'Random selection each time 🎲',
+    'Balanced selection based on past results',
+    'These numbers were observed more often in past results',
+    'Random selection for reference only 🎲',
   ];
   static const _kThreePicksColors = [
     Color(0xFFF59E0B), // amber  — Best Pick
@@ -268,24 +268,24 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   static final _insightMessages = {
     PlayStyle.balanced: [
-      'Smart analysis sees a balanced spread for today',
+      'Based on past data, this shows a balanced spread for reference',
       'History points to an even distribution',
-      'Balanced picks look stronger today',
+      'Balanced number spread seen in past results',
     ],
     PlayStyle.hot: [
-      'Recent pattern observed',
-      'Frequently seen in recent results',
-      'Smart analysis detects a frequent-number pattern',
+      'Recent results show similar patterns',
+      'Frequently observed in past results',
+      'Based on past results, a similar pattern was observed',
     ],
     PlayStyle.cold: [
-      'Smart analysis found less-frequent numbers ❄️',
-      'Less-frequent numbers from past results',
-      'Less-frequent numbers from past results',
+      'Based on past results, less common numbers were observed ❄️',
+      'Less common numbers from past results',
+      'Less common numbers from past results',
     ],
     PlayStyle.random: [
       'Sometimes randomness is fun 🎲',
-      'Chaos is a pattern too',
-      'Pure randomness — trust the universe',
+      'Random pattern for reference only',
+      'Random selection for fun',
     ],
   };
 
@@ -639,7 +639,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    '3 Number Sets combine Balanced + Popular + Random for variety.',
+                    '3 Number Sets combine Balanced + Observed + Random styles for reference only.',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
                       color: theme.colorScheme.onSurface.withAlpha(110),
@@ -647,7 +647,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '✨ Some selections overlapped multiple numbers in recent past results 👀',
+                    '✨ Some selections overlapped multiple numbers in past results (for reference only)',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
                       color: theme.colorScheme.primary.withAlpha(160),
@@ -709,7 +709,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             Expanded(
                               child: Text(
                                 _showReadyFlash
-                                    ? '✨ Your Smart pick is ready'
+                                    ? '✨ Your number set is ready'
                                     : _insightText,
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   color: _showReadyFlash
@@ -1166,7 +1166,7 @@ class _LuckBar extends StatelessWidget {
     return Row(
       children: [
         Text(
-          '📊 Similarity score: $_luckPct / 100',
+          '📊 Historical similarity (for reference only): $_luckPct / 100',
           style: theme.textTheme.labelMedium?.copyWith(
             color: theme.colorScheme.primary,
             fontWeight: FontWeight.w700,
@@ -1292,7 +1292,7 @@ class _CompactPickBannerState extends State<_CompactPickBanner>
                       children: [
                         Expanded(
                           child: Text(
-                            'Smart Pick · ${widget.pick.style.tagline}',
+                            'Reference Pick · ${widget.pick.style.tagline}',
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.primary,
                               fontWeight: FontWeight.w700,
