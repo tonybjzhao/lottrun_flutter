@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'app.dart';
 import 'firebase_options.dart';
+import 'services/analysis_style_service.dart';
 import 'services/analytics_service.dart';
 import 'services/locale_service.dart';
 import 'services/notification_service.dart';
@@ -16,6 +17,7 @@ Future<void> main() async {
   unawaited(NotificationService.instance.init());
   AnalyticsService.init(_initFirebase());
   await LocaleService.instance.load();
+  await AnalysisStyleService.instance.load();
   await _initAds();
   runApp(LottFunApp(localeService: LocaleService.instance));
 }

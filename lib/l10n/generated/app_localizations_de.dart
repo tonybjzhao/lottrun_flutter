@@ -468,6 +468,38 @@ class AppLocalizationsDe extends AppLocalizations {
   String get languageGerman => 'Deutsch';
 
   @override
+  String get settingsAnalysisStyle => 'Analysestil';
+
+  @override
+  String get settingsAnalysisStyleSubtitle =>
+      'Wie historische Trends gewichtet werden';
+
+  @override
+  String get analysisStyleRecentTrend => 'Aktueller Trend';
+
+  @override
+  String get analysisStyleRecentTrendDescription =>
+      'Betont aktuelle Muster (0-12 Wochen: 70%, 13-52 Wochen: 20%, 1-5 Jahre: 10%)';
+
+  @override
+  String get analysisStyleBalanced => 'Ausgewogen';
+
+  @override
+  String get analysisStyleBalancedDescription =>
+      'Gleichmäßige Berücksichtigung aller Zeiträume (0-12 Wochen: 50%, 13-52 Wochen: 30%, 1-5 Jahre: 20%)';
+
+  @override
+  String get analysisStyleLongTermPattern => 'Langzeitmuster';
+
+  @override
+  String get analysisStyleLongTermPatternDescription =>
+      'Betont historische Muster (0-12 Wochen: 30%, 13-52 Wochen: 30%, 1-5 Jahre: 40%)';
+
+  @override
+  String get analysisStyleDisclaimer =>
+      'Dies ändert nur die Gewichtung historischer Trends. Es verbessert nicht die Gewinnchancen.';
+
+  @override
   String get settingsAbout => 'Über';
 
   @override

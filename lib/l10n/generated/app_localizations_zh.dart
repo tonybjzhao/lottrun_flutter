@@ -432,6 +432,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get languageGerman => 'Deutsch';
 
   @override
+  String get settingsAnalysisStyle => '分析风格';
+
+  @override
+  String get settingsAnalysisStyleSubtitle => '历史趋势的权重方式';
+
+  @override
+  String get analysisStyleRecentTrend => '近期趋势';
+
+  @override
+  String get analysisStyleRecentTrendDescription =>
+      '强调近期模式（0-12周：70%，13-52周：20%，1-5年：10%）';
+
+  @override
+  String get analysisStyleBalanced => '平衡';
+
+  @override
+  String get analysisStyleBalancedDescription =>
+      '各时间段均衡考虑（0-12周：50%，13-52周：30%，1-5年：20%）';
+
+  @override
+  String get analysisStyleLongTermPattern => '长期模式';
+
+  @override
+  String get analysisStyleLongTermPatternDescription =>
+      '强调历史模式（0-12周：30%，13-52周：30%，1-5年：40%）';
+
+  @override
+  String get analysisStyleDisclaimer => '这只改变历史趋势的权重方式，不会提高中奖几率。';
+
+  @override
   String get settingsAbout => '关于';
 
   @override

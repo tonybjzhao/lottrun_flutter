@@ -902,6 +902,60 @@ abstract class AppLocalizations {
   /// **'Deutsch'**
   String get languageGerman;
 
+  /// No description provided for @settingsAnalysisStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis Style'**
+  String get settingsAnalysisStyle;
+
+  /// No description provided for @settingsAnalysisStyleSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How historical trends are weighted'**
+  String get settingsAnalysisStyleSubtitle;
+
+  /// No description provided for @analysisStyleRecentTrend.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Trend'**
+  String get analysisStyleRecentTrend;
+
+  /// No description provided for @analysisStyleRecentTrendDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Emphasizes recent patterns (0–12 weeks: 70%, 13–52 weeks: 20%, 1–5 years: 10%)'**
+  String get analysisStyleRecentTrendDescription;
+
+  /// No description provided for @analysisStyleBalanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Balanced'**
+  String get analysisStyleBalanced;
+
+  /// No description provided for @analysisStyleBalancedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Equal consideration across time periods (0–12 weeks: 50%, 13–52 weeks: 30%, 1–5 years: 20%)'**
+  String get analysisStyleBalancedDescription;
+
+  /// No description provided for @analysisStyleLongTermPattern.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-Term Pattern'**
+  String get analysisStyleLongTermPattern;
+
+  /// No description provided for @analysisStyleLongTermPatternDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Emphasizes historical patterns (0–12 weeks: 30%, 13–52 weeks: 30%, 1–5 years: 40%)'**
+  String get analysisStyleLongTermPatternDescription;
+
+  /// No description provided for @analysisStyleDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'This only changes how historical trends are weighted. It does not improve the odds of winning.'**
+  String get analysisStyleDisclaimer;
+
   /// No description provided for @settingsAbout.
   ///
   /// In en, this message translates to:

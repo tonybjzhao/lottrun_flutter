@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../l10n/l10n.dart';
+import '../models/analysis_style.dart';
+import '../services/analysis_style_service.dart';
 import '../services/insight_service.dart';
 import '../services/locale_service.dart';
 
@@ -154,6 +156,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         setState(() {});
                         LocaleService.instance.setLanguageCode(code);
                       },
+                    ),
+                  ),
+                ),
+                const Divider(indent: 16, endIndent: 16),
+
+                // ── Analysis Style section ────────────────────────────
+                _SectionHeader(label: l10n.settingsAnalysisStyle, theme: theme),
+                ListTile(
+                  leading: _LeadingIcon(
+                    color: theme.colorScheme.primaryContainer,
+                    icon: Icons.analytics_outlined,
+                    iconColor: theme.colorScheme.primary,
+                  ),
+                  title: Text(l10n.settingsAnalysisStyle),
+                  subtitle: Text(l10n.settingsAnalysisStyleSubtitle),
+                  trailing: DropdownButtonHideUnderline(
+                    child: DropdownButton<AnalysisStyle>(
+                      value: AnalysisStyleService.instance.style,
+                      items: [
+                        DropdownMenuItem(
+                          value: AnalysisStyle.recentTrend,
+                          child: Text(l10n.analysisStyleRecentTrend),
+                        ),
+                        DropdownMenuItem(
+                          value: AnalysisStyle.balanced,
+                          child: Text(l10n.analysisStyleBalanced),
+                        ),
+                        DropdownMenuItem(
+                          value: AnalysisStyle.longTermPattern,
+                          child: Text(l10n.analysisStyleLongTermPattern),
+                        ),
+                      ],
+                      onChanged: (style) {
+                        if (style == null) return;
+                        setState(() {});
+                        AnalysisStyleService.instance.setStyle(style);
+                      },
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(72, 0, 16, 16),
+                  child: Text(
+                    l10n.analysisStyleDisclaimer,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withAlpha(140),
+                      fontStyle: FontStyle.italic,
                     ),
                   ),
                 ),
