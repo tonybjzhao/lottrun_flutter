@@ -133,4 +133,34 @@ final List<Lottery> kSeedLotteries = [
     bonusMax: 49,
     // bonusLabel: null → same-pool bonus number, shown as supplementary.
   ),
+
+  // ── Germany ───────────────────────────────────────────────────────────────
+  Lottery(
+    id: 'de_lotto_6aus49',
+    countryCode: 'DE',
+    countryName: _l10n.countryGermany,
+    name: _l10n.lotteryLotto6aus49,
+    mainCount: 6,
+    mainMin: 1,
+    mainMax: 49,
+    bonusCount: 1,
+    bonusMin: 0,
+    bonusMax: 9,
+    hasSeparateBonusPool: true,
+    bonusLabel: _l10n.bonusSuperzahl,
+  ),
+  Lottery(
+    id: 'de_eurojackpot',
+    countryCode: 'DE',
+    countryName: _l10n.countryGermany,
+    name: _l10n.lotteryEuroJackpot,
+    mainCount: 5,
+    mainMin: 1,
+    mainMax: 50,
+    bonusCount: 2,
+    bonusMin: 1,
+    bonusMax: 12,
+    hasSeparateBonusPool: true,
+    bonusLabel: _l10n.bonusEuroNumbers,
+  ),
 ];

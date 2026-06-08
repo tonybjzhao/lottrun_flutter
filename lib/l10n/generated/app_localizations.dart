@@ -226,6 +226,12 @@ abstract class AppLocalizations {
   /// **'Canada'**
   String get countryCanada;
 
+  /// No description provided for @countryGermany.
+  ///
+  /// In en, this message translates to:
+  /// **'Germany'**
+  String get countryGermany;
+
   /// No description provided for @countryOther.
   ///
   /// In en, this message translates to:
@@ -280,6 +286,18 @@ abstract class AppLocalizations {
   /// **'Lotto 6/49'**
   String get lotteryLotto649;
 
+  /// No description provided for @lotteryLotto6aus49.
+  ///
+  /// In en, this message translates to:
+  /// **'Lotto 6aus49'**
+  String get lotteryLotto6aus49;
+
+  /// No description provided for @lotteryEuroJackpot.
+  ///
+  /// In en, this message translates to:
+  /// **'EuroJackpot'**
+  String get lotteryEuroJackpot;
+
   /// No description provided for @bonusPowerball.
   ///
   /// In en, this message translates to:
@@ -297,6 +315,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lucky Stars'**
   String get bonusLuckyStars;
+
+  /// No description provided for @bonusSuperzahl.
+  ///
+  /// In en, this message translates to:
+  /// **'Superzahl'**
+  String get bonusSuperzahl;
+
+  /// No description provided for @bonusEuroNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Euro Numbers'**
+  String get bonusEuroNumbers;
 
   /// No description provided for @screenHistoryTitle.
   ///
