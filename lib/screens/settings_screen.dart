@@ -140,6 +140,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   theme: theme,
                 ),
                 ListTile(
+                  onTap: _pickNotificationTime,
                   leading: _LeadingIcon(
                     color: theme.colorScheme.primaryContainer,
                     icon: Icons.schedule_rounded,
@@ -151,9 +152,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _notifScheduleTime.format(context),
                     ),
                   ),
-                  trailing: TextButton(
+                  trailing: IconButton(
                     onPressed: _pickNotificationTime,
-                    child: Text(_notifScheduleTime.format(context)),
+                    tooltip: l10n.settingsNotificationTime,
+                    icon: const Icon(Icons.edit_calendar_rounded),
                   ),
                 ),
                 Padding(
