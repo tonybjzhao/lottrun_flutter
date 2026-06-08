@@ -1,8 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 
 import '../data/seed_lotteries.dart';
+import '../l10n/generated/app_localizations.dart';
 import '../models/lottery_draw.dart';
 import '../services/insight_service.dart';
+import '../services/locale_service.dart';
 import '../services/local_storage_service.dart';
 import '../services/lottery_history_csv_service.dart';
 import '../services/lottery_service.dart';
@@ -13,17 +17,25 @@ class ResultNotificationService {
   static final instance = ResultNotificationService._();
   ResultNotificationService._();
 
+  AppLocalizations get _l10n => lookupAppLocalizations(
+    LocaleService.instance.locale ?? const Locale('en'),
+  );
+
   /// Checks all saved picks for newly resolved results and fires a local
   /// notification if any pick transitioned from pending → result ready.
   /// Also fires daily insight and weekly summary notifications when enabled.
   /// Hard cap: max 2 notifications per day total.
   Future<void> checkAndNotify() async {
-    debugPrint('[ResultNotificationService] ═══ Starting notification check at ${DateTime.now()} ═══');
+    debugPrint(
+      '[ResultNotificationService] ═══ Starting notification check at ${DateTime.now()} ═══',
+    );
     try {
       await _checkResults();
       await _checkWeeklySummary();
       await _checkDailyInsight();
-      debugPrint('[ResultNotificationService] ═══ Notification check complete ═══');
+      debugPrint(
+        '[ResultNotificationService] ═══ Notification check complete ═══',
+      );
     } catch (e, stack) {
       debugPrint('[ResultNotificationService] ❌ ERROR: $e');
       debugPrint('[ResultNotificationService] Stack trace: $stack');
@@ -32,13 +44,19 @@ class ResultNotificationService {
 
   Future<void> _checkResults() async {
     debugPrint('[ResultNotificationService] Checking results...');
-    final resultsEnabled = await InsightService.instance
-        .getNotifPref(kNotifKeyResults);
-    final myPicksEnabled = await InsightService.instance
-        .getNotifPref(kNotifKeyMyPicks);
-    debugPrint('[ResultNotificationService] Results enabled: $resultsEnabled, My Picks enabled: $myPicksEnabled');
+    final resultsEnabled = await InsightService.instance.getNotifPref(
+      kNotifKeyResults,
+    );
+    final myPicksEnabled = await InsightService.instance.getNotifPref(
+      kNotifKeyMyPicks,
+    );
+    debugPrint(
+      '[ResultNotificationService] Results enabled: $resultsEnabled, My Picks enabled: $myPicksEnabled',
+    );
     if (!resultsEnabled || !myPicksEnabled) {
-      debugPrint('[ResultNotificationService] Result notifications disabled, skipping');
+      debugPrint(
+        '[ResultNotificationService] Result notifications disabled, skipping',
+      );
       return;
     }
 
@@ -51,24 +69,28 @@ class ResultNotificationService {
         .toSet();
 
     final drawsCache = <String, List<LotteryDraw>>{};
-    await Future.wait(uniqueIds.map((id) async {
-      final lottery = LotteryService.instance.getLotteryById(id);
-      if (lottery == null) return;
-      try {
-        final result =
-            await LotteryHistoryCsvService.instance.fetchDraws(lottery);
-        drawsCache[id] = result.draws;
-      } catch (_) {
-        drawsCache[id] = LotteryService.instance.getDraws(id);
-      }
-    }));
+    await Future.wait(
+      uniqueIds.map((id) async {
+        final lottery = LotteryService.instance.getLotteryById(id);
+        if (lottery == null) return;
+        try {
+          final result = await LotteryHistoryCsvService.instance.fetchDraws(
+            lottery,
+          );
+          drawsCache[id] = result.draws;
+        } catch (_) {
+          drawsCache[id] = LotteryService.instance.getDraws(id);
+        }
+      }),
+    );
 
     for (final pick in picks) {
       if (pick.hasNotifiedResultReady) continue;
       if (pick.drawDate == null) continue;
       final lottery = LotteryService.instance.getLotteryById(pick.lotteryId);
       if (lottery == null) continue;
-      final draws = drawsCache[pick.lotteryId] ??
+      final draws =
+          drawsCache[pick.lotteryId] ??
           LotteryService.instance.getDraws(pick.lotteryId);
       final result = checkPickResult(pick, lottery, draws);
       if (result != null && !result.isPending) {
@@ -76,44 +98,64 @@ class ResultNotificationService {
       }
     }
 
-    debugPrint('[ResultNotificationService] Found ${newlyResolved.length} newly resolved picks');
+    debugPrint(
+      '[ResultNotificationService] Found ${newlyResolved.length} newly resolved picks',
+    );
     if (newlyResolved.isEmpty) {
-      debugPrint('[ResultNotificationService] No newly resolved picks, skipping notification');
+      debugPrint(
+        '[ResultNotificationService] No newly resolved picks, skipping notification',
+      );
       return;
     }
     final canSend = await InsightService.instance.canSendNotification();
-    debugPrint('[ResultNotificationService] Can send notification (daily cap check): $canSend');
+    debugPrint(
+      '[ResultNotificationService] Can send notification (daily cap check): $canSend',
+    );
     if (!canSend) {
-      debugPrint('[ResultNotificationService] Daily notification cap reached, skipping');
+      debugPrint(
+        '[ResultNotificationService] Daily notification cap reached, skipping',
+      );
       return;
     }
 
-    await LocalStorageService.instance
-        .markPicksNotified(newlyResolved.toSet());
+    await LocalStorageService.instance.markPicksNotified(newlyResolved.toSet());
     await NotificationService.instance.showResultReady(newlyResolved.length);
     await InsightService.instance.recordNotificationSent();
-    debugPrint('[ResultNotificationService] ✓ Result notification sent for ${newlyResolved.length} picks');
+    debugPrint(
+      '[ResultNotificationService] ✓ Result notification sent for ${newlyResolved.length} picks',
+    );
   }
 
   Future<void> _checkWeeklySummary() async {
     debugPrint('[ResultNotificationService] Checking weekly summary...');
-    final enabled = await InsightService.instance
-        .getNotifPref(kNotifKeyWeeklySummary);
+    final enabled = await InsightService.instance.getNotifPref(
+      kNotifKeyWeeklySummary,
+    );
     debugPrint('[ResultNotificationService] Weekly summary enabled: $enabled');
     if (!enabled) {
-      debugPrint('[ResultNotificationService] Weekly summary disabled, skipping');
+      debugPrint(
+        '[ResultNotificationService] Weekly summary disabled, skipping',
+      );
       return;
     }
     final shouldSend = await InsightService.instance.shouldSendWeeklySummary();
-    debugPrint('[ResultNotificationService] Should send weekly (timing check): $shouldSend');
+    debugPrint(
+      '[ResultNotificationService] Should send weekly (timing check): $shouldSend',
+    );
     if (!shouldSend) {
-      debugPrint('[ResultNotificationService] Not Sunday or already sent this week, skipping');
+      debugPrint(
+        '[ResultNotificationService] Not Sunday or already sent this week, skipping',
+      );
       return;
     }
     final canSend = await InsightService.instance.canSendNotification();
-    debugPrint('[ResultNotificationService] Can send notification (daily cap check): $canSend');
+    debugPrint(
+      '[ResultNotificationService] Can send notification (daily cap check): $canSend',
+    );
     if (!canSend) {
-      debugPrint('[ResultNotificationService] Daily notification cap reached, skipping');
+      debugPrint(
+        '[ResultNotificationService] Daily notification cap reached, skipping',
+      );
       return;
     }
 
@@ -122,28 +164,41 @@ class ResultNotificationService {
     final lottery = kSeedLotteries.first;
     final draws = LotteryService.instance.getDraws(lottery.id);
 
-    final body = InsightService.instance
-        .weeklySummaryBody(lottery: lottery, draws: draws);
+    final body = InsightService.instance.weeklySummaryBody(
+      lottery: lottery,
+      draws: draws,
+      l10n: _l10n,
+    );
 
     await NotificationService.instance.showWeeklySummary(body);
     await InsightService.instance.recordNotificationSent();
     await InsightService.instance.recordWeeklySummarySent();
-    debugPrint('[ResultNotificationService] ✓ Weekly summary notification sent');
+    debugPrint(
+      '[ResultNotificationService] ✓ Weekly summary notification sent',
+    );
   }
 
   Future<void> _checkDailyInsight() async {
     debugPrint('[ResultNotificationService] Checking daily insight...');
-    final enabled = await InsightService.instance
-        .getNotifPref(kNotifKeyDailyInsight, defaultValue: false);
+    final enabled = await InsightService.instance.getNotifPref(
+      kNotifKeyDailyInsight,
+      defaultValue: false,
+    );
     debugPrint('[ResultNotificationService] Daily insight enabled: $enabled');
     if (!enabled) {
-      debugPrint('[ResultNotificationService] Daily insight disabled, skipping');
+      debugPrint(
+        '[ResultNotificationService] Daily insight disabled, skipping',
+      );
       return;
     }
     final canSend = await InsightService.instance.canSendNotification();
-    debugPrint('[ResultNotificationService] Can send notification (daily cap check): $canSend');
+    debugPrint(
+      '[ResultNotificationService] Can send notification (daily cap check): $canSend',
+    );
     if (!canSend) {
-      debugPrint('[ResultNotificationService] Daily notification cap reached, skipping');
+      debugPrint(
+        '[ResultNotificationService] Daily notification cap reached, skipping',
+      );
       return;
     }
 
@@ -151,8 +206,11 @@ class ResultNotificationService {
     final lottery = kSeedLotteries.first;
     final draws = LotteryService.instance.getDraws(lottery.id);
 
-    final body = await InsightService.instance
-        .getDailyInsight(lottery: lottery, draws: draws);
+    final body = await InsightService.instance.getDailyInsight(
+      lottery: lottery,
+      draws: draws,
+      l10n: _l10n,
+    );
 
     await NotificationService.instance.showDailyInsight(body);
     await InsightService.instance.recordNotificationSent();
