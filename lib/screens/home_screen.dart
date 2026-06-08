@@ -1163,17 +1163,18 @@ class _LuckBar extends StatelessWidget {
             ? '⏳ $countdown'
             : null;
 
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '📊 Historical similarity (for reference only): $_luckPct / 100',
+          '📊 Historical similarity (reference only): $_luckPct / 100',
           style: theme.textTheme.labelMedium?.copyWith(
             color: theme.colorScheme.primary,
             fontWeight: FontWeight.w700,
           ),
         ),
         if (right != null) ...[
-          const Spacer(),
+          const SizedBox(height: 4),
           Text(
             right,
             style: theme.textTheme.labelSmall?.copyWith(
