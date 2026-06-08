@@ -1,8 +1,9 @@
+import '../l10n/generated/app_localizations.dart';
 import '../l10n/generated/app_localizations_en.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 
-final _l10n = AppLocalizationsEn();
+final _l10nFallback = AppLocalizationsEn();
 
 // ── Output models ─────────────────────────────────────────────────────────────
 
@@ -113,7 +114,9 @@ class DrawAnalysisService {
     required Lottery lottery,
     required List<LotteryDraw> draws,
     required int drawCount,
+    AppLocalizations? l10n,
   }) {
+    final localizations = l10n ?? _l10nFallback;
     final recent = draws.take(drawCount).toList();
     if (recent.isEmpty) {
       return RecentDrawTrends(
@@ -126,7 +129,7 @@ class DrawAnalysisService {
         avgConsecutivePairs: 0,
         mostCommonConsecutiveCount: 0,
         trendStrength: TrendStrength.random,
-        summary: _l10n.drawAnalysisNotEnough,
+        summary: localizations.drawAnalysisNotEnough,
       );
     }
 
@@ -143,11 +146,12 @@ class DrawAnalysisService {
             .fold(0, (s, v) => s + v) /
         recent.length;
 
-    final oddEvenPattern = _mostCommonOddEven(recent);
+    final oddEvenPattern = _mostCommonOddEven(recent, localizations);
     final lowHighPattern = _mostCommonLowHigh(
       recent,
       lottery.mainMin,
       lottery.mainMax,
+      localizations,
     );
 
     final consecutiveCounts = recent
@@ -164,6 +168,7 @@ class DrawAnalysisService {
       topFrequent,
       lottery.mainMin,
       lottery.mainMax,
+      localizations,
     );
 
     return RecentDrawTrends(
@@ -186,7 +191,9 @@ class DrawAnalysisService {
     required List<List<int>> savedMainNumbers,
     required List<LotteryDraw> recentDraws,
     int compareDrawCount = 20,
+    AppLocalizations? l10n,
   }) {
+    final localizations = l10n ?? _l10nFallback;
     final draws = recentDraws.take(compareDrawCount).toList();
 
     if (savedMainNumbers.isEmpty || draws.isEmpty) {
@@ -196,7 +203,7 @@ class DrawAnalysisService {
         averageMatchCount: 0,
         frequentlyPickedNumbers: [],
         recentlyAppearedNumbers: [],
-        summary: _l10n.drawAnalysisNoSavedPicks,
+        summary: localizations.drawAnalysisNoSavedPicks,
       );
     }
 
@@ -235,7 +242,7 @@ class DrawAnalysisService {
     final recentlyAppeared =
         allSavedNumbers.intersection(recentDrawNumbers).toList()..sort();
 
-    final summary = _savedPicksSummary(avgMatch, recentlyAppeared.length);
+    final summary = _savedPicksSummary(avgMatch, recentlyAppeared.length, localizations);
 
     return SavedPicksAnalysis(
       bestMatchDrawDate: bestDate,
@@ -257,7 +264,9 @@ class DrawAnalysisService {
     required LotteryDraw targetDraw,
     required List<LotteryDraw> allDraws,
     int similarDrawsLimit = 3,
+    AppLocalizations? l10n,
   }) {
+    final localizations = l10n ?? _l10nFallback;
     final cutoff = targetDraw.drawDate.subtract(const Duration(days: 365 * 5));
     final history =
         allDraws
@@ -317,7 +326,7 @@ class DrawAnalysisService {
     final historicalSums =
         history.map((d) => d.mainNumbers.fold(0, (s, n) => s + n)).toList()
           ..sort();
-    final sumLabel = _sumRangeLabel(currentSum, historicalSums);
+    final sumLabel = _sumRangeLabel(currentSum, historicalSums, localizations);
 
     final similar = _findSimilarDraws(
       targetDraw,
@@ -326,7 +335,7 @@ class DrawAnalysisService {
       similarDrawsLimit,
     );
 
-    final summary = _historicalSummary(finalScore);
+    final summary = _historicalSummary(finalScore, localizations);
 
     return HistoricalPatternMatch(
       historicalMatchScore: finalScore,
@@ -339,8 +348,8 @@ class DrawAnalysisService {
       hotNumberCount: hotCount,
       coldNumberCount: coldCount,
       recentTrendMatchScore: trend.round().clamp(0, 100),
-      oddEvenPattern: '$oddCount odd / $evenCount even',
-      lowHighPattern: '$lowCount low / $highCount high',
+      oddEvenPattern: '$oddCount${localizations.odd} / $evenCount${localizations.even}',
+      lowHighPattern: '$lowCount${localizations.low} / $highCount${localizations.high}',
       sumRangeLabel: sumLabel,
       consecutiveNumberCount: consecCount,
       similarPastDraws: similar,
@@ -378,33 +387,36 @@ class DrawAnalysisService {
     return freq.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
   }
 
-  static String _mostCommonOddEven(List<LotteryDraw> draws) {
-    final freq = <String, int>{};
+  static String _mostCommonOddEven(List<LotteryDraw> draws, AppLocalizations l10n) {
+    final freq = <(int, int), int>{};
     for (final d in draws) {
       final odd = d.mainNumbers.where((n) => n.isOdd).length;
       final even = d.mainNumbers.length - odd;
-      final key = '$odd odd / $even even';
+      final key = (odd, even);
       freq[key] = (freq[key] ?? 0) + 1;
     }
     if (freq.isEmpty) return '—';
-    return freq.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
+    final mostCommon = freq.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
+    return '${mostCommon.$1}${l10n.odd} / ${mostCommon.$2}${l10n.even}';
   }
 
   static String _mostCommonLowHigh(
     List<LotteryDraw> draws,
     int minVal,
     int maxVal,
+    AppLocalizations l10n,
   ) {
     final midpoint = (minVal + maxVal) / 2;
-    final freq = <String, int>{};
+    final freq = <(int, int), int>{};
     for (final d in draws) {
       final low = d.mainNumbers.where((n) => n <= midpoint).length;
       final high = d.mainNumbers.length - low;
-      final key = '$low low / $high high';
+      final key = (low, high);
       freq[key] = (freq[key] ?? 0) + 1;
     }
     if (freq.isEmpty) return '—';
-    return freq.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
+    final mostCommon = freq.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
+    return '${mostCommon.$1}${l10n.low} / ${mostCommon.$2}${l10n.high}';
   }
 
   static TrendStrength _trendStrength(
@@ -560,13 +572,13 @@ class DrawAnalysisService {
     return 40;
   }
 
-  static String _sumRangeLabel(int sum, List<int> sortedSums) {
-    if (sortedSums.isEmpty) return _l10n.unknown;
+  static String _sumRangeLabel(int sum, List<int> sortedSums, AppLocalizations l10n) {
+    if (sortedSums.isEmpty) return l10n.unknown;
     final p25 = sortedSums[((sortedSums.length - 1) * 0.25).round()];
     final p75 = sortedSums[((sortedSums.length - 1) * 0.75).round()];
-    if (sum < p25) return _l10n.belowTypicalRange;
-    if (sum > p75) return _l10n.aboveTypicalRange;
-    return _l10n.withinTypicalRange;
+    if (sum < p25) return l10n.belowTypicalRange;
+    if (sum > p75) return l10n.aboveTypicalRange;
+    return l10n.withinTypicalRange;
   }
 
   static List<SimilarDraw> _findSimilarDraws(
@@ -622,6 +634,7 @@ class DrawAnalysisService {
     List<int> topNums,
     int minVal,
     int maxVal,
+    AppLocalizations l10n,
   ) {
     final topInMid = topNums
         .where(
@@ -633,34 +646,34 @@ class DrawAnalysisService {
 
     switch (strength) {
       case TrendStrength.strong:
-        return _l10n.recentDrawsConcentrated;
+        return l10n.recentDrawsConcentrated;
       case TrendStrength.balanced:
         if (topInMid >= 3) {
-          return _l10n.periodMidRangeActive;
+          return l10n.periodMidRangeActive;
         }
-        return _l10n.recentDrawsModerateSpread;
+        return l10n.recentDrawsModerateSpread;
       case TrendStrength.random:
-        return _l10n.recentDrawsNoStrongPattern;
+        return l10n.recentDrawsNoStrongPattern;
     }
   }
 
-  static String _savedPicksSummary(double avgMatch, int recentlyAppearedCount) {
+  static String _savedPicksSummary(double avgMatch, int recentlyAppearedCount, AppLocalizations l10n) {
     if (avgMatch >= 2.5) {
-      return _l10n.savedPicksModerate;
+      return l10n.savedPicksModerate;
     }
     if (recentlyAppearedCount >= 3) {
-      return _l10n.savedNumbersAppeared;
+      return l10n.savedNumbersAppeared;
     }
-    return _l10n.savedPicksLimited;
+    return l10n.savedPicksLimited;
   }
 
-  static String _historicalSummary(int score) {
+  static String _historicalSummary(int score, AppLocalizations l10n) {
     if (score >= 70) {
-      return _l10n.drawStrongHistoricalComparison;
+      return l10n.drawStrongHistoricalComparison;
     }
     if (score >= 45) {
-      return _l10n.drawModerateHistoricalComparison;
+      return l10n.drawModerateHistoricalComparison;
     }
-    return _l10n.drawLimitedHistoricalComparison;
+    return l10n.drawLimitedHistoricalComparison;
   }
 }

@@ -632,6 +632,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get patternRandomLike => 'Proche du hasard';
 
   @override
+  String get odd => 'impair';
+
+  @override
+  String get even => 'pair';
+
+  @override
+  String get low => 'faible';
+
+  @override
+  String get high => 'élevé';
+
+  @override
   String get dailyInsightTitle => 'Aperçu du jour';
 
   @override

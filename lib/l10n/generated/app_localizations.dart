@@ -1154,6 +1154,30 @@ abstract class AppLocalizations {
   /// **'Random-like'**
   String get patternRandomLike;
 
+  /// No description provided for @odd.
+  ///
+  /// In en, this message translates to:
+  /// **'odd'**
+  String get odd;
+
+  /// No description provided for @even.
+  ///
+  /// In en, this message translates to:
+  /// **'even'**
+  String get even;
+
+  /// No description provided for @low.
+  ///
+  /// In en, this message translates to:
+  /// **'low'**
+  String get low;
+
+  /// No description provided for @high.
+  ///
+  /// In en, this message translates to:
+  /// **'high'**
+  String get high;
+
   /// No description provided for @dailyInsightTitle.
   ///
   /// In en, this message translates to:

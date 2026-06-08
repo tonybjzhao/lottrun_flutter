@@ -23,17 +23,18 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
   int _drawCount = 20;
   static const _options = [10, 20, 50];
 
-  RecentDrawTrends get _trends => DrawAnalysisService.analyzeRecentTrends(
+  RecentDrawTrends _trends(BuildContext context) => DrawAnalysisService.analyzeRecentTrends(
     lottery: widget.lottery,
     draws: widget.draws,
     drawCount: _drawCount,
+    l10n: context.l10n,
   );
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = context.l10n;
-    final trends = _trends;
+    final trends = _trends(context);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
@@ -349,7 +350,7 @@ class _StatChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(10),
@@ -363,15 +364,20 @@ class _StatChip extends StatelessWidget {
                 color: theme.colorScheme.onSurface.withAlpha(120),
                 fontSize: 10,
               ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              value,
-              style: theme.textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 2),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+                maxLines: 1,
+              ),
             ),
           ],
         ),

@@ -635,6 +635,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get patternRandomLike => 'Random-like';
 
   @override
+  String get odd => 'odd';
+
+  @override
+  String get even => 'even';
+
+  @override
+  String get low => 'low';
+
+  @override
+  String get high => 'high';
+
+  @override
   String get dailyInsightTitle => 'Today\'s Insight';
 
   @override

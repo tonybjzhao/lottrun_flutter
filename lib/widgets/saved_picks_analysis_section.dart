@@ -15,7 +15,7 @@ class SavedPicksAnalysisSection extends StatelessWidget {
     required this.drawsByLottery,
   });
 
-  SavedPicksAnalysis _compute() {
+  SavedPicksAnalysis _compute(BuildContext context) {
     final lotteryFreq = <String, int>{};
     for (final p in picks) {
       lotteryFreq[p.lotteryId] = (lotteryFreq[p.lotteryId] ?? 0) + 1;
@@ -24,6 +24,7 @@ class SavedPicksAnalysisSection extends StatelessWidget {
       return DrawAnalysisService.analyzeSavedPicks(
         savedMainNumbers: [],
         recentDraws: [],
+        l10n: context.l10n,
       );
     }
     final dominantId = lotteryFreq.entries
@@ -43,6 +44,7 @@ class SavedPicksAnalysisSection extends StatelessWidget {
           ? filteredMains
           : allMainNumbers,
       recentDraws: recentDraws,
+      l10n: context.l10n,
     );
   }
 
@@ -50,7 +52,7 @@ class SavedPicksAnalysisSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = context.l10n;
-    final analysis = _compute();
+    final analysis = _compute(context);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),

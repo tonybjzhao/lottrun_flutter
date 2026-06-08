@@ -27,6 +27,7 @@ class HistoricalPatternMatchCard extends StatelessWidget {
       targetDraw: targetDraw,
       allDraws: allDraws,
       similarDrawsLimit: 10,
+      l10n: l10n,
     );
 
     if (result == null) {
@@ -346,11 +347,15 @@ class _InfoChip extends StatelessWidget {
             ),
             const SizedBox(width: 4),
           ],
-          Text(
-            label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurface.withAlpha(180),
-              fontWeight: FontWeight.w600,
+          Flexible(
+            child: Text(
+              label,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurface.withAlpha(180),
+                fontWeight: FontWeight.w600,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

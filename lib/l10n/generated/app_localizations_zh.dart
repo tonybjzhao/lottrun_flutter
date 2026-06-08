@@ -594,6 +594,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get patternRandomLike => '类似随机';
 
   @override
+  String get odd => '奇';
+
+  @override
+  String get even => '偶';
+
+  @override
+  String get low => '低';
+
+  @override
+  String get high => '高';
+
+  @override
   String get dailyInsightTitle => '今日洞察';
 
   @override
