@@ -102,7 +102,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get lotteryLotto649 => 'Lotto 6/49';
 
   @override
-  String get lotteryLotto6aus49 => '德国 Lotto 6aus49';
+  String get lotteryLotto6aus49 => 'Lotto 6aus49';
 
   @override
   String get lotteryEuroJackpot => 'EuroJackpot';
