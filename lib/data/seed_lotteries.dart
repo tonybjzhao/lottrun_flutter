@@ -13,6 +13,7 @@ const List<Lottery> kSeedLotteries = [
     bonusCount: 1,
     bonusMin: 1,
     bonusMax: 20,
+    hasSeparateBonusPool: true,
     bonusLabel: 'Powerball',
   ),
   Lottery(
@@ -54,6 +55,7 @@ const List<Lottery> kSeedLotteries = [
     bonusCount: 1,
     bonusMin: 1,
     bonusMax: 26,
+    hasSeparateBonusPool: true,
     bonusLabel: 'Powerball',
   ),
   Lottery(
@@ -67,6 +69,65 @@ const List<Lottery> kSeedLotteries = [
     bonusCount: 1,
     bonusMin: 1,
     bonusMax: 25,
+    hasSeparateBonusPool: true,
     bonusLabel: 'Mega Ball',
+  ),
+
+  // ── United Kingdom ────────────────────────────────────────────────────────
+  Lottery(
+    id: 'uk_lotto',
+    countryCode: 'GB',
+    countryName: 'United Kingdom',
+    name: 'UK Lotto',
+    mainCount: 6,
+    mainMin: 1,
+    mainMax: 59,
+    bonusCount: 1,
+    bonusMin: 1,
+    bonusMax: 59,
+    drawRoundsPerTicket: 2,
+    // bonusLabel: null → same-pool bonus ball, shown as supplementary.
+  ),
+  Lottery(
+    id: 'uk_euromillions',
+    countryCode: 'GB',
+    countryName: 'United Kingdom',
+    name: 'EuroMillions',
+    mainCount: 5,
+    mainMin: 1,
+    mainMax: 50,
+    bonusCount: 2,
+    bonusMin: 1,
+    bonusMax: 12,
+    hasSeparateBonusPool: true,
+    bonusLabel: 'Lucky Stars',
+  ),
+
+  // ── Canada ────────────────────────────────────────────────────────────────
+  Lottery(
+    id: 'ca_lotto_max',
+    countryCode: 'CA',
+    countryName: 'Canada',
+    name: 'Lotto Max',
+    mainCount: 7,
+    mainMin: 1,
+    mainMax: 52,
+    bonusCount: 1,
+    bonusMin: 1,
+    bonusMax: 52,
+    // bonusLabel: null → same-pool bonus number, shown as supplementary.
+  ),
+  Lottery(
+    id: 'ca_lotto_649',
+    countryCode: 'CA',
+    countryName: 'Canada',
+    name: 'Lotto 6/49',
+    mainCount: 6,
+    mainMin: 1,
+    mainMax: 49,
+    bonusCount: 1,
+    bonusMin: 1,
+    bonusMax: 49,
+    // bonusLabel: null → same-pool bonus number, shown as supplementary.
   ),
 ];

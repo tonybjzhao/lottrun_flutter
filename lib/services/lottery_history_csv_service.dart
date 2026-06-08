@@ -24,6 +24,13 @@ class LotteryHistoryCsvService {
         'https://tonybjzhao.github.io/lottrun_flutter/us_powerball.csv',
     'us_megamillions':
         'https://tonybjzhao.github.io/lottrun_flutter/us_megamillions.csv',
+    'uk_lotto': 'https://tonybjzhao.github.io/lottrun_flutter/uk_lotto.csv',
+    'uk_euromillions':
+        'https://tonybjzhao.github.io/lottrun_flutter/uk_euromillions.csv',
+    'ca_lotto_max':
+        'https://tonybjzhao.github.io/lottrun_flutter/ca_lotto_max.csv',
+    'ca_lotto_649':
+        'https://tonybjzhao.github.io/lottrun_flutter/ca_lotto_649.csv',
   };
 
   static const Map<String, String> _cacheKeys = {
@@ -32,11 +39,23 @@ class LotteryHistoryCsvService {
     'au_saturday': 'cache_saturday_lotto_csv',
     'us_powerball': 'cache_us_powerball_csv',
     'us_megamillions': 'cache_us_megamillions_csv',
+    'uk_lotto': 'cache_uk_lotto_csv',
+    'uk_euromillions': 'cache_uk_euromillions_csv',
+    'ca_lotto_max': 'cache_ca_lotto_max_csv',
+    'ca_lotto_649': 'cache_ca_lotto_649_csv',
   };
 
   Future<LotteryHistoryResult> fetchDraws(Lottery lottery) async {
     final baseUrl = _csvUrls[lottery.id];
     if (baseUrl == null) {
+      final seedDraws = LotteryService.instance.getDraws(lottery.id);
+      if (seedDraws.isNotEmpty) {
+        return LotteryHistoryResult(
+          draws: seedDraws,
+          source: LotteryHistorySource.seed,
+          loadedAt: null,
+        );
+      }
       throw Exception('No remote CSV configured for ${lottery.name}.');
     }
 
@@ -47,9 +66,7 @@ class LotteryHistoryCsvService {
       final uri = Uri.parse(
         '$baseUrl?v=${DateTime.now().millisecondsSinceEpoch}',
       );
-      final response = await http
-          .get(uri)
-          .timeout(const Duration(seconds: 12));
+      final response = await http.get(uri).timeout(const Duration(seconds: 12));
       if (response.statusCode != 200) {
         throw Exception('Failed to load history CSV (${response.statusCode}).');
       }
@@ -80,7 +97,9 @@ class LotteryHistoryCsvService {
           return LotteryHistoryResult(
             draws: draws,
             source: LotteryHistorySource.cache,
-            loadedAt: loadedAtText == null ? null : DateTime.tryParse(loadedAtText),
+            loadedAt: loadedAtText == null
+                ? null
+                : DateTime.tryParse(loadedAtText),
           );
         } catch (_) {
           // cached CSV corrupt — fall through to seed data
@@ -97,7 +116,9 @@ class LotteryHistoryCsvService {
         );
       }
 
-      throw Exception('No internet connection and no saved lottery history yet.');
+      throw Exception(
+        'No internet connection and no saved lottery history yet.',
+      );
     }
   }
 
@@ -112,19 +133,32 @@ class LotteryHistoryCsvService {
     }
 
     try {
+      final header = rows.first.map((cell) => cell.toString().trim()).toList();
+      final roundIndex = header.indexWhere(
+        (cell) => cell.toLowerCase() == 'round',
+      );
+      final firstMainIndex = roundIndex >= 0 ? roundIndex + 1 : 3;
       final seen = <String>{};
-      final draws = rows
-          .skip(1)
-          .where((row) => row.length >= 3)
-          .map((row) => _rowToDraw(row, lottery))
-          .whereType<LotteryDraw>()
-          .where((draw) {
-            final key =
-                '${draw.drawDate.toIso8601String()}-${draw.mainNumbers.join(',')}-${(draw.bonusNumbers ?? []).join(',')}';
-            return seen.add(key);
-          })
-          .toList()
-        ..sort((a, b) => b.drawDate.compareTo(a.drawDate));
+      final draws =
+          rows
+              .skip(1)
+              .where((row) => row.length >= 3)
+              .map(
+                (row) => _rowToDraw(
+                  row,
+                  lottery,
+                  firstMainIndex: firstMainIndex,
+                  roundIndex: roundIndex,
+                ),
+              )
+              .whereType<LotteryDraw>()
+              .where((draw) {
+                final key =
+                    '${draw.drawDate.toIso8601String()}-${draw.mainNumbers.join(',')}-${(draw.bonusNumbers ?? []).join(',')}';
+                return seen.add(key);
+              })
+              .toList()
+            ..sort((a, b) => b.drawDate.compareTo(a.drawDate));
 
       if (draws.isEmpty) {
         throw Exception('No valid draw rows found in CSV.');
@@ -136,16 +170,25 @@ class LotteryHistoryCsvService {
     }
   }
 
-  LotteryDraw? _rowToDraw(List<dynamic> row, Lottery lottery) {
+  LotteryDraw? _rowToDraw(
+    List<dynamic> row,
+    Lottery lottery, {
+    required int firstMainIndex,
+    required int roundIndex,
+  }) {
     final drawDateText = row[1]?.toString().trim() ?? '';
     if (drawDateText.isEmpty) return null;
 
     final drawDate = DateTime.tryParse(drawDateText);
     if (drawDate == null) return null;
 
+    final drawRound = roundIndex >= 0 && roundIndex < row.length
+        ? int.tryParse(row[roundIndex]?.toString().trim() ?? '') ?? 1
+        : 1;
+
     final mainNumbers = <int>[];
     for (var i = 0; i < lottery.mainCount; i++) {
-      final index = 3 + i;
+      final index = firstMainIndex + i;
       if (index >= row.length) break;
       final value = row[index]?.toString().trim() ?? '';
       if (value.isEmpty) continue;
@@ -156,7 +199,7 @@ class LotteryHistoryCsvService {
     final bonusNumbers = <int>[];
     final bonusCount = lottery.bonusCount ?? 0;
     for (var i = 0; i < bonusCount; i++) {
-      final index = 3 + lottery.mainCount + i;
+      final index = firstMainIndex + lottery.mainCount + i;
       if (index >= row.length) break;
       final value = row[index]?.toString().trim() ?? '';
       if (value.isEmpty) continue;
@@ -173,6 +216,7 @@ class LotteryHistoryCsvService {
       drawDate: drawDate,
       mainNumbers: mainNumbers,
       bonusNumbers: bonusNumbers.isEmpty ? null : bonusNumbers,
+      drawRound: drawRound,
     );
   }
 }

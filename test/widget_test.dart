@@ -9,11 +9,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lottfun_flutter/app.dart';
 
 void main() {
-  testWidgets('App smoke test — LottFun renders home screen',
-      (WidgetTester tester) async {
+  testWidgets('App smoke test — LottFun renders home screen', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const LottFunApp());
     await tester.pumpAndSettle();
     expect(find.text('LottFun'), findsNothing); // RichText, not plain Text
-    expect(find.text('Generate Numbers'), findsOneWidget);
+    expect(find.text('Generate 1 Pick'), findsOneWidget);
   });
 }

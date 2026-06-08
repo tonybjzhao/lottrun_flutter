@@ -2,8 +2,10 @@ import '../data/seed_lotteries.dart';
 import '../data/seed_oz_lotto.dart';
 import '../data/seed_powerball.dart';
 import '../data/seed_saturday_lotto.dart';
+import '../data/seed_uk_lotteries.dart';
 import '../data/seed_us_megamillions.dart';
 import '../data/seed_us_powerball.dart';
+import '../data/seed_canada_lotteries.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 
@@ -35,6 +37,14 @@ class LotteryService {
         return kUsPowerballDraws;
       case 'us_megamillions':
         return kUsMegaMillionsDraws;
+      case 'uk_lotto':
+        return kUkLottoDraws;
+      case 'uk_euromillions':
+        return kUkEuroMillionsDraws;
+      case 'ca_lotto_max':
+        return kCaLottoMaxDraws;
+      case 'ca_lotto_649':
+        return kCaLotto649Draws;
       default:
         return [];
     }

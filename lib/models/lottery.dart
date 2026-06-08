@@ -9,6 +9,8 @@ class Lottery {
   final int? bonusCount;
   final int? bonusMin;
   final int? bonusMax;
+  final bool hasSeparateBonusPool;
+  final int drawRoundsPerTicket;
 
   /// Inline label shown before bonus balls (e.g. "Powerball", "Mega Ball").
   /// null = supplementary style (shown on second row, labeled "Supp").
@@ -25,6 +27,8 @@ class Lottery {
     this.bonusCount,
     this.bonusMin,
     this.bonusMax,
+    this.hasSeparateBonusPool = false,
+    this.drawRoundsPerTicket = 1,
     this.bonusLabel,
   });
 

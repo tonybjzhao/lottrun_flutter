@@ -1,0 +1,60 @@
+[
+  {
+    "countryCode": "GB",
+    "countryName": "United Kingdom",
+    "games": [
+      {
+        "gameId": "uk_lotto",
+        "displayName": "UK Lotto",
+        "mainCount": 6,
+        "mainMin": 1,
+        "mainMax": 59,
+        "bonusCount": 1,
+        "bonusMin": 1,
+        "bonusMax": 59,
+        "hasSeparateBonusPool": false,
+        "drawRoundsPerTicket": 2
+      },
+      {
+        "gameId": "uk_euromillions",
+        "displayName": "EuroMillions",
+        "mainCount": 5,
+        "mainMin": 1,
+        "mainMax": 50,
+        "bonusCount": 2,
+        "bonusMin": 1,
+        "bonusMax": 12,
+        "bonusLabel": "Lucky Stars",
+        "hasSeparateBonusPool": true
+      }
+    ]
+  },
+  {
+    "countryCode": "CA",
+    "countryName": "Canada",
+    "games": [
+      {
+        "gameId": "ca_lotto_max",
+        "displayName": "Lotto Max",
+        "mainCount": 7,
+        "mainMin": 1,
+        "mainMax": 52,
+        "bonusCount": 1,
+        "bonusMin": 1,
+        "bonusMax": 52,
+        "hasSeparateBonusPool": false
+      },
+      {
+        "gameId": "ca_lotto_649",
+        "displayName": "Lotto 6/49",
+        "mainCount": 6,
+        "mainMin": 1,
+        "mainMax": 49,
+        "bonusCount": 1,
+        "bonusMin": 1,
+        "bonusMax": 49,
+        "hasSeparateBonusPool": false
+      }
+    ]
+  }
+]

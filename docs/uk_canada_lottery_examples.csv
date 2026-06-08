@@ -1,0 +1,6 @@
+game_id,country_code,draw_date,draw_number,round,main_1,main_2,main_3,main_4,main_5,main_6,main_7,bonus_1,bonus_2
+uk_lotto,GB,2026-06-10,example,1,1,2,3,4,5,6,,7,
+uk_lotto,GB,2026-06-10,example,2,8,9,10,11,12,13,,14,
+uk_euromillions,GB,2026-06-09,example,1,1,2,3,4,5,,,6,7
+ca_lotto_max,CA,2026-06-09,example,1,1,2,3,4,5,6,7,8,
+ca_lotto_649,CA,2026-06-10,example,1,1,2,3,4,5,6,,7,

@@ -17,16 +17,16 @@ import '../widgets/saved_picks_analysis_section.dart';
 // Country helpers ──────────────────────────────────────────────────────────────
 
 String _countryFlag(String code) => switch (code) {
-      'US' => '🇺🇸',
-      'AU' => '🇦🇺',
-      _ => '🌍',
-    };
+  'US' => '🇺🇸',
+  'AU' => '🇦🇺',
+  _ => '🌍',
+};
 
 String _countryName(String code) => switch (code) {
-      'US' => 'United States',
-      'AU' => 'Australia',
-      _ => 'Other',
-    };
+  'US' => 'United States',
+  'AU' => 'Australia',
+  _ => 'Other',
+};
 
 const _countryOrder = ['US', 'AU', 'OTHER'];
 
@@ -81,16 +81,20 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
 
     final uniqueIds = picks.map((p) => p.lotteryId).toSet();
     final drawsMap = <String, List<LotteryDraw>>{};
-    await Future.wait(uniqueIds.map((id) async {
-      final lottery = LotteryService.instance.getLotteryById(id);
-      if (lottery == null) return;
-      try {
-        final result = await LotteryHistoryCsvService.instance.fetchDraws(lottery);
-        drawsMap[id] = result.draws;
-      } catch (_) {
-        drawsMap[id] = LotteryService.instance.getDraws(id);
-      }
-    }));
+    await Future.wait(
+      uniqueIds.map((id) async {
+        final lottery = LotteryService.instance.getLotteryById(id);
+        if (lottery == null) return;
+        try {
+          final result = await LotteryHistoryCsvService.instance.fetchDraws(
+            lottery,
+          );
+          drawsMap[id] = result.draws;
+        } catch (_) {
+          drawsMap[id] = LotteryService.instance.getDraws(id);
+        }
+      }),
+    );
 
     if (mounted) {
       setState(() {
@@ -106,7 +110,10 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
     setState(() => _picks.removeWhere((p) => p.id == pick.id));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pick deleted'), duration: Duration(seconds: 2)),
+        const SnackBar(
+          content: Text('Pick deleted'),
+          duration: Duration(seconds: 2),
+        ),
       );
     }
   }
@@ -166,33 +173,37 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
           if (_picks.isNotEmpty)
             TextButton(
               onPressed: _clearAll,
-              child: Text('Clear all',
-                  style: TextStyle(color: theme.colorScheme.error)),
+              child: Text(
+                'Clear all',
+                style: TextStyle(color: theme.colorScheme.error),
+              ),
             ),
         ],
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _picks.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.bookmark_outline_rounded,
-                          size: 52,
-                          color: theme.colorScheme.onSurface.withAlpha(55)),
-                      const SizedBox(height: 12),
-                      Text(
-                        'No saved picks yet.\nTap Save after generating a pick.',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withAlpha(130),
-                        ),
-                      ),
-                    ],
+          ? Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.bookmark_outline_rounded,
+                    size: 52,
+                    color: theme.colorScheme.onSurface.withAlpha(55),
                   ),
-                )
-              : _buildGroupedList(theme),
+                  const SizedBox(height: 12),
+                  Text(
+                    'No saved picks yet.\nTap Save after generating a pick.',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withAlpha(130),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : _buildGroupedList(theme),
     );
   }
 
@@ -204,9 +215,9 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
       final lottery = LotteryService.instance.getLotteryById(p.lotteryId);
       if (lottery == null) return 2;
       final result = checkPickResult(p, lottery, _drawsFor(p.lotteryId));
-      if (result == null) return 2;        // legacy — no draw context
-      if (result.isPending) return 0;      // pending draw
-      return 1;                            // resolved
+      if (result == null) return 2; // legacy — no draw context
+      if (result.isPending) return 0; // pending draw
+      return 1; // resolved
     }
 
     return [...picks]..sort((a, b) {
@@ -290,58 +301,71 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
 
     // ── Stats card (only when results available) ────────────────────────────
     if (stats.hasAnyResult) {
-      items.add(Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-        child: _StatsCard(stats: stats),
-      ));
+      items.add(
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          child: _StatsCard(stats: stats),
+        ),
+      );
     }
 
     // ── Saved picks analysis ────────────────────────────────────────────────
     items.add(const Divider(height: 1));
-    items.add(Padding(
-      padding: const EdgeInsets.only(top: 12),
-      child: SavedPicksAnalysisSection(
-        picks: _picks,
-        drawsByLottery: _drawsByLottery,
+    items.add(
+      Padding(
+        padding: const EdgeInsets.only(top: 12),
+        child: SavedPicksAnalysisSection(
+          picks: _picks,
+          drawsByLottery: _drawsByLottery,
+        ),
       ),
-    ));
+    );
     items.add(const Divider(height: 1));
 
-    items.add(Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-      child: Row(
-        children: [
-          Icon(Icons.access_time_rounded,
-              size: 13, color: theme.colorScheme.onSurface.withAlpha(100)),
-          const SizedBox(width: 4),
-          Text(
-            'Pending draws first',
-            style: theme.textTheme.labelSmall?.copyWith(
+    items.add(
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+        child: Row(
+          children: [
+            Icon(
+              Icons.access_time_rounded,
+              size: 13,
               color: theme.colorScheme.onSurface.withAlpha(100),
             ),
-          ),
-        ],
+            const SizedBox(width: 4),
+            Text(
+              'Pending draws first',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurface.withAlpha(100),
+              ),
+            ),
+          ],
+        ),
       ),
-    ));
+    );
 
     for (final country in sections) {
       final picks = _sortPicks(grouped[country]!);
-      items.add(_SectionHeader(
-        flag: _countryFlag(country),
-        name: _countryName(country),
-        count: picks.length,
-      ));
+      items.add(
+        _SectionHeader(
+          flag: _countryFlag(country),
+          name: _countryName(country),
+          count: picks.length,
+        ),
+      );
       for (final pick in picks) {
-        items.add(Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-          child: _PickItem(
-            pick: pick,
-            draws: _drawsFor(pick.lotteryId),
-            isBest: pick.id == bestId,
-            onDelete: () => _delete(pick),
-            onTap: () => Navigator.pop(context, pick),
+        items.add(
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: _PickItem(
+              pick: pick,
+              draws: _drawsFor(pick.lotteryId),
+              isBest: pick.id == bestId,
+              onDelete: () => _delete(pick),
+              onTap: () => Navigator.pop(context, pick),
+            ),
           ),
-        ));
+        );
       }
     }
 
@@ -393,8 +417,11 @@ class _StatsCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.bar_chart_rounded,
-                  size: 14, color: theme.colorScheme.primary),
+              Icon(
+                Icons.bar_chart_rounded,
+                size: 14,
+                color: theme.colorScheme.primary,
+              ),
               const SizedBox(width: 5),
               Text(
                 'Your Stats',
@@ -523,9 +550,12 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Row(
         children: [
-          Text('$flag  $name',
-              style: theme.textTheme.titleSmall
-                  ?.copyWith(fontWeight: FontWeight.w700)),
+          Text(
+            '$flag  $name',
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
@@ -575,12 +605,13 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    final lottery = LotteryService.instance.getLotteryById(widget.pick.lotteryId);
+    final lottery = LotteryService.instance.getLotteryById(
+      widget.pick.lotteryId,
+    );
     _result = lottery != null
         ? checkPickResult(widget.pick, lottery, widget.draws)
         : null;
   }
-
 
   Lottery? get _lottery =>
       LotteryService.instance.getLotteryById(widget.pick.lotteryId);
@@ -592,12 +623,15 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
     final bonusLabel = switch (widget.pick.lotteryId) {
       'us_powerball' => 'Powerball',
       'us_megamillions' => 'Mega Ball',
+      'au_powerball' => 'Powerball',
+      'uk_euromillions' => 'Lucky Stars',
       _ => 'Bonus',
     };
     final bonus =
-        (widget.pick.bonusNumbers != null && widget.pick.bonusNumbers!.isNotEmpty)
-            ? '\n+ $bonusLabel: ${widget.pick.bonusNumbers!.join(' ')}'
-            : '';
+        (widget.pick.bonusNumbers != null &&
+            widget.pick.bonusNumbers!.isNotEmpty)
+        ? '\n+ $bonusLabel: ${widget.pick.bonusNumbers!.join(' ')}'
+        : '';
     return '🎯 My $_lotteryName Number Set\n${widget.pick.displayLabel}\n\n$main$bonus\n\nGenerated for fun — NumberRun';
   }
 
@@ -605,10 +639,12 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
     HapticFeedback.lightImpact();
     await Clipboard.setData(ClipboardData(text: _copyText));
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Copied to clipboard.'),
-        duration: Duration(seconds: 2),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Copied to clipboard.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -624,36 +660,35 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
     );
   }
 
-
-
   Widget _pendingChip(ThemeData theme) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12),
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+    decoration: BoxDecoration(
+      color: theme.colorScheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text('⏳', style: TextStyle(fontSize: 11)),
+        const SizedBox(width: 4),
+        Text(
+          widget.pick.drawLabel != null
+              ? 'Pending · ${widget.pick.drawLabel}'
+              : 'Pending',
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('⏳', style: TextStyle(fontSize: 11)),
-            const SizedBox(width: 4),
-            Text(
-              widget.pick.drawLabel != null
-                  ? 'Pending · ${widget.pick.drawLabel}'
-                  : 'Pending',
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      );
+      ],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final dateStr =
-        DateFormat('d MMM yyyy · HH:mm').format(widget.pick.createdAt.toLocal());
+    final dateStr = DateFormat(
+      'd MMM yyyy · HH:mm',
+    ).format(widget.pick.createdAt.toLocal());
     final bonusNums = widget.pick.bonusNumbers ?? [];
     final lottery = _lottery;
     final result = _result;
@@ -668,11 +703,17 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
             width: 360,
             child: RepaintBoundary(
               key: _shareCardKey,
-              child: PickShareCard(pick: widget.pick, lottery: lottery, result: _result),
+              child: PickShareCard(
+                pick: widget.pick,
+                lottery: lottery,
+                result: _result,
+              ),
             ),
           ),
         Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           elevation: 1,
           clipBehavior: Clip.hardEdge,
           child: InkWell(
@@ -694,28 +735,35 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
                                 Expanded(
                                   child: Text(
                                     _lotteryName,
-                                    style: theme.textTheme.labelMedium?.copyWith(
-                                      color: theme.colorScheme.primary,
-                                      fontWeight: FontWeight.w700,
-                                    ),
+                                    style: theme.textTheme.labelMedium
+                                        ?.copyWith(
+                                          color: theme.colorScheme.primary,
+                                          fontWeight: FontWeight.w700,
+                                        ),
                                   ),
                                 ),
                                 if (widget.pick.source == PickSource.manual)
                                   Container(
                                     margin: const EdgeInsets.only(left: 6),
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 6, vertical: 2),
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: theme.colorScheme.tertiaryContainer,
+                                      color:
+                                          theme.colorScheme.tertiaryContainer,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
                                       '👤 My Pick',
-                                      style: theme.textTheme.labelSmall?.copyWith(
-                                        color: theme.colorScheme.onTertiaryContainer,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 10,
-                                      ),
+                                      style: theme.textTheme.labelSmall
+                                          ?.copyWith(
+                                            color: theme
+                                                .colorScheme
+                                                .onTertiaryContainer,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 10,
+                                          ),
                                     ),
                                   ),
                               ],
@@ -724,14 +772,18 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
                             Text(
                               widget.pick.displayLabel,
                               style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.onSurface.withAlpha(160),
+                                color: theme.colorScheme.onSurface.withAlpha(
+                                  160,
+                                ),
                               ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               dateStr,
                               style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.onSurface.withAlpha(100),
+                                color: theme.colorScheme.onSurface.withAlpha(
+                                  100,
+                                ),
                               ),
                             ),
                           ],
@@ -739,7 +791,10 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
                       ),
                       IconButton(
                         onPressed: widget.onDelete,
-                        icon: const Icon(Icons.delete_outline_rounded, size: 20),
+                        icon: const Icon(
+                          Icons.delete_outline_rounded,
+                          size: 20,
+                        ),
                         color: theme.colorScheme.onSurface.withAlpha(120),
                         tooltip: 'Delete',
                         visualDensity: VisualDensity.compact,

@@ -45,16 +45,26 @@ class GeneratorService {
         return _pickRandom(lottery.mainMin, lottery.mainMax, lottery.mainCount);
       case PlayStyle.hot:
         return _pickByScore(
-          lottery.mainMin, lottery.mainMax, lottery.mainCount, allMain,
+          lottery.mainMin,
+          lottery.mainMax,
+          lottery.mainCount,
+          allMain,
           favourHigh: true,
         );
       case PlayStyle.cold:
         return _pickByScore(
-          lottery.mainMin, lottery.mainMax, lottery.mainCount, allMain,
+          lottery.mainMin,
+          lottery.mainMax,
+          lottery.mainCount,
+          allMain,
           favourHigh: false,
         );
       case PlayStyle.balanced:
-        return _pickBalanced(lottery.mainMin, lottery.mainMax, lottery.mainCount);
+        return _pickBalanced(
+          lottery.mainMin,
+          lottery.mainMax,
+          lottery.mainCount,
+        );
     }
   }
 
@@ -73,22 +83,37 @@ class GeneratorService {
     final count = lottery.bonusCount!;
     final min = lottery.bonusMin!;
     final max = lottery.bonusMax!;
+    final excludedNumbers = lottery.hasSeparateBonusPool
+        ? const <int>[]
+        : exclude;
 
     switch (style) {
       case PlayStyle.random:
-        return _pickRandom(min, max, count, exclude: exclude);
+        return _pickRandom(min, max, count, exclude: excludedNumbers);
       case PlayStyle.hot:
         return allBonus.isEmpty
-            ? _pickRandom(min, max, count, exclude: exclude)
-            : _pickByScore(min, max, count, allBonus,
-                favourHigh: true, exclude: exclude);
+            ? _pickRandom(min, max, count, exclude: excludedNumbers)
+            : _pickByScore(
+                min,
+                max,
+                count,
+                allBonus,
+                favourHigh: true,
+                exclude: excludedNumbers,
+              );
       case PlayStyle.cold:
         return allBonus.isEmpty
-            ? _pickRandom(min, max, count, exclude: exclude)
-            : _pickByScore(min, max, count, allBonus,
-                favourHigh: false, exclude: exclude);
+            ? _pickRandom(min, max, count, exclude: excludedNumbers)
+            : _pickByScore(
+                min,
+                max,
+                count,
+                allBonus,
+                favourHigh: false,
+                exclude: excludedNumbers,
+              );
       case PlayStyle.balanced:
-        return _pickRandom(min, max, count, exclude: exclude);
+        return _pickRandom(min, max, count, exclude: excludedNumbers);
     }
   }
 
@@ -132,8 +157,12 @@ class GeneratorService {
 
   // ── Strategies ───────────────────────────────────────────────────────────
 
-  List<int> _pickRandom(int min, int max, int count,
-      {List<int> exclude = const []}) {
+  List<int> _pickRandom(
+    int min,
+    int max,
+    int count, {
+    List<int> exclude = const [],
+  }) {
     final pool = [for (var i = min; i <= max; i++) i]
       ..removeWhere(exclude.contains)
       ..shuffle(_rng);
@@ -156,9 +185,11 @@ class GeneratorService {
 
     // Sort: hot wants highest scores first, cold wants lowest
     final sorted = scores.entries.toList()
-      ..sort((a, b) => favourHigh
-          ? b.value.compareTo(a.value)
-          : a.value.compareTo(b.value));
+      ..sort(
+        (a, b) => favourHigh
+            ? b.value.compareTo(a.value)
+            : a.value.compareTo(b.value),
+      );
 
     // Build weighted pool: rank 1 gets weight = sorted.length, last gets 1.
     // This gives a soft bias — even rank-1 can lose to a lucky lower-rank pick.
@@ -180,8 +211,14 @@ class GeneratorService {
     }
 
     if (result.length < count) {
-      result.addAll(_pickRandom(min, max, count - result.length,
-          exclude: [...exclude, ...result]));
+      result.addAll(
+        _pickRandom(
+          min,
+          max,
+          count - result.length,
+          exclude: [...exclude, ...result],
+        ),
+      );
     }
     return result..sort();
   }

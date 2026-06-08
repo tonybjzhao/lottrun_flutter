@@ -51,7 +51,8 @@ ShareCardTemplate selectTemplate(
     return ShareCardTemplate.warm;
   }
   final isSupp = lottery.bonusIsSupplementary;
-  final total  = result.matchedMain +
+  final total =
+      result.matchedMain +
       (isSupp ? result.suppCategoryHits(lottery) : result.matchedBonus);
   if (total >= 3) return ShareCardTemplate.fire;
   if (total >= 1) return ShareCardTemplate.electric;
@@ -102,7 +103,8 @@ class ShareCardGeneratorState extends State<ShareCardGenerator> {
 
   /// Which template is currently active.
   ShareCardTemplate get template {
-    final resolvedResult = widget.result != null &&
+    final resolvedResult =
+        widget.result != null &&
         !widget.result!.isPending &&
         widget.result!.drawMainNumbers.isNotEmpty;
     final requested =
@@ -122,10 +124,11 @@ class ShareCardGeneratorState extends State<ShareCardGenerator> {
   /// [pixelRatio] 3.0 produces a 1080-px-wide image from the 360-pt card.
   /// Returns null if the widget has not been laid out yet.
   Future<Uint8List?> exportImage({double pixelRatio = 3.0}) async {
-    final boundary = _repaintKey.currentContext?.findRenderObject()
-        as RenderRepaintBoundary?;
+    final boundary =
+        _repaintKey.currentContext?.findRenderObject()
+            as RenderRepaintBoundary?;
     if (boundary == null) return null;
-    final image    = await boundary.toImage(pixelRatio: pixelRatio);
+    final image = await boundary.toImage(pixelRatio: pixelRatio);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     return byteData?.buffer.asUint8List();
   }
@@ -136,7 +139,7 @@ class ShareCardGeneratorState extends State<ShareCardGenerator> {
   Future<void> share({Rect? sharePositionOrigin}) async {
     final bytes = await exportImage();
     if (bytes == null) return;
-    final dir  = await getTemporaryDirectory();
+    final dir = await getTemporaryDirectory();
     final file = File('${dir.path}/lottorun_share.png');
     await file.writeAsBytes(bytes);
     await Share.shareXFiles(
@@ -148,18 +151,26 @@ class ShareCardGeneratorState extends State<ShareCardGenerator> {
 
   @override
   Widget build(BuildContext context) {
-    final r         = widget.result;
+    final r = widget.result;
     final hasResult = r != null && !r.isPending && r.drawMainNumbers.isNotEmpty;
 
     final Widget card = switch (template) {
-      ShareCardTemplate.fire     => _FireTemplate(pick: widget.pick, lottery: widget.lottery, result: r!),
-      ShareCardTemplate.electric => _ElectricTemplate(pick: widget.pick, lottery: widget.lottery, result: r!),
-      ShareCardTemplate.warm     => _WarmTemplate(
-          pick: widget.pick,
-          lottery: widget.lottery,
-          result: hasResult ? r : null,
-          forceFunnyFail: widget.templateOverride == ShareCardTemplate.warm,
-        ),
+      ShareCardTemplate.fire => _FireTemplate(
+        pick: widget.pick,
+        lottery: widget.lottery,
+        result: r!,
+      ),
+      ShareCardTemplate.electric => _ElectricTemplate(
+        pick: widget.pick,
+        lottery: widget.lottery,
+        result: r!,
+      ),
+      ShareCardTemplate.warm => _WarmTemplate(
+        pick: widget.pick,
+        lottery: widget.lottery,
+        result: hasResult ? r : null,
+        forceFunnyFail: widget.templateOverride == ShareCardTemplate.warm,
+      ),
     };
 
     return RepaintBoundary(key: _repaintKey, child: card);
@@ -184,17 +195,17 @@ class _FireTemplate extends StatelessWidget {
     required this.result,
   });
 
-  static const _bg1  = Color(0xFF0D0D0D);
-  static const _bg2  = Color(0xFF1C0A00);
+  static const _bg1 = Color(0xFF0D0D0D);
+  static const _bg2 = Color(0xFF1C0A00);
   static const _gold = Color(0xFFFFD700);
   static const _goldDim = Color(0xFFB8860B);
 
   @override
   Widget build(BuildContext context) {
-    final isSupp    = lottery.bonusIsSupplementary;
+    final isSupp = lottery.bonusIsSupplementary;
     final matchMain = result.matchedMain;
-    final suppHits  = result.suppCategoryHits(lottery);
-    final total     = matchMain + (isSupp ? suppHits : result.matchedBonus);
+    final suppHits = result.suppCategoryHits(lottery);
+    final total = matchMain + (isSupp ? suppHits : result.matchedBonus);
     final mainCount = lottery.mainCount;
 
     final drawMain = result.drawMainNumbers;
@@ -220,9 +231,11 @@ class _FireTemplate extends StatelessWidget {
           children: [
             // ── Ambient glow top-right ─────────────────────────────────────
             Positioned(
-              top: -70, right: -70,
+              top: -70,
+              right: -70,
               child: Container(
-                width: 280, height: 280,
+                width: 280,
+                height: 280,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
@@ -233,9 +246,11 @@ class _FireTemplate extends StatelessWidget {
             ),
             // ── Warm glow bottom-left ──────────────────────────────────────
             Positioned(
-              bottom: -50, left: -50,
+              bottom: -50,
+              left: -50,
               child: Container(
-                width: 200, height: 200,
+                width: 200,
+                height: 200,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
@@ -256,28 +271,30 @@ class _FireTemplate extends StatelessWidget {
 
                   RichText(
                     textAlign: TextAlign.center,
-                    text: TextSpan(children: [
-                      TextSpan(
-                        text: '$total',
-                        style: const TextStyle(
-                          color: _gold,
-                          fontSize: 80,
-                          fontWeight: FontWeight.w900,
-                          height: 1.0,
-                          letterSpacing: -3,
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: '$total',
+                          style: const TextStyle(
+                            color: _gold,
+                            fontSize: 80,
+                            fontWeight: FontWeight.w900,
+                            height: 1.0,
+                            letterSpacing: -3,
+                          ),
                         ),
-                      ),
-                      TextSpan(
-                        text: ' / $mainCount',
-                        style: const TextStyle(
-                          color: _goldDim,
-                          fontSize: 38,
-                          fontWeight: FontWeight.w700,
-                          height: 1.0,
-                          letterSpacing: -1,
+                        TextSpan(
+                          text: ' / $mainCount',
+                          style: const TextStyle(
+                            color: _goldDim,
+                            fontSize: 38,
+                            fontWeight: FontWeight.w700,
+                            height: 1.0,
+                            letterSpacing: -1,
+                          ),
                         ),
-                      ),
-                    ]),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -290,7 +307,13 @@ class _FireTemplate extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    _matchDesc(matchMain, suppHits, isSupp, result.matchedBonus, lottery),
+                    _matchDesc(
+                      matchMain,
+                      suppHits,
+                      isSupp,
+                      result.matchedBonus,
+                      lottery,
+                    ),
                     style: const TextStyle(
                       color: Color(0xFFFFE082),
                       fontSize: 14,
@@ -336,34 +359,44 @@ class _FireTemplate extends StatelessWidget {
     );
   }
 
-  Widget _topBar() => Row(children: [
-        Text(
-          '${_flagEmoji(lottery.countryCode)}  ${_lotteryShortName(lottery.name)}',
+  Widget _topBar() => Row(
+    children: [
+      Text(
+        '${_flagEmoji(lottery.countryCode)}  ${_lotteryShortName(lottery.name)}',
+        style: const TextStyle(
+          color: Colors.white70,
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      const Spacer(),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: _gold.withAlpha(25),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          'NumberRun',
           style: const TextStyle(
-              color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w700),
-        ),
-        const Spacer(),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            color: _gold.withAlpha(25),
-            borderRadius: BorderRadius.circular(8),
+            color: _gold,
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
           ),
-          child: Text('NumberRun',
-              style: const TextStyle(
-                  color: _gold, fontSize: 10, fontWeight: FontWeight.w700)),
         ),
-      ]);
+      ),
+    ],
+  );
 
   Widget _footer() => Text(
-        '✨ NumberRun',
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          color: Color(0x99FFFFFF),
-          fontSize: 10,
-          fontWeight: FontWeight.w600,
-        ),
-      );
+    '✨ NumberRun',
+    textAlign: TextAlign.center,
+    style: const TextStyle(
+      color: Color(0x99FFFFFF),
+      fontSize: 10,
+      fontWeight: FontWeight.w600,
+    ),
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -384,15 +417,15 @@ class _ElectricTemplate extends StatelessWidget {
     required this.result,
   });
 
-  static const _bg   = Color(0xFF08122A);
+  static const _bg = Color(0xFF08122A);
   static const _cyan = Color(0xFF00E5FF);
 
   @override
   Widget build(BuildContext context) {
-    final isSupp    = lottery.bonusIsSupplementary;
+    final isSupp = lottery.bonusIsSupplementary;
     final matchMain = result.matchedMain;
-    final suppHits  = result.suppCategoryHits(lottery);
-    final total     = matchMain + (isSupp ? suppHits : result.matchedBonus);
+    final suppHits = result.suppCategoryHits(lottery);
+    final total = matchMain + (isSupp ? suppHits : result.matchedBonus);
     final mainCount = lottery.mainCount;
 
     final drawMain = result.drawMainNumbers;
@@ -415,7 +448,8 @@ class _ElectricTemplate extends StatelessWidget {
           children: [
             // ── Diagonal accent top-right ─────────────────────────────────
             Positioned(
-              top: 0, right: 0,
+              top: 0,
+              right: 0,
               child: CustomPaint(
                 size: const Size(160, 120),
                 painter: _DiagonalAccentPainter(color: const Color(0xFF0D2040)),
@@ -423,9 +457,11 @@ class _ElectricTemplate extends StatelessWidget {
             ),
             // ── Cyan glow bottom-right ────────────────────────────────────
             Positioned(
-              bottom: -60, right: -60,
+              bottom: -60,
+              right: -60,
               child: Container(
-                width: 200, height: 200,
+                width: 200,
+                height: 200,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
@@ -447,7 +483,8 @@ class _ElectricTemplate extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
-                        width: 84, height: 84,
+                        width: 84,
+                        height: 84,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(color: _cyan, width: 2.5),
@@ -468,7 +505,9 @@ class _ElectricTemplate extends StatelessWidget {
                             Text(
                               'of $mainCount',
                               style: const TextStyle(
-                                  color: Colors.white38, fontSize: 11),
+                                color: Colors.white38,
+                                fontSize: 11,
+                              ),
                             ),
                           ],
                         ),
@@ -488,8 +527,13 @@ class _ElectricTemplate extends StatelessWidget {
                             ),
                             const SizedBox(height: 5),
                             Text(
-                              _matchDesc(matchMain, suppHits, isSupp,
-                                  result.matchedBonus, lottery),
+                              _matchDesc(
+                                matchMain,
+                                suppHits,
+                                isSupp,
+                                result.matchedBonus,
+                                lottery,
+                              ),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,
@@ -533,30 +577,39 @@ class _ElectricTemplate extends StatelessWidget {
     );
   }
 
-  Widget _topBar() => Row(children: [
-        Text(
-          '${_flagEmoji(lottery.countryCode)}  ${_lotteryShortName(lottery.name)}',
-          style: const TextStyle(
-              color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w700),
+  Widget _topBar() => Row(
+    children: [
+      Text(
+        '${_flagEmoji(lottery.countryCode)}  ${_lotteryShortName(lottery.name)}',
+        style: const TextStyle(
+          color: Colors.white70,
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
         ),
-        const Spacer(),
-        Text('✨ NumberRun',
-            style: const TextStyle(
-                color: Color(0x99FFFFFF),
-                fontSize: 10,
-                fontWeight: FontWeight.w600)),
-      ]);
-
-  Widget _footer() => Text(
+      ),
+      const Spacer(),
+      Text(
         '✨ NumberRun',
-        textAlign: TextAlign.center,
         style: const TextStyle(
           color: Color(0x99FFFFFF),
           fontSize: 10,
           fontWeight: FontWeight.w600,
         ),
-      );
+      ),
+    ],
+  );
+
+  Widget _footer() => Text(
+    '✨ NumberRun',
+    textAlign: TextAlign.center,
+    style: const TextStyle(
+      color: Color(0x99FFFFFF),
+      fontSize: 10,
+      fontWeight: FontWeight.w600,
+    ),
+  );
 }
+
 class _DiagonalAccentPainter extends CustomPainter {
   final Color color;
   const _DiagonalAccentPainter({required this.color});
@@ -604,13 +657,13 @@ class _WarmTemplate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme     = _styleThemeFor(pick.style);
-    final isMiss    = result != null && !result!.isPending;
+    final theme = _styleThemeFor(pick.style);
+    final isMiss = result != null && !result!.isPending;
     final isPending = result?.isPending == true;
     final isFunnyFail = isMiss || forceFunnyFail;
-    final userMain  = pick.mainNumbers;
+    final userMain = pick.mainNumbers;
     final bonusNums = pick.bonusNumbers ?? [];
-    final isSupp    = lottery.bonusIsSupplementary;
+    final isSupp = lottery.bonusIsSupplementary;
 
     final String emoji;
     final String headline;
@@ -618,27 +671,27 @@ class _WarmTemplate extends StatelessWidget {
     final String? blurbText;
 
     if (isFunnyFail) {
-      emoji    = '😂';
+      emoji = '😂';
       headline = 'Not today';
-      subhead  = isMiss ? '0 overlapped' : 'Random result';
+      subhead = isMiss ? '0 overlapped' : 'Random result';
       blurbText = null;
     } else if (isPending) {
-      emoji    = '⏳';
+      emoji = '⏳';
       headline = 'Result update incoming!';
-      subhead  = 'Waiting for results 🤞';
+      subhead = 'Waiting for results 🤞';
       blurbText = 'Can you beat this? 👀';
     } else {
-      emoji    = '🎯';
+      emoji = '🎯';
       headline = 'My Number Pick';
-      subhead  = "Let's see what happens 👀";
+      subhead = "Let's see what happens 👀";
       blurbText = 'These are my numbers ↑';
     }
 
     final bonusLabel = switch (lottery.id) {
-      'au_powerball'    => 'Powerball',
-      'us_powerball'    => 'Powerball',
+      'au_powerball' => 'Powerball',
+      'us_powerball' => 'Powerball',
       'us_megamillions' => 'Mega Ball',
-      _                 => 'Bonus',
+      _ => 'Bonus',
     };
 
     final List<Color> gradColors = isFunnyFail
@@ -661,9 +714,11 @@ class _WarmTemplate extends StatelessWidget {
           children: [
             // Background glow
             Positioned(
-              top: -40, right: -40,
+              top: -40,
+              right: -40,
               child: Container(
-                width: 200, height: 200,
+                width: 200,
+                height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: theme.glowColor,
@@ -728,10 +783,12 @@ class _WarmTemplate extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        ...bonusNums.map((n) => Padding(
-                              padding: const EdgeInsets.only(left: 4),
-                              child: _ball(n, _BallKind.suppHit, size: 50),
-                            )),
+                        ...bonusNums.map(
+                          (n) => Padding(
+                            padding: const EdgeInsets.only(left: 4),
+                            child: _ball(n, _BallKind.suppHit, size: 50),
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -774,79 +831,87 @@ class _WarmTemplate extends StatelessWidget {
   }
 
   Widget _missCard() => Container(
-        width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFFF9C4),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFFFEE58), width: 1.5),
-        ),
-        child: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '😂 Funny fail',
-              style: TextStyle(
-                color: Color(0xFF333333),
-                fontWeight: FontWeight.w800,
-                fontSize: 16,
-              ),
-            ),
-            SizedBox(height: 6),
-            Text(
-              'Not today',
-              style: TextStyle(
-                color: Color(0xFF5F4339),
-                fontWeight: FontWeight.w700,
-                fontSize: 13,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Can you beat this? 👀',
-              style: TextStyle(
-                color: Color(0xFF7B2FBE),
-                fontWeight: FontWeight.w800,
-                fontSize: 13,
-              ),
-            ),
-          ],
-        ),
-      );
-
-  Widget _strategyCard(String copy, _StyleTheme theme) => Container(
-        width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(16, 13, 16, 13),
-        decoration: BoxDecoration(
-          color: Colors.white.withAlpha(22),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withAlpha(45)),
-        ),
-        child: Text(
-          copy,
-          style: const TextStyle(
-              color: Color(0xCCFFFFFF), fontSize: 13, height: 1.4),
-          textAlign: TextAlign.center,
-        ),
-      );
-
-  Widget _topBar(_StyleTheme theme) => Row(children: [
+    width: double.infinity,
+    padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+    decoration: BoxDecoration(
+      color: const Color(0xFFFFF9C4),
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: const Color(0xFFFFEE58), width: 1.5),
+    ),
+    child: const Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         Text(
-          '${_flagEmoji(lottery.countryCode)}  ${lottery.name}',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            height: 1.3,
+          '😂 Funny fail',
+          style: TextStyle(
+            color: Color(0xFF333333),
+            fontWeight: FontWeight.w800,
+            fontSize: 16,
           ),
         ),
-        const Spacer(),
-        Text('NumberRun',
-            style: const TextStyle(
-                color: Colors.white54,
-                fontSize: 11,
-                fontWeight: FontWeight.w600)),
-      ]);
+        SizedBox(height: 6),
+        Text(
+          'Not today',
+          style: TextStyle(
+            color: Color(0xFF5F4339),
+            fontWeight: FontWeight.w700,
+            fontSize: 13,
+          ),
+        ),
+        SizedBox(height: 8),
+        Text(
+          'Can you beat this? 👀',
+          style: TextStyle(
+            color: Color(0xFF7B2FBE),
+            fontWeight: FontWeight.w800,
+            fontSize: 13,
+          ),
+        ),
+      ],
+    ),
+  );
+
+  Widget _strategyCard(String copy, _StyleTheme theme) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.fromLTRB(16, 13, 16, 13),
+    decoration: BoxDecoration(
+      color: Colors.white.withAlpha(22),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.white.withAlpha(45)),
+    ),
+    child: Text(
+      copy,
+      style: const TextStyle(
+        color: Color(0xCCFFFFFF),
+        fontSize: 13,
+        height: 1.4,
+      ),
+      textAlign: TextAlign.center,
+    ),
+  );
+
+  Widget _topBar(_StyleTheme theme) => Row(
+    children: [
+      Text(
+        '${_flagEmoji(lottery.countryCode)}  ${lottery.name}',
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+          height: 1.3,
+        ),
+      ),
+      const Spacer(),
+      Text(
+        'NumberRun',
+        style: const TextStyle(
+          color: Colors.white54,
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ],
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -864,23 +929,23 @@ Widget _ball(int number, _BallKind kind, {required double size}) {
     case _BallKind.mainHit:
       colors = [const Color(0xFFEF5350), const Color(0xFFB71C1C)];
       shadow = const Color(0xFFB71C1C);
-      text   = Colors.white;
+      text = Colors.white;
     case _BallKind.suppHit:
       colors = [const Color(0xFF5C9FD6), const Color(0xFF1A5FA8)];
       shadow = const Color(0xFF1A5FA8);
-      text   = Colors.white;
+      text = Colors.white;
     case _BallKind.miss:
       colors = [const Color(0xFFE0E0E0), const Color(0xFFBDBDBD)];
       shadow = const Color(0xFFBDBDBD);
-      text   = const Color(0xFF888888);
+      text = const Color(0xFF888888);
     case _BallKind.drawMain:
       colors = [const Color(0xFFEF5350), const Color(0xFFB71C1C)];
       shadow = const Color(0xFFB71C1C);
-      text   = Colors.white;
+      text = Colors.white;
     case _BallKind.drawSupp:
       colors = [const Color(0xFF5C9FD6), const Color(0xFF1A5FA8)];
       shadow = const Color(0xFF1A5FA8);
-      text   = Colors.white;
+      text = Colors.white;
   }
 
   return Container(
@@ -951,21 +1016,26 @@ String _matchDesc(
     return '$matchMain matched';
   }
   if (matchMain == 0) return '$suppHits supp matched';
-  if (suppHits == 0)  return '$matchMain main matched';
+  if (suppHits == 0) return '$matchMain main matched';
   return '$matchMain main + $suppHits supp matched';
 }
 
 String _flagEmoji(String countryCode) => switch (countryCode) {
-      'AU' => '🇦🇺',
-      'US' => '🇺🇸',
-      _    => '🌍',
-    };
+  'AU' => '🇦🇺',
+  'US' => '🇺🇸',
+  'GB' => '🇬🇧',
+  'CA' => '🇨🇦',
+  _ => '🌍',
+};
 
 String _lotteryShortName(String name) {
   if (name.contains('Saturday')) return 'Saturday\nLotto';
-  if (name.contains('Oz'))       return 'Oz Lotto';
-  if (name.contains('Powerball'))return 'Powerball';
-  if (name.contains('Mega'))     return 'Mega Millions';
+  if (name.contains('Oz')) return 'Oz Lotto';
+  if (name.contains('Powerball')) return 'Powerball';
+  if (name.contains('Mega')) return 'Mega Millions';
+  if (name.contains('Euro')) return 'EuroMillions';
+  if (name.contains('Max')) return 'Lotto Max';
+  if (name.contains('6/49')) return 'Lotto 6/49';
   return name;
 }
 
@@ -975,16 +1045,16 @@ String _lotteryShortName(String name) {
 
 List<Widget> _confettiParticles() {
   const particles = [
-    (dx: 28.0,  dy: 55.0,  size: 6.0, color: Color(0xAAFFD700), angle: 0.3),
-    (dx: 308.0, dy: 38.0,  size: 5.0, color: Color(0xAA9C27B0), angle: 0.8),
-    (dx: 48.0,  dy: 108.0, size: 4.0, color: Color(0xAAFF6090), angle: 1.2),
-    (dx: 288.0, dy: 88.0,  size: 7.0, color: Color(0xAAFFD700), angle: 0.5),
-    (dx: 18.0,  dy: 158.0, size: 4.0, color: Color(0xAA64B5F6), angle: 1.8),
+    (dx: 28.0, dy: 55.0, size: 6.0, color: Color(0xAAFFD700), angle: 0.3),
+    (dx: 308.0, dy: 38.0, size: 5.0, color: Color(0xAA9C27B0), angle: 0.8),
+    (dx: 48.0, dy: 108.0, size: 4.0, color: Color(0xAAFF6090), angle: 1.2),
+    (dx: 288.0, dy: 88.0, size: 7.0, color: Color(0xAAFFD700), angle: 0.5),
+    (dx: 18.0, dy: 158.0, size: 4.0, color: Color(0xAA64B5F6), angle: 1.8),
     (dx: 318.0, dy: 148.0, size: 5.0, color: Color(0xAAFFD700), angle: 2.1),
-    (dx: 58.0,  dy: 198.0, size: 3.0, color: Color(0xAA9C27B0), angle: 0.7),
+    (dx: 58.0, dy: 198.0, size: 3.0, color: Color(0xAA9C27B0), angle: 0.7),
     (dx: 278.0, dy: 198.0, size: 4.0, color: Color(0xAAFF6090), angle: 1.5),
     (dx: 328.0, dy: 278.0, size: 5.0, color: Color(0xAAFFD700), angle: 0.2),
-    (dx: 14.0,  dy: 298.0, size: 3.0, color: Color(0xAA64B5F6), angle: 2.5),
+    (dx: 14.0, dy: 298.0, size: 3.0, color: Color(0xAA64B5F6), angle: 2.5),
   ];
 
   return particles.map((p) {
@@ -1022,23 +1092,27 @@ class _StyleTheme {
 }
 
 _StyleTheme _styleThemeFor(PlayStyle style) => switch (style) {
-      PlayStyle.hot => const _StyleTheme(
-          gradientColors: [Color(0xFF7B1F00), Color(0xFFBF360C), Color(0xFF8D2800)],
-          accentColor: Color(0xFFFFB74D),
-          glowColor: Color(0x33FF6D00)),
-      PlayStyle.cold => const _StyleTheme(
-          gradientColors: [Color(0xFF0D2B4E), Color(0xFF1565C0), Color(0xFF0A3D6B)],
-          accentColor: Color(0xFF80DEEA),
-          glowColor: Color(0x3300B0FF)),
-      PlayStyle.random => const _StyleTheme(
-          gradientColors: [Color(0xFF1A0050), Color(0xFF4527A0), Color(0xFF311B92)],
-          accentColor: Color(0xFFCE93D8),
-          glowColor: Color(0x33AA00FF)),
-      PlayStyle.balanced => const _StyleTheme(
-          gradientColors: [Color(0xFF1A0A3C), Color(0xFF4A148C), Color(0xFF2E0066)],
-          accentColor: Color(0xFFFFD700),
-          glowColor: Color(0x33FFD700)),
-    };
+  PlayStyle.hot => const _StyleTheme(
+    gradientColors: [Color(0xFF7B1F00), Color(0xFFBF360C), Color(0xFF8D2800)],
+    accentColor: Color(0xFFFFB74D),
+    glowColor: Color(0x33FF6D00),
+  ),
+  PlayStyle.cold => const _StyleTheme(
+    gradientColors: [Color(0xFF0D2B4E), Color(0xFF1565C0), Color(0xFF0A3D6B)],
+    accentColor: Color(0xFF80DEEA),
+    glowColor: Color(0x3300B0FF),
+  ),
+  PlayStyle.random => const _StyleTheme(
+    gradientColors: [Color(0xFF1A0050), Color(0xFF4527A0), Color(0xFF311B92)],
+    accentColor: Color(0xFFCE93D8),
+    glowColor: Color(0x33AA00FF),
+  ),
+  PlayStyle.balanced => const _StyleTheme(
+    gradientColors: [Color(0xFF1A0A3C), Color(0xFF4A148C), Color(0xFF2E0066)],
+    accentColor: Color(0xFFFFD700),
+    glowColor: Color(0x33FFD700),
+  ),
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // § 11  Backward-compat: PickShareCard
@@ -1064,19 +1138,26 @@ class PickShareCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final r         = result;
+    final r = result;
     final hasResult = r != null && !r.isPending && r.drawMainNumbers.isNotEmpty;
-    final template =
-        templateOverride ?? selectTemplate(pick, r, lottery);
+    final template = templateOverride ?? selectTemplate(pick, r, lottery);
     return switch (template) {
-      ShareCardTemplate.fire     => _FireTemplate(pick: pick, lottery: lottery, result: r!),
-      ShareCardTemplate.electric => _ElectricTemplate(pick: pick, lottery: lottery, result: r!),
-      ShareCardTemplate.warm     => _WarmTemplate(
-          pick: pick,
-          lottery: lottery,
-          result: hasResult ? r : null,
-          forceFunnyFail: templateOverride == ShareCardTemplate.warm,
-        ),
+      ShareCardTemplate.fire => _FireTemplate(
+        pick: pick,
+        lottery: lottery,
+        result: r!,
+      ),
+      ShareCardTemplate.electric => _ElectricTemplate(
+        pick: pick,
+        lottery: lottery,
+        result: r!,
+      ),
+      ShareCardTemplate.warm => _WarmTemplate(
+        pick: pick,
+        lottery: lottery,
+        result: hasResult ? r : null,
+        forceFunnyFail: templateOverride == ShareCardTemplate.warm,
+      ),
     };
   }
 }
@@ -1092,11 +1173,8 @@ Future<void> showPickShareSheet({
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => _PickShareSheet(
-      pick: pick,
-      lottery: lottery,
-      result: result,
-    ),
+    builder: (_) =>
+        _PickShareSheet(pick: pick, lottery: lottery, result: result),
   );
 }
 
@@ -1123,8 +1201,7 @@ class _PickShareSheetState extends State<_PickShareSheet> {
   ShareCardTemplate get _autoTemplate =>
       selectTemplate(widget.pick, widget.result, widget.lottery);
 
-  ShareCardTemplate get _effectiveTemplate =>
-      _manualTemplate ?? _autoTemplate;
+  ShareCardTemplate get _effectiveTemplate => _manualTemplate ?? _autoTemplate;
 
   bool get _hasResolvedResult =>
       widget.result != null &&
@@ -1134,7 +1211,9 @@ class _PickShareSheetState extends State<_PickShareSheet> {
   Future<void> _share(BuildContext buttonContext) async {
     if (_isSharing) return;
     final box = buttonContext.findRenderObject() as RenderBox?;
-    final origin = box == null ? null : box.localToGlobal(Offset.zero) & box.size;
+    final origin = box == null
+        ? null
+        : box.localToGlobal(Offset.zero) & box.size;
 
     setState(() => _isSharing = true);
     try {
@@ -1227,9 +1306,7 @@ class _PickShareSheetState extends State<_PickShareSheet> {
                       runSpacing: 10,
                       children: [
                         ChoiceChip(
-                          label: Text(
-                            '⭐ Reference Pick',
-                          ),
+                          label: Text('⭐ Reference Pick'),
                           selected: _manualTemplate == null,
                           onSelected: (_) {
                             setState(() => _manualTemplate = null);
@@ -1239,7 +1316,8 @@ class _PickShareSheetState extends State<_PickShareSheet> {
                           ChoiceChip(
                             label: Text(_templateLabel(template)),
                             selected: _manualTemplate == template,
-                            onSelected: (template == ShareCardTemplate.fire ||
+                            onSelected:
+                                (template == ShareCardTemplate.fire ||
                                         template ==
                                             ShareCardTemplate.electric) &&
                                     !_hasResolvedResult
@@ -1300,12 +1378,12 @@ class _PickShareSheetState extends State<_PickShareSheet> {
                             ? const SizedBox(
                                 width: 18,
                                 height: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               )
                             : const Icon(Icons.share_rounded),
-                        label: Text(
-                          _isSharing ? 'Preparing...' : 'Share PNG',
-                        ),
+                        label: Text(_isSharing ? 'Preparing...' : 'Share PNG'),
                       ),
                     ),
                   ),
@@ -1332,7 +1410,7 @@ Future<void> sharePickCard({
   PickMatchResult? result,
   Lottery? lottery,
 }) async {
-  final box    = btnContext.findRenderObject() as RenderBox?;
+  final box = btnContext.findRenderObject() as RenderBox?;
   final origin = box == null ? null : box.localToGlobal(Offset.zero) & box.size;
 
   try {
@@ -1340,12 +1418,13 @@ Future<void> sharePickCard({
         repaintKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
     if (boundary == null) return;
 
-    final image    = await boundary.toImage(pixelRatio: 3.0);
+    final image = await boundary.toImage(pixelRatio: 3.0);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     if (byteData == null) return;
 
     final file = File(
-        '${(await getTemporaryDirectory()).path}/lottorun_pick.png');
+      '${(await getTemporaryDirectory()).path}/lottorun_pick.png',
+    );
     await file.writeAsBytes(byteData.buffer.asUint8List());
 
     await Share.shareXFiles(
@@ -1363,19 +1442,20 @@ Future<void> sharePickCards({
   required List<GlobalKey> repaintKeys,
   required BuildContext btnContext,
 }) async {
-  final box    = btnContext.findRenderObject() as RenderBox?;
+  final box = btnContext.findRenderObject() as RenderBox?;
   final origin = box == null ? null : box.localToGlobal(Offset.zero) & box.size;
 
   try {
-    final dir   = await getTemporaryDirectory();
+    final dir = await getTemporaryDirectory();
     final files = <XFile>[];
 
     for (var i = 0; i < repaintKeys.length; i++) {
-      final boundary = repaintKeys[i].currentContext?.findRenderObject()
-          as RenderRepaintBoundary?;
+      final boundary =
+          repaintKeys[i].currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
       if (boundary == null) continue;
 
-      final image    = await boundary.toImage(pixelRatio: 3.0);
+      final image = await boundary.toImage(pixelRatio: 3.0);
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) continue;
 
@@ -1399,8 +1479,9 @@ String _shareText(PickMatchResult? result, Lottery? lottery) {
   if (result == null || result.isPending) {
     return 'My number pick 🎯 — Generated by NumberRun';
   }
-  final isSupp  = lottery?.bonusIsSupplementary ?? false;
-  final total   = result.matchedMain +
+  final isSupp = lottery?.bonusIsSupplementary ?? false;
+  final total =
+      result.matchedMain +
       (isSupp ? result.suppCategoryHits(lottery!) : result.matchedBonus);
   final tmpl = selectTemplate(
     GeneratedPick(
@@ -1410,31 +1491,38 @@ String _shareText(PickMatchResult? result, Lottery? lottery) {
       createdAt: DateTime.now(),
     ),
     result,
-    lottery ?? Lottery(
-      id: '', countryCode: '', countryName: '', name: '',
-      mainCount: 6, mainMin: 1, mainMax: 45,
-    ),
+    lottery ??
+        Lottery(
+          id: '',
+          countryCode: '',
+          countryName: '',
+          name: '',
+          mainCount: 6,
+          mainMin: 1,
+          mainMax: 45,
+        ),
   );
   return switch (tmpl) {
-    ShareCardTemplate.fire     => '🔥 Number comparison from NumberRun',
+    ShareCardTemplate.fire => '🔥 Number comparison from NumberRun',
     ShareCardTemplate.electric => '🎯 Number overlap from NumberRun',
-    ShareCardTemplate.warm     => total == 0
-        ? '😆 Random result from NumberRun'
-        : 'My number pick 🎯 — Generated by NumberRun',
+    ShareCardTemplate.warm =>
+      total == 0
+          ? '😆 Random result from NumberRun'
+          : 'My number pick 🎯 — Generated by NumberRun',
   };
 }
 
 String _templateLabel(ShareCardTemplate template) => switch (template) {
-      ShareCardTemplate.fire => '🔥 Almost Overlap',
-      ShareCardTemplate.electric => '🎯 Number Overlap',
-      ShareCardTemplate.warm => '😂 Random Result',
-    };
+  ShareCardTemplate.fire => '🔥 Almost Overlap',
+  ShareCardTemplate.electric => '🎯 Number Overlap',
+  ShareCardTemplate.warm => '😂 Random Result',
+};
 
 String _templateDescription(ShareCardTemplate template) => switch (template) {
-      ShareCardTemplate.fire =>
-        'Dramatic gold-on-dark card for close calls and strong hit streaks.',
-      ShareCardTemplate.electric =>
-        'Clean neon stats card for smaller wins and partial matches.',
-      ShareCardTemplate.warm =>
-        'Playful motivational card for pending draws, misses, or pick-only sharing.',
-    };
+  ShareCardTemplate.fire =>
+    'Dramatic gold-on-dark card for close calls and strong hit streaks.',
+  ShareCardTemplate.electric =>
+    'Clean neon stats card for smaller wins and partial matches.',
+  ShareCardTemplate.warm =>
+    'Playful motivational card for pending draws, misses, or pick-only sharing.',
+};
