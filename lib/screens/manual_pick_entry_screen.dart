@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../data/seed_lotteries.dart';
+import '../l10n/l10n.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery.dart';
 import '../services/draw_date_service.dart';
@@ -68,7 +69,9 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
     setState(() => _saving = true);
 
     final mainSorted = _selectedMain.toList()..sort();
-    final bonusSorted = _selectedBonus.isEmpty ? null : (_selectedBonus.toList()..sort());
+    final bonusSorted = _selectedBonus.isEmpty
+        ? null
+        : (_selectedBonus.toList()..sort());
     final now = DateTime.now();
 
     final pick = GeneratedPick(
@@ -77,7 +80,7 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
       mainNumbers: mainSorted,
       bonusNumbers: bonusSorted,
       createdAt: now,
-      pickLabel: '👤 My Numbers',
+      pickLabel: context.l10n.manualPickLabel,
       drawDate: nextDrawDate(_lottery.id),
       drawLabel: nextDrawLabel(_lottery.id),
       source: PickSource.manual,
@@ -87,14 +90,15 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
     if (mounted) Navigator.pop(context, true);
   }
 
-  String _bonusLabel() => _lottery.bonusLabel ?? 'Supp';
+  String _bonusLabel() => _lottery.bonusLabel ?? context.l10n.commonSupp;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Add My Numbers')),
+      appBar: AppBar(title: Text(l10n.screenAddMyNumbersTitle)),
       body: Column(
         children: [
           Expanded(
@@ -106,11 +110,14 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
                   // ── Lottery selector ──────────────────────────────
                   InputDecorator(
                     decoration: InputDecoration(
-                      labelText: 'Lottery',
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                      labelText: l10n.lotteryLabel,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 4,
+                      ),
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<Lottery>(
@@ -132,12 +139,14 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        Icon(Icons.event_rounded,
-                            size: 13,
-                            color: theme.colorScheme.primary.withAlpha(160)),
+                        Icon(
+                          Icons.event_rounded,
+                          size: 13,
+                          color: theme.colorScheme.primary.withAlpha(160),
+                        ),
                         const SizedBox(width: 5),
                         Text(
-                          'Tracking result: ${nextDrawLabel(_lottery.id)}',
+                          l10n.trackingResult(nextDrawLabel(_lottery.id)!),
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: theme.colorScheme.primary.withAlpha(160),
                           ),
@@ -150,8 +159,11 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
 
                   // ── Main numbers ──────────────────────────────────
                   _SectionHeader(
-                    label:
-                        'Pick ${_lottery.mainCount} numbers  (${_lottery.mainMin}–${_lottery.mainMax})',
+                    label: l10n.pickMainNumbers(
+                      _lottery.mainCount,
+                      _lottery.mainMin,
+                      _lottery.mainMax,
+                    ),
                     selected: _selectedMain.length,
                     total: _lottery.mainCount,
                     theme: theme,
@@ -170,8 +182,12 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
                   if (_lottery.hasBonus) ...[
                     const SizedBox(height: 20),
                     _SectionHeader(
-                      label:
-                          'Pick ${_lottery.bonusCount} ${_bonusLabel()}  (${_lottery.bonusMin}–${_lottery.bonusMax})',
+                      label: l10n.pickBonusNumbers(
+                        _lottery.bonusCount!,
+                        _bonusLabel(),
+                        _lottery.bonusMin!,
+                        _lottery.bonusMax!,
+                      ),
                       selected: _selectedBonus.length,
                       total: _lottery.bonusCount!,
                       theme: theme,
@@ -207,12 +223,17 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white),
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : const Icon(Icons.bookmark_add_rounded),
                   label: Text(
-                    _isComplete ? 'Save My Numbers' : _progressText(),
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                    _isComplete ? l10n.saveMyNumbers : _progressText(l10n),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
@@ -223,16 +244,16 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
     );
   }
 
-  String _progressText() {
+  String _progressText(AppLocalizations l10n) {
     final mainLeft = _lottery.mainCount - _selectedMain.length;
-    if (mainLeft > 0) return 'Pick $mainLeft more number${mainLeft == 1 ? '' : 's'}';
+    if (mainLeft > 0) return l10n.pickMoreNumbers(mainLeft);
     if (_lottery.hasBonus) {
       final bonusLeft = (_lottery.bonusCount ?? 1) - _selectedBonus.length;
       if (bonusLeft > 0) {
-        return 'Pick $bonusLeft more ${_bonusLabel().toLowerCase()}${bonusLeft == 1 ? '' : 's'}';
+        return l10n.pickMoreBonus(bonusLeft, _bonusLabel().toLowerCase());
       }
     }
-    return 'Save My Numbers';
+    return l10n.saveMyNumbers;
   }
 }
 
@@ -259,8 +280,8 @@ class _SectionHeader extends StatelessWidget {
     final color = done
         ? Colors.green.shade600
         : isBonus
-            ? const Color(0xFFD32F2F)
-            : theme.colorScheme.primary;
+        ? const Color(0xFFD32F2F)
+        : theme.colorScheme.primary;
 
     return Row(
       children: [
@@ -276,8 +297,12 @@ class _SectionHeader extends StatelessWidget {
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
           child: done
-              ? Icon(Icons.check_circle_rounded,
-                  key: const ValueKey('done'), size: 18, color: Colors.green.shade600)
+              ? Icon(
+                  Icons.check_circle_rounded,
+                  key: const ValueKey('done'),
+                  size: 18,
+                  color: Colors.green.shade600,
+                )
               : Text(
                   '$selected / $total',
                   key: const ValueKey('count'),
@@ -351,9 +376,8 @@ class _NumberChip extends StatelessWidget {
     required this.onTap,
   });
 
-  Color get _fillColor => isBonus
-      ? const Color(0xFFD32F2F)
-      : theme.colorScheme.primary;
+  Color get _fillColor =>
+      isBonus ? const Color(0xFFD32F2F) : theme.colorScheme.primary;
 
   @override
   Widget build(BuildContext context) {
@@ -370,8 +394,8 @@ class _NumberChip extends StatelessWidget {
             color: selected
                 ? _fillColor
                 : disabled
-                    ? theme.colorScheme.outline.withAlpha(60)
-                    : theme.colorScheme.outline.withAlpha(130),
+                ? theme.colorScheme.outline.withAlpha(60)
+                : theme.colorScheme.outline.withAlpha(130),
             width: 1.5,
           ),
         ),
@@ -384,8 +408,8 @@ class _NumberChip extends StatelessWidget {
               color: selected
                   ? Colors.white
                   : disabled
-                      ? theme.colorScheme.onSurface.withAlpha(60)
-                      : theme.colorScheme.onSurface.withAlpha(180),
+                  ? theme.colorScheme.onSurface.withAlpha(60)
+                  : theme.colorScheme.onSurface.withAlpha(180),
             ),
           ),
         ),

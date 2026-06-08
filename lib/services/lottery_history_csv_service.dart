@@ -4,10 +4,13 @@ import 'package:csv/csv.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../l10n/generated/app_localizations_en.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import '../models/lottery_history_result.dart';
 import 'lottery_service.dart';
+
+final _l10n = AppLocalizationsEn();
 
 class LotteryHistoryCsvService {
   LotteryHistoryCsvService._();
@@ -56,7 +59,7 @@ class LotteryHistoryCsvService {
           loadedAt: null,
         );
       }
-      throw Exception('No remote CSV configured for ${lottery.name}.');
+      throw Exception(_l10n.lotteryHistoryNoRemoteCsv(lottery.name));
     }
 
     final prefs = await SharedPreferences.getInstance();
@@ -68,7 +71,7 @@ class LotteryHistoryCsvService {
       );
       final response = await http.get(uri).timeout(const Duration(seconds: 12));
       if (response.statusCode != 200) {
-        throw Exception('Failed to load history CSV (${response.statusCode}).');
+        throw Exception(_l10n.lotteryHistoryLoadFailed(response.statusCode));
       }
 
       final csvString = utf8.decode(response.bodyBytes);
@@ -116,9 +119,7 @@ class LotteryHistoryCsvService {
         );
       }
 
-      throw Exception(
-        'No internet connection and no saved lottery history yet.',
-      );
+      throw Exception(_l10n.noInternetNoSavedHistory);
     }
   }
 
@@ -129,7 +130,7 @@ class LotteryHistoryCsvService {
     ).convert(csvString);
 
     if (rows.length <= 1) {
-      throw Exception('History CSV is empty.');
+      throw Exception(_l10n.lotteryHistoryCsvEmpty);
     }
 
     try {
@@ -161,12 +162,12 @@ class LotteryHistoryCsvService {
             ..sort((a, b) => b.drawDate.compareTo(a.drawDate));
 
       if (draws.isEmpty) {
-        throw Exception('No valid draw rows found in CSV.');
+        throw Exception(_l10n.lotteryHistoryNoValidRows);
       }
 
       return draws;
     } catch (error) {
-      throw Exception('Failed to parse history CSV: $error');
+      throw Exception(_l10n.lotteryHistoryParseFailed(error.toString()));
     }
   }
 

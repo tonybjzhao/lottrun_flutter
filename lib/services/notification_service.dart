@@ -3,8 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import '../l10n/generated/app_localizations_en.dart';
 import '../navigator_key.dart';
 import '../screens/saved_picks_screen.dart';
+
+final _l10n = AppLocalizationsEn();
 
 class NotificationService {
   static final instance = NotificationService._();
@@ -14,7 +17,6 @@ class NotificationService {
   bool _initialized = false;
 
   static const _channelId = 'result_ready';
-  static const _channelName = 'Result Ready';
   static const _notifId = 42;
   static const _insightNotifId = 43;
   static const _weeklyNotifId = 44;
@@ -23,8 +25,9 @@ class NotificationService {
     if (_initialized) return;
     _initialized = true;
 
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -40,9 +43,7 @@ class NotificationService {
   void _handleTap(NotificationResponse response) {
     final navigator = globalNavigatorKey.currentState;
     if (navigator == null) return;
-    navigator.push(
-      MaterialPageRoute(builder: (_) => const SavedPicksScreen()),
-    );
+    navigator.push(MaterialPageRoute(builder: (_) => const SavedPicksScreen()));
   }
 
   /// Returns true if the app was cold-launched by tapping a notification.
@@ -56,10 +57,10 @@ class NotificationService {
     final granted = await _requestPermission();
     if (!granted) return;
 
-    const androidDetails = AndroidNotificationDetails(
+    final androidDetails = AndroidNotificationDetails(
       _channelId,
-      _channelName,
-      channelDescription: 'Notifies when lottery draw results are available',
+      _l10n.notificationResultReadyChannel,
+      channelDescription: _l10n.notificationResultsDescription,
       importance: Importance.high,
       priority: Priority.high,
     );
@@ -69,14 +70,15 @@ class NotificationService {
       presentSound: true,
     );
 
-    final title =
-        count == 1 ? 'Result Ready 🎯' : '$count Results Ready 🎯';
+    final title = count == 1
+        ? _l10n.notificationResultReadyTitle
+        : _l10n.notificationResultsReadyTitle(count);
 
     await _plugin.show(
       _notifId,
       title,
-      'Your saved lottery numbers are ready to check',
-      const NotificationDetails(android: androidDetails, iOS: iosDetails),
+      _l10n.notificationSavedNumbersReady,
+      NotificationDetails(android: androidDetails, iOS: iosDetails),
     );
   }
 
@@ -85,10 +87,10 @@ class NotificationService {
     final granted = await _requestPermission();
     if (!granted) return;
 
-    const androidDetails = AndroidNotificationDetails(
+    final androidDetails = AndroidNotificationDetails(
       'insights',
-      'Daily Insights',
-      channelDescription: 'Daily draw trend observations',
+      _l10n.notificationDailyInsightsChannel,
+      channelDescription: _l10n.notificationDailyDescription,
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
     );
@@ -100,9 +102,9 @@ class NotificationService {
 
     await _plugin.show(
       _insightNotifId,
-      "Today's Insight 📊",
+      _l10n.notificationDailyInsightTitle,
       body,
-      const NotificationDetails(android: androidDetails, iOS: iosDetails),
+      NotificationDetails(android: androidDetails, iOS: iosDetails),
     );
   }
 
@@ -111,10 +113,10 @@ class NotificationService {
     final granted = await _requestPermission();
     if (!granted) return;
 
-    const androidDetails = AndroidNotificationDetails(
+    final androidDetails = AndroidNotificationDetails(
       'weekly_summary',
-      'Weekly Summary',
-      channelDescription: 'Weekly draw pattern summary',
+      _l10n.notificationWeeklySummaryChannel,
+      channelDescription: _l10n.notificationWeeklyDescription,
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
     );
@@ -126,9 +128,9 @@ class NotificationService {
 
     await _plugin.show(
       _weeklyNotifId,
-      'Weekly Summary 📅',
+      _l10n.notificationWeeklySummaryTitle,
       body,
-      const NotificationDetails(android: androidDetails, iOS: iosDetails),
+      NotificationDetails(android: androidDetails, iOS: iosDetails),
     );
   }
 
@@ -136,14 +138,16 @@ class NotificationService {
     if (Platform.isIOS) {
       return await _plugin
               .resolvePlatformSpecificImplementation<
-                  IOSFlutterLocalNotificationsPlugin>()
+                IOSFlutterLocalNotificationsPlugin
+              >()
               ?.requestPermissions(alert: true, badge: false, sound: true) ??
           false;
     }
     if (Platform.isAndroid) {
       return await _plugin
               .resolvePlatformSpecificImplementation<
-                  AndroidFlutterLocalNotificationsPlugin>()
+                AndroidFlutterLocalNotificationsPlugin
+              >()
               ?.requestNotificationsPermission() ??
           false;
     }

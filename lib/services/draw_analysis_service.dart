@@ -1,5 +1,8 @@
+import '../l10n/generated/app_localizations_en.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
+
+final _l10n = AppLocalizationsEn();
 
 // ── Output models ─────────────────────────────────────────────────────────────
 
@@ -113,7 +116,7 @@ class DrawAnalysisService {
   }) {
     final recent = draws.take(drawCount).toList();
     if (recent.isEmpty) {
-      return const RecentDrawTrends(
+      return RecentDrawTrends(
         drawCount: 0,
         topFrequent: [],
         bottomFrequent: [],
@@ -123,7 +126,7 @@ class DrawAnalysisService {
         avgConsecutivePairs: 0,
         mostCommonConsecutiveCount: 0,
         trendStrength: TrendStrength.random,
-        summary: 'Not enough draw history for analysis.',
+        summary: _l10n.drawAnalysisNotEnough,
       );
     }
 
@@ -132,28 +135,36 @@ class DrawAnalysisService {
       ..sort((a, b) => b.value.compareTo(a.value));
 
     final topFrequent = sorted.take(5).map((e) => e.key).toList();
-    final bottomFrequent =
-        sorted.reversed.take(5).map((e) => e.key).toList();
+    final bottomFrequent = sorted.reversed.take(5).map((e) => e.key).toList();
 
-    final avgSum = recent
+    final avgSum =
+        recent
             .map((d) => d.mainNumbers.fold(0, (s, n) => s + n))
             .fold(0, (s, v) => s + v) /
         recent.length;
 
     final oddEvenPattern = _mostCommonOddEven(recent);
-    final lowHighPattern =
-        _mostCommonLowHigh(recent, lottery.mainMin, lottery.mainMax);
+    final lowHighPattern = _mostCommonLowHigh(
+      recent,
+      lottery.mainMin,
+      lottery.mainMax,
+    );
 
-    final consecutiveCounts =
-        recent.map((d) => _consecutivePairs(d.mainNumbers)).toList();
+    final consecutiveCounts = recent
+        .map((d) => _consecutivePairs(d.mainNumbers))
+        .toList();
     final avgConsec =
         consecutiveCounts.fold(0, (s, v) => s + v) / consecutiveCounts.length;
     final mostCommonConsec = _mode(consecutiveCounts);
 
     final strength = _trendStrength(freq, recent.length, lottery.mainCount);
 
-    final summary =
-        _recentTrendSummary(strength, topFrequent, lottery.mainMin, lottery.mainMax);
+    final summary = _recentTrendSummary(
+      strength,
+      topFrequent,
+      lottery.mainMin,
+      lottery.mainMax,
+    );
 
     return RecentDrawTrends(
       drawCount: recent.length,
@@ -179,13 +190,13 @@ class DrawAnalysisService {
     final draws = recentDraws.take(compareDrawCount).toList();
 
     if (savedMainNumbers.isEmpty || draws.isEmpty) {
-      return const SavedPicksAnalysis(
+      return SavedPicksAnalysis(
         bestMatchDrawDate: null,
         bestMatchCount: 0,
         averageMatchCount: 0,
         frequentlyPickedNumbers: [],
         recentlyAppearedNumbers: [],
-        summary: 'No saved picks or draw history to compare.',
+        summary: _l10n.drawAnalysisNoSavedPicks,
       );
     }
 
@@ -248,13 +259,16 @@ class DrawAnalysisService {
     int similarDrawsLimit = 3,
   }) {
     final cutoff = targetDraw.drawDate.subtract(const Duration(days: 365 * 5));
-    final history = allDraws
-        .where((d) =>
-            d.lotteryId == targetDraw.lotteryId &&
-            d.drawDate.isBefore(targetDraw.drawDate) &&
-            d.drawDate.isAfter(cutoff))
-        .toList()
-      ..sort((a, b) => b.drawDate.compareTo(a.drawDate));
+    final history =
+        allDraws
+            .where(
+              (d) =>
+                  d.lotteryId == targetDraw.lotteryId &&
+                  d.drawDate.isBefore(targetDraw.drawDate) &&
+                  d.drawDate.isAfter(cutoff),
+            )
+            .toList()
+          ..sort((a, b) => b.drawDate.compareTo(a.drawDate));
 
     if (history.length < _minHistoryRequired) return null;
 
@@ -268,7 +282,8 @@ class DrawAnalysisService {
     final sumRange = _calcSumRangeScore(main, history);
     final consec = _calcConsecutiveScore(main, history);
 
-    final rawScore = 0.35 * trend +
+    final rawScore =
+        0.35 * trend +
         0.25 * hotCold +
         0.15 * oddEven +
         0.10 * lowHigh +
@@ -279,10 +294,11 @@ class DrawAnalysisService {
 
     final longTermFreq = _frequencyMap(history);
     final allNums = List.generate(
-        lottery.mainMax - lottery.mainMin + 1, (i) => lottery.mainMin + i);
+      lottery.mainMax - lottery.mainMin + 1,
+      (i) => lottery.mainMin + i,
+    );
     final sortedByFreq = allNums.toList()
-      ..sort((a, b) =>
-          (longTermFreq[b] ?? 0).compareTo(longTermFreq[a] ?? 0));
+      ..sort((a, b) => (longTermFreq[b] ?? 0).compareTo(longTermFreq[a] ?? 0));
     final hotThreshold = (allNums.length * 0.25).ceil();
     final coldThreshold = (allNums.length * 0.75).floor();
     final hotSet = sortedByFreq.take(hotThreshold).toSet();
@@ -298,14 +314,17 @@ class DrawAnalysisService {
     final consecCount = _consecutivePairs(main);
 
     final currentSum = main.fold(0, (s, n) => s + n);
-    final historicalSums = history
-        .map((d) => d.mainNumbers.fold(0, (s, n) => s + n))
-        .toList()
-      ..sort();
+    final historicalSums =
+        history.map((d) => d.mainNumbers.fold(0, (s, n) => s + n)).toList()
+          ..sort();
     final sumLabel = _sumRangeLabel(currentSum, historicalSums);
 
-    final similar =
-        _findSimilarDraws(targetDraw, history, midpoint, similarDrawsLimit);
+    final similar = _findSimilarDraws(
+      targetDraw,
+      history,
+      midpoint,
+      similarDrawsLimit,
+    );
 
     final summary = _historicalSummary(finalScore);
 
@@ -372,7 +391,10 @@ class DrawAnalysisService {
   }
 
   static String _mostCommonLowHigh(
-      List<LotteryDraw> draws, int minVal, int maxVal) {
+    List<LotteryDraw> draws,
+    int minVal,
+    int maxVal,
+  ) {
     final midpoint = (minVal + maxVal) / 2;
     final freq = <String, int>{};
     for (final d in draws) {
@@ -386,12 +408,16 @@ class DrawAnalysisService {
   }
 
   static TrendStrength _trendStrength(
-      Map<int, int> freq, int drawCount, int mainCount) {
+    Map<int, int> freq,
+    int drawCount,
+    int mainCount,
+  ) {
     if (freq.isEmpty || drawCount == 0) return TrendStrength.random;
     final totalAppearances = drawCount * mainCount;
     final uniqueNumbers = freq.length;
-    final expectedAvg =
-        uniqueNumbers > 0 ? totalAppearances / uniqueNumbers : 1.0;
+    final expectedAvg = uniqueNumbers > 0
+        ? totalAppearances / uniqueNumbers
+        : 1.0;
     final maxFreq = freq.values.reduce((a, b) => a > b ? a : b).toDouble();
     final ratio = maxFreq / expectedAvg;
     if (ratio >= 2.0) return TrendStrength.strong;
@@ -402,7 +428,10 @@ class DrawAnalysisService {
   // ── Phase 3 score components ──────────────────────────────────────────────
 
   static double _calcTrendScore(
-      List<int> main, List<LotteryDraw> history, Lottery lottery) {
+    List<int> main,
+    List<LotteryDraw> history,
+    Lottery lottery,
+  ) {
     final weightedFreq = <int, double>{};
     for (int i = 0; i < history.length; i++) {
       final weight = i < 12 ? 0.6 : (i < 52 ? 0.3 : 0.1);
@@ -426,10 +455,15 @@ class DrawAnalysisService {
   }
 
   static double _calcHotColdScore(
-      List<int> main, List<LotteryDraw> history, Lottery lottery) {
+    List<int> main,
+    List<LotteryDraw> history,
+    Lottery lottery,
+  ) {
     final freq = _frequencyMap(history);
     final allNums = List.generate(
-        lottery.mainMax - lottery.mainMin + 1, (i) => lottery.mainMin + i);
+      lottery.mainMax - lottery.mainMin + 1,
+      (i) => lottery.mainMin + i,
+    );
     final sorted = allNums.toList()
       ..sort((a, b) => (freq[b] ?? 0).compareTo(freq[a] ?? 0));
     final hotThreshold = (allNums.length * 0.25).ceil();
@@ -450,8 +484,7 @@ class DrawAnalysisService {
     return (total / main.length).clamp(0, 100);
   }
 
-  static double _calcOddEvenScore(
-      List<int> main, List<LotteryDraw> history) {
+  static double _calcOddEvenScore(List<int> main, List<LotteryDraw> history) {
     final currentOdd = main.where((n) => n.isOdd).length;
     final mostCommon = _mostCommonOddEvenCount(history);
     final diff = (currentOdd - mostCommon).abs();
@@ -472,7 +505,10 @@ class DrawAnalysisService {
   }
 
   static double _calcLowHighScore(
-      List<int> main, List<LotteryDraw> history, double midpoint) {
+    List<int> main,
+    List<LotteryDraw> history,
+    double midpoint,
+  ) {
     final currentLow = main.where((n) => n <= midpoint).length;
     final mostCommon = _mostCommonLowCount(history, midpoint);
     final diff = (currentLow - mostCommon).abs();
@@ -492,13 +528,11 @@ class DrawAnalysisService {
     return freq.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
   }
 
-  static double _calcSumRangeScore(
-      List<int> main, List<LotteryDraw> history) {
+  static double _calcSumRangeScore(List<int> main, List<LotteryDraw> history) {
     final currentSum = main.fold(0, (s, n) => s + n);
-    final sums = history
-        .map((d) => d.mainNumbers.fold(0, (s, n) => s + n))
-        .toList()
-      ..sort();
+    final sums =
+        history.map((d) => d.mainNumbers.fold(0, (s, n) => s + n)).toList()
+          ..sort();
     if (sums.isEmpty) return 50;
 
     final p10 = sums[((sums.length - 1) * 0.10).round()];
@@ -513,10 +547,13 @@ class DrawAnalysisService {
   }
 
   static double _calcConsecutiveScore(
-      List<int> main, List<LotteryDraw> history) {
+    List<int> main,
+    List<LotteryDraw> history,
+  ) {
     final currentConsec = _consecutivePairs(main);
     final mostCommon = _mode(
-        history.map((d) => _consecutivePairs(d.mainNumbers)).toList());
+      history.map((d) => _consecutivePairs(d.mainNumbers)).toList(),
+    );
     final diff = (currentConsec - mostCommon).abs();
     if (diff == 0) return 100;
     if (diff == 1) return 70;
@@ -524,17 +561,20 @@ class DrawAnalysisService {
   }
 
   static String _sumRangeLabel(int sum, List<int> sortedSums) {
-    if (sortedSums.isEmpty) return 'Unknown';
+    if (sortedSums.isEmpty) return _l10n.unknown;
     final p25 = sortedSums[((sortedSums.length - 1) * 0.25).round()];
     final p75 = sortedSums[((sortedSums.length - 1) * 0.75).round()];
-    if (sum < p25) return 'Below typical range';
-    if (sum > p75) return 'Above typical range';
-    return 'Within typical range';
+    if (sum < p25) return _l10n.belowTypicalRange;
+    if (sum > p75) return _l10n.aboveTypicalRange;
+    return _l10n.withinTypicalRange;
   }
 
   static List<SimilarDraw> _findSimilarDraws(
-      LotteryDraw target, List<LotteryDraw> history, double midpoint,
-      int limit) {
+    LotteryDraw target,
+    List<LotteryDraw> history,
+    double midpoint,
+    int limit,
+  ) {
     final targetMain = target.mainNumbers.toSet();
     final targetOdd = target.mainNumbers.where((n) => n.isOdd).length;
     final targetLow = target.mainNumbers.where((n) => n <= midpoint).length;
@@ -557,7 +597,8 @@ class DrawAnalysisService {
           : 0.5;
       final consecScore = targetConsec == dConsec ? 1.0 : 0.5;
 
-      final similarity = (sharedScore * 0.4 +
+      final similarity =
+          (sharedScore * 0.4 +
               oddScore * 0.15 +
               lowScore * 0.15 +
               sumScore.clamp(0, 1) * 0.2 +
@@ -569,8 +610,7 @@ class DrawAnalysisService {
         sharedNumbers: shared,
         similarityScore: similarity.clamp(0, 100),
       );
-    }).toList()
-      ..sort((a, b) => b.similarityScore.compareTo(a.similarityScore));
+    }).toList()..sort((a, b) => b.similarityScore.compareTo(a.similarityScore));
 
     return scored.take(limit).toList();
   }
@@ -578,44 +618,49 @@ class DrawAnalysisService {
   // ── Summary text generators ───────────────────────────────────────────────
 
   static String _recentTrendSummary(
-      TrendStrength strength, List<int> topNums, int minVal, int maxVal) {
+    TrendStrength strength,
+    List<int> topNums,
+    int minVal,
+    int maxVal,
+  ) {
     final topInMid = topNums
-        .where((n) =>
-            n > minVal + (maxVal - minVal) * 0.25 &&
-            n < maxVal - (maxVal - minVal) * 0.25)
+        .where(
+          (n) =>
+              n > minVal + (maxVal - minVal) * 0.25 &&
+              n < maxVal - (maxVal - minVal) * 0.25,
+        )
         .length;
 
     switch (strength) {
       case TrendStrength.strong:
-        return 'Recent draws show higher activity among a few numbers — a notable concentration in this period.';
+        return _l10n.recentDrawsConcentrated;
       case TrendStrength.balanced:
         if (topInMid >= 3) {
-          return 'This period shows higher activity among several mid-range numbers.';
+          return _l10n.periodMidRangeActive;
         }
-        return 'Recent draws are fairly balanced with a moderate spread across numbers.';
+        return _l10n.recentDrawsModerateSpread;
       case TrendStrength.random:
-        return 'Recent draws are fairly balanced with no strong pattern detected.';
+        return _l10n.recentDrawsNoStrongPattern;
     }
   }
 
-  static String _savedPicksSummary(
-      double avgMatch, int recentlyAppearedCount) {
+  static String _savedPicksSummary(double avgMatch, int recentlyAppearedCount) {
     if (avgMatch >= 2.5) {
-      return 'Your saved picks have matched recent draws moderately.';
+      return _l10n.savedPicksModerate;
     }
     if (recentlyAppearedCount >= 3) {
-      return 'Several numbers you saved appeared in recent results.';
+      return _l10n.savedNumbersAppeared;
     }
-    return 'Your saved picks show limited overlap with recent draw results.';
+    return _l10n.savedPicksLimited;
   }
 
   static String _historicalSummary(int score) {
     if (score >= 70) {
-      return 'This draw shows a strong comparison with historical patterns from the past 5 years.';
+      return _l10n.drawStrongHistoricalComparison;
     }
     if (score >= 45) {
-      return 'This draw shows a moderate comparison with historical distribution patterns.';
+      return _l10n.drawModerateHistoricalComparison;
     }
-    return 'This draw shows a limited comparison with typical historical patterns.';
+    return _l10n.drawLimitedHistoricalComparison;
   }
 }

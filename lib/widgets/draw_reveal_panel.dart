@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/l10n.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery.dart';
 import '../services/pick_result_service.dart';
@@ -66,13 +67,19 @@ class _DrawRevealPanelState extends State<DrawRevealPanel>
     super.dispose();
   }
 
-  Animation<double> _interval(double start, double end,
-          {Curve curve = Curves.easeOutCubic}) =>
-      CurvedAnimation(parent: _ctrl, curve: Interval(start, end, curve: curve));
+  Animation<double> _interval(
+    double start,
+    double end, {
+    Curve curve = Curves.easeOutCubic,
+  }) => CurvedAnimation(
+    parent: _ctrl,
+    curve: Interval(start, end, curve: curve),
+  );
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final drawMain = widget.result.drawMainNumbers;
     final drawSupp = widget.result.drawBonusNumbers ?? [];
     final isSupp = widget.lottery.bonusIsSupplementary;
@@ -89,32 +96,45 @@ class _DrawRevealPanelState extends State<DrawRevealPanel>
     // [0.66–0.90]  animated match counter
     // [0.88–1.00]  summary card slide-up
 
-    final headerAnim    = _interval(0.00, 0.07);
-    final mainAnims     = List.generate(drawMain.length, (i) =>
-        _interval(0.02 + i * 0.06, 0.12 + i * 0.06, curve: Curves.elasticOut));
+    final headerAnim = _interval(0.00, 0.07);
+    final mainAnims = List.generate(
+      drawMain.length,
+      (i) =>
+          _interval(0.02 + i * 0.06, 0.12 + i * 0.06, curve: Curves.elasticOut),
+    );
     final suppLabelAnim = _interval(0.40, 0.47);
-    final suppAnims     = List.generate(drawSupp.length, (i) =>
-        _interval(0.44 + i * 0.09, 0.54 + i * 0.09, curve: Curves.easeOutBack));
-    final userFadeAnim  = _interval(0.58, 0.65);
-    final highlightAnims = List.generate(_matchedIndices.length, (i) =>
-        _interval((0.66 + i * 0.07).clamp(0.0, 0.88),
-                  (0.76 + i * 0.07).clamp(0.0, 0.96),
-                  curve: Curves.elasticOut));
-    final counterAnim   = _interval(0.66, 0.90);
-    final summaryAnim   = _interval(0.88, 1.00, curve: Curves.easeOutQuart);
+    final suppAnims = List.generate(
+      drawSupp.length,
+      (i) => _interval(
+        0.44 + i * 0.09,
+        0.54 + i * 0.09,
+        curve: Curves.easeOutBack,
+      ),
+    );
+    final userFadeAnim = _interval(0.58, 0.65);
+    final highlightAnims = List.generate(
+      _matchedIndices.length,
+      (i) => _interval(
+        (0.66 + i * 0.07).clamp(0.0, 0.88),
+        (0.76 + i * 0.07).clamp(0.0, 0.96),
+        curve: Curves.elasticOut,
+      ),
+    );
+    final counterAnim = _interval(0.66, 0.90);
+    final summaryAnim = _interval(0.88, 1.00, curve: Curves.easeOutQuart);
 
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (context, _) {
         // Pre-compute all values — one rebuild per frame, no sub-AnimatedBuilders.
-        final headerOp    = headerAnim.value.clamp(0.0, 1.0);
-        final mainVals    = mainAnims.map((a) => a.value).toList();
+        final headerOp = headerAnim.value.clamp(0.0, 1.0);
+        final mainVals = mainAnims.map((a) => a.value).toList();
         final suppLabelOp = suppLabelAnim.value.clamp(0.0, 1.0);
-        final suppVals    = suppAnims.map((a) => a.value).toList();
-        final userFadeOp  = userFadeAnim.value.clamp(0.0, 1.0);
-        final hlVals      = highlightAnims.map((a) => a.value).toList();
+        final suppVals = suppAnims.map((a) => a.value).toList();
+        final userFadeOp = userFadeAnim.value.clamp(0.0, 1.0);
+        final hlVals = highlightAnims.map((a) => a.value).toList();
         final counterProg = counterAnim.value;
-        final summaryOp   = summaryAnim.value.clamp(0.0, 1.0);
+        final summaryOp = summaryAnim.value.clamp(0.0, 1.0);
 
         // Map: userMain index → highlight value (0..1.5 elastic)
         final hlMap = <int, double>{
@@ -131,7 +151,7 @@ class _DrawRevealPanelState extends State<DrawRevealPanel>
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
-                  'DRAW RESULT',
+                  l10n.drawResult,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.w800,
@@ -149,7 +169,11 @@ class _DrawRevealPanelState extends State<DrawRevealPanel>
               child: Row(
                 children: [
                   for (var i = 0; i < drawMain.length; i++) ...[
-                    _RevealBall(number: drawMain[i], value: mainVals[i], isSupp: false),
+                    _RevealBall(
+                      number: drawMain[i],
+                      value: mainVals[i],
+                      isSupp: false,
+                    ),
                     if (i < drawMain.length - 1) const SizedBox(width: 6),
                   ],
                 ],
@@ -161,9 +185,9 @@ class _DrawRevealPanelState extends State<DrawRevealPanel>
               const SizedBox(height: 8),
               Opacity(
                 opacity: suppLabelOp,
-                child: const Text(
-                  'SUPPLEMENTARY',
-                  style: TextStyle(
+                child: Text(
+                  l10n.supplementary,
+                  style: const TextStyle(
                     color: Color(0xFF1A5FA8),
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.0,
@@ -176,7 +200,11 @@ class _DrawRevealPanelState extends State<DrawRevealPanel>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   for (var i = 0; i < drawSupp.length; i++) ...[
-                    _RevealBall(number: drawSupp[i], value: suppVals[i], isSupp: true),
+                    _RevealBall(
+                      number: drawSupp[i],
+                      value: suppVals[i],
+                      isSupp: true,
+                    ),
                     if (i < drawSupp.length - 1) const SizedBox(width: 6),
                   ],
                 ],
@@ -188,18 +216,21 @@ class _DrawRevealPanelState extends State<DrawRevealPanel>
             // ── Divider ────────────────────────────────────────────────────
             Opacity(
               opacity: userFadeOp,
-              child: Divider(height: 1, color: theme.colorScheme.outlineVariant),
+              child: Divider(
+                height: 1,
+                color: theme.colorScheme.outlineVariant,
+              ),
             ),
             const SizedBox(height: 10),
 
             // ── "YOUR NUMBERS" label ───────────────────────────────────────
             Opacity(
               opacity: userFadeOp,
-              child: const Padding(
-                padding: EdgeInsets.only(bottom: 8),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
-                  'YOUR NUMBERS',
-                  style: TextStyle(
+                  l10n.yourNumbers,
+                  style: const TextStyle(
                     color: Color(0xFF999999),
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.0,
@@ -225,7 +256,8 @@ class _DrawRevealPanelState extends State<DrawRevealPanel>
                           isMatchedMain: _matchedMainSet.contains(_userMain[i]),
                           isMatchedSupp: _matchedSuppSet.contains(_userMain[i]),
                           // Matched: animate 0→1; unmatched: immediately dimmed (1.0)
-                          highlightValue: hlMap[i] ??
+                          highlightValue:
+                              hlMap[i] ??
                               (_matchedMainSet.contains(_userMain[i]) ||
                                       _matchedSuppSet.contains(_userMain[i])
                                   ? 0.0
@@ -253,8 +285,11 @@ class _DrawRevealPanelState extends State<DrawRevealPanel>
                   matchedBonus: widget.result.matchedBonus,
                   bonusLabel: widget.lottery.bonusLabel,
                   counterProgress: counterProg,
-                  summary: widget.result.matchSummary(widget.lottery),
-                  levelLabel: widget.result.levelLabel(widget.lottery),
+                  summary: widget.result.matchSummary(widget.lottery, l10n),
+                  levelLabel: widget.result.levelLabel(widget.lottery, l10n),
+                  totalMatches: isSupp
+                      ? matchedMain + suppHits
+                      : matchedMain + widget.result.matchedBonus,
                   isBest: widget.isBest,
                   theme: theme,
                 ),
@@ -274,13 +309,16 @@ class _RevealBall extends StatelessWidget {
   final double value; // raw animation value; elastic may exceed 1.0
   final bool isSupp;
 
-  const _RevealBall(
-      {required this.number, required this.value, required this.isSupp});
+  const _RevealBall({
+    required this.number,
+    required this.value,
+    required this.isSupp,
+  });
 
   @override
   Widget build(BuildContext context) {
     final opacity = value.clamp(0.0, 1.0);
-    final scale   = value.clamp(0.0, 1.15);
+    final scale = value.clamp(0.0, 1.15);
     final yOffset = 10.0 * (1.0 - opacity);
 
     const size = 38.0;
@@ -288,8 +326,9 @@ class _RevealBall extends StatelessWidget {
     final colors = isSupp
         ? [const Color(0xFFB0BEC5), const Color(0xFF78909C)]
         : [const Color(0xFF42A5F5), const Color(0xFF1565C0)];
-    final shadowColor =
-        isSupp ? const Color(0xFF78909C) : const Color(0xFF1565C0);
+    final shadowColor = isSupp
+        ? const Color(0xFF78909C)
+        : const Color(0xFF1565C0);
 
     return Transform.translate(
       offset: Offset(0, yOffset),
@@ -364,15 +403,18 @@ class _UserMatchBall extends StatelessWidget {
     final Color textColor;
 
     if (isMatchedMain) {
-      gradient  = [const Color(0xFFFFD54F), const Color(0xFFFFAB00)]; // warm gold
+      gradient = [
+        const Color(0xFFFFD54F),
+        const Color(0xFFFFAB00),
+      ]; // warm gold
       ringColor = const Color(0xFFFF8F00);
       textColor = const Color(0xFF4A3000);
     } else if (isMatchedSupp) {
-      gradient  = [const Color(0xFF5C9FD6), const Color(0xFF1A5FA8)]; // blue
+      gradient = [const Color(0xFF5C9FD6), const Color(0xFF1A5FA8)]; // blue
       ringColor = const Color(0xFF1A5FA8);
       textColor = Colors.white;
     } else {
-      gradient  = [const Color(0xFFEEEEEE), const Color(0xFFE0E0E0)]; // grey
+      gradient = [const Color(0xFFEEEEEE), const Color(0xFFE0E0E0)]; // grey
       ringColor = Colors.transparent;
       textColor = Colors.grey.shade500;
     }
@@ -380,7 +422,7 @@ class _UserMatchBall extends StatelessWidget {
     // Matched: scale in from 0.82 → 1.0 (elastic may push past 1)
     // Unmatched: immediate full dim (highlightValue=1.0 on reveal)
     final ballOpacity = isMatched ? 1.0 : (1.0 - 0.55 * hvC);
-    final ballScale   = isMatched ? (0.82 + 0.18 * hvC) : 1.0;
+    final ballScale = isMatched ? (0.82 + 0.18 * hvC) : 1.0;
 
     return Stack(
       alignment: Alignment.center,
@@ -459,15 +501,12 @@ class _UserMatchBall extends StatelessWidget {
                   color: const Color(0xFF1A5FA8),
                   borderRadius: BorderRadius.circular(4),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(40),
-                      blurRadius: 3,
-                    ),
+                    BoxShadow(color: Colors.black.withAlpha(40), blurRadius: 3),
                   ],
                 ),
-                child: const Text(
-                  'S',
-                  style: TextStyle(
+                child: Text(
+                  context.l10n.suppShort,
+                  style: const TextStyle(
                     fontSize: 7,
                     color: Colors.white,
                     fontWeight: FontWeight.w900,
@@ -493,6 +532,7 @@ class _MatchSummaryCard extends StatelessWidget {
   final double counterProgress; // 0.0–1.0
   final String summary;
   final String levelLabel;
+  final int totalMatches;
   final bool isBest;
   final ThemeData theme;
 
@@ -505,41 +545,42 @@ class _MatchSummaryCard extends StatelessWidget {
     required this.counterProgress,
     required this.summary,
     required this.levelLabel,
+    required this.totalMatches,
     required this.isBest,
     required this.theme,
   });
 
-  String get _emoji => switch (levelLabel) {
-        'Light hit' => '🙂',
-        'Nice'      => '😊',
-        'Solid'     => '🔥',
-        'Strong'    => '💪',
-        'Great'     => '💥',
-        _           => '—',
-      };
+  String get _emoji => switch (totalMatches) {
+    1 => '🙂',
+    2 => '😊',
+    3 => '🔥',
+    4 => '💪',
+    >= 5 => '💥',
+    _ => '—',
+  };
 
   @override
   Widget build(BuildContext context) {
     final total = isSupp ? matchedMain + suppHits : matchedMain + matchedBonus;
     final animatedCount = (total * counterProgress.clamp(0.0, 1.0)).round();
-    final isGood  = total >= 2;
+    final isGood = total >= 2;
     final isGreat = total >= 4;
 
     final bgColor = isGreat
         ? Colors.amber.shade50
         : isGood
-            ? theme.colorScheme.primaryContainer.withAlpha(100)
-            : theme.colorScheme.surfaceContainerHighest.withAlpha(200);
+        ? theme.colorScheme.primaryContainer.withAlpha(100)
+        : theme.colorScheme.surfaceContainerHighest.withAlpha(200);
     final borderColor = isGreat
         ? Colors.amber.shade200
         : isGood
-            ? theme.colorScheme.primary.withAlpha(50)
-            : theme.colorScheme.outlineVariant;
+        ? theme.colorScheme.primary.withAlpha(50)
+        : theme.colorScheme.outlineVariant;
     final accentColor = isGreat
         ? Colors.amber.shade900
         : isGood
-            ? theme.colorScheme.primary
-            : theme.colorScheme.onSurface.withAlpha(140);
+        ? theme.colorScheme.primary
+        : theme.colorScheme.onSurface.withAlpha(140);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
@@ -566,13 +607,16 @@ class _MatchSummaryCard extends StatelessWidget {
               if (isBest) ...[
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.amber.shade100,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    '🏆 Top',
+                    context.l10n.topWithTrophy,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: Colors.amber.shade900,
                       fontWeight: FontWeight.w800,
@@ -584,14 +628,16 @@ class _MatchSummaryCard extends StatelessWidget {
               const Spacer(),
               // Animated match counter
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: isGreat
                       ? Colors.amber.shade100
                       : isGood
-                          ? theme.colorScheme.primary.withAlpha(18)
-                          : theme.colorScheme.surfaceContainerHighest,
+                      ? theme.colorScheme.primary.withAlpha(18)
+                      : theme.colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: borderColor),
                 ),
@@ -607,7 +653,7 @@ class _MatchSummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            summary.isEmpty ? 'No main matched' : summary,
+            summary.isEmpty ? context.l10n.noMainMatched : summary,
             style: theme.textTheme.bodySmall?.copyWith(
               color: isGood
                   ? theme.colorScheme.onSurface
@@ -617,7 +663,7 @@ class _MatchSummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Check official results for details',
+            context.l10n.checkOfficialResults,
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurface.withAlpha(75),
               fontStyle: FontStyle.italic,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/l10n.dart';
 import '../models/generated_pick.dart';
 
 class StyleChipGroup extends StatelessWidget {
@@ -21,6 +22,7 @@ class StyleChipGroup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     return Wrap(
       spacing: 10,
       runSpacing: 10,
@@ -64,7 +66,7 @@ class StyleChipGroup extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  style.label,
+                  l10n.playStyleLabel(style),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

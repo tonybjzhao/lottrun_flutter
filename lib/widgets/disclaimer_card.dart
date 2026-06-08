@@ -1,11 +1,13 @@
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
+import '../l10n/l10n.dart';
 
 class DisclaimerCard extends StatelessWidget {
   const DisclaimerCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Card(
       color: const Color(0xFFFFF8E1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -22,20 +24,18 @@ class DisclaimerCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Just for fun — play responsibly.',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: const Color(0xFF7B5800)),
+                    l10n.disclaimerTitle,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: const Color(0xFF7B5800),
+                    ),
                   ),
                   if (Platform.isIOS) ...[
                     const SizedBox(height: 4),
                     Text(
-                      'This app provides number selections based on historical data only. It does NOT predict results, improve odds, or guarantee outcomes.',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(color: const Color(0xFF7B5800)),
+                      l10n.disclaimerBody,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: const Color(0xFF7B5800),
+                      ),
                     ),
                   ],
                 ],

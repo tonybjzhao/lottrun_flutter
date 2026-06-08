@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../l10n/l10n.dart';
 import '../admob_ids.dart';
 import '../feature_flags.dart';
 import '../services/analytics_service.dart';
@@ -69,7 +70,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return LotteryHistoryCsvService.instance.fetchDraws(lottery);
   }
 
-
   @override
   void dispose() {
     _bannerAd?.dispose();
@@ -85,11 +85,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('History'),
-      ),
+      appBar: AppBar(title: Text(l10n.screenHistoryTitle)),
       body: Column(
         children: [
           // ── Lottery picker ──────────────────────────────────────
@@ -97,11 +96,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: InputDecorator(
               decoration: InputDecoration(
-                labelText: 'Number selection',
+                labelText: l10n.numberSelectionLabel,
                 contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 4),
+                  horizontal: 14,
+                  vertical: 4,
+                ),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<Lottery>(
@@ -128,8 +130,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 children: [
                   Text(
                     snapshot.hasData
-                        ? '${snapshot.data!.draws.length} past results'
-                        : 'Loading...',
+                        ? l10n.historyPastResultsCount(
+                            snapshot.data!.draws.length,
+                          )
+                        : l10n.commonLoading,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.onSurface.withAlpha(120),
                     ),
@@ -151,17 +155,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 }
 
                 if (snapshot.hasError) {
-                  return _errorState(theme, snapshot.error.toString());
+                  return _errorState(context, theme, snapshot.error.toString());
                 }
 
                 final history = snapshot.data;
                 final draws = history?.draws ?? const <LotteryDraw>[];
                 if (draws.isEmpty) {
-                  return _emptyState(theme);
+                  return _emptyState(context, theme);
                 }
 
                 // Add bottom padding for banner ad if enabled and loaded
-                final double bottomPadding = (kShowHistoryBannerAd && !kIsSimulatorOrEmulator && _isBannerAdLoaded)
+                final double bottomPadding =
+                    (kShowHistoryBannerAd &&
+                        !kIsSimulatorOrEmulator &&
+                        _isBannerAdLoaded)
                     ? 52.0
                     : 0.0;
 
@@ -173,7 +180,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     separatorBuilder: (context, index) {
                       if (index <= 1) return const SizedBox.shrink();
                       if (index == 2) return const Divider(height: 1);
-                      return const Divider(height: 1, indent: 16, endIndent: 16);
+                      return const Divider(
+                        height: 1,
+                        indent: 16,
+                        endIndent: 16,
+                      );
                     },
                     itemBuilder: (context, index) {
                       if (index == 0) {
@@ -192,7 +203,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         );
                       }
                       final draw = draws[index - 3];
-                      return _DrawTile(draw: draw, lottery: _lottery, allDraws: draws);
+                      return _DrawTile(
+                        draw: draw,
+                        lottery: _lottery,
+                        allDraws: draws,
+                      );
                     },
                   ),
                 );
@@ -201,13 +216,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
 
           // ── Ad banner ──────────────────────────────────────────
-          if (kShowHistoryBannerAd && !kIsSimulatorOrEmulator && _isBannerAdLoaded && _bannerAd != null)
+          if (kShowHistoryBannerAd &&
+              !kIsSimulatorOrEmulator &&
+              _isBannerAdLoaded &&
+              _bannerAd != null)
             SafeArea(
               top: false,
-              child: SizedBox(
-                height: 52,
-                child: AdWidget(ad: _bannerAd!),
-              ),
+              child: SizedBox(height: 52, child: AdWidget(ad: _bannerAd!)),
             ),
         ],
       ),
@@ -244,8 +259,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ),
         child: Text(
           updatedAtText == null
-              ? 'Offline mode: showing saved results'
-              : 'Offline mode: showing saved results from $updatedAtText',
+              ? context.l10n.offlineModeSavedResults
+              : context.l10n.offlineModeSavedResultsFrom(updatedAtText),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurface.withAlpha(180),
             fontWeight: FontWeight.w600,
@@ -255,16 +270,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  Widget _emptyState(ThemeData theme) {
+  Widget _emptyState(BuildContext context, ThemeData theme) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.history_rounded,
-              size: 48, color: theme.colorScheme.onSurface.withAlpha(60)),
+          Icon(
+            Icons.history_rounded,
+            size: 48,
+            color: theme.colorScheme.onSurface.withAlpha(60),
+          ),
           const SizedBox(height: 12),
           Text(
-            'No history data available yet.',
+            context.l10n.noHistoryData,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withAlpha(100),
@@ -275,11 +293,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  Widget _errorState(ThemeData theme, String message) {
-    final friendlyMessage = message.contains(
-      'No internet connection and no saved lottery history yet.',
-    )
-        ? 'No internet connection and no saved result history yet.'
+  Widget _errorState(BuildContext context, ThemeData theme, String message) {
+    final friendlyMessage =
+        message.contains(context.l10n.noInternetNoSavedHistory)
+        ? context.l10n.noInternetNoSavedResultHistory
         : message;
 
     return Center(
@@ -288,11 +305,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.cloud_off_rounded,
-                size: 48, color: theme.colorScheme.error.withAlpha(180)),
+            Icon(
+              Icons.cloud_off_rounded,
+              size: 48,
+              color: theme.colorScheme.error.withAlpha(180),
+            ),
             const SizedBox(height: 12),
             Text(
-              'Failed to load history.',
+              context.l10n.failedToLoadHistory,
               style: theme.textTheme.titleSmall,
               textAlign: TextAlign.center,
             ),
@@ -309,7 +329,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               onPressed: () {
                 setState(() => _historyFuture = _loadDraws(_lottery));
               },
-              child: const Text('Retry'),
+              child: Text(context.l10n.commonRetry),
             ),
           ],
         ),
@@ -336,10 +356,14 @@ class _DrawTile extends StatelessWidget {
     final s = size ?? _ballSize;
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: numbers.map((n) => Padding(
-        padding: const EdgeInsets.only(right: _ballSpacing),
-        child: LottoBall(number: n, isBonus: bonus, size: s),
-      )).toList(),
+      children: numbers
+          .map(
+            (n) => Padding(
+              padding: const EdgeInsets.only(right: _ballSpacing),
+              child: LottoBall(number: n, isBonus: bonus, size: s),
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -366,7 +390,9 @@ class _DrawTile extends StatelessWidget {
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onSurface.withAlpha(40),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withAlpha(40),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -436,7 +462,7 @@ class _DrawTile extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          bonusLabel ?? 'Supp',
+                          bonusLabel ?? context.l10n.commonSupp,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: const Color(0xFFD32F2F),
                             fontWeight: FontWeight.w700,

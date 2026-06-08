@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 /// Match state for result display. When set, overrides the default isBonus color.
 enum BallResultState {
-  none,        // default: isBonus drives the color (amber/red gradient)
+  none, // default: isBonus drives the color (amber/red gradient)
   matchedMain, // hit a draw main number → red
   matchedSupp, // hit a draw supplementary number → blue
-  unmatched,   // no match → grey (dimmed)
+  unmatched, // no match → grey (dimmed)
 }
 
 class LottoBall extends StatefulWidget {
@@ -44,9 +44,10 @@ class _LottoBallState extends State<LottoBall>
         vsync: this,
         duration: const Duration(milliseconds: 1200),
       )..repeat(reverse: true);
-      _scale = Tween<double>(begin: 1.0, end: 1.08).animate(
-        CurvedAnimation(parent: _pulse!, curve: Curves.easeInOut),
-      );
+      _scale = Tween<double>(
+        begin: 1.0,
+        end: 1.08,
+      ).animate(CurvedAnimation(parent: _pulse!, curve: Curves.easeInOut));
     }
   }
 
@@ -93,7 +94,8 @@ class _LottoBallState extends State<LottoBall>
     }
 
     final isResult = widget.resultState != BallResultState.none;
-    final isHighlighted = widget.resultState == BallResultState.matchedMain ||
+    final isHighlighted =
+        widget.resultState == BallResultState.matchedMain ||
         widget.resultState == BallResultState.matchedSupp ||
         widget.isMatched;
 
@@ -110,9 +112,17 @@ class _LottoBallState extends State<LottoBall>
         boxShadow: [
           BoxShadow(
             color: shadowColor.withAlpha(
-              isHighlighted ? 180 : isResult ? 60 : (widget.isBonus ? 140 : 100),
+              isHighlighted
+                  ? 180
+                  : isResult
+                  ? 60
+                  : (widget.isBonus ? 140 : 100),
             ),
-            blurRadius: isHighlighted ? 12 : isResult ? 4 : (widget.isBonus ? 10 : 6),
+            blurRadius: isHighlighted
+                ? 12
+                : isResult
+                ? 4
+                : (widget.isBonus ? 10 : 6),
             offset: const Offset(0, 2),
             spreadRadius: isHighlighted ? 1 : 0,
           ),
@@ -134,7 +144,8 @@ class _LottoBallState extends State<LottoBall>
 
     return AnimatedBuilder(
       animation: _scale!,
-      builder: (_, child) => Transform.scale(scale: _scale!.value, child: child),
+      builder: (_, child) =>
+          Transform.scale(scale: _scale!.value, child: child),
       child: ball,
     );
   }

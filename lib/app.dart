@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'l10n/l10n.dart';
 import 'navigator_key.dart';
 import 'screens/home_screen.dart';
 
@@ -9,7 +10,9 @@ class LottFunApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: globalNavigatorKey,
-      title: 'LottFun',
+      onGenerateTitle: (context) => context.l10n.appTitle,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

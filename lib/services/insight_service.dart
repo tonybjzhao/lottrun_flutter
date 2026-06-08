@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import '../l10n/generated/app_localizations_en.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import 'draw_analysis_service.dart';
@@ -17,6 +18,7 @@ const String _kNotifCountToday = 'notif_count_today';
 const String _kLastWeeklySummaryDate = 'last_weekly_summary_date';
 
 const int _kDailyNotifCap = 2;
+final _l10n = AppLocalizationsEn();
 
 class InsightService {
   InsightService._();
@@ -49,7 +51,7 @@ class InsightService {
     required List<LotteryDraw> draws,
   }) {
     if (draws.isEmpty) {
-      return 'Recent draws are fairly balanced with no strong pattern detected.';
+      return _l10n.recentDrawsNoStrongPattern;
     }
 
     final trends = DrawAnalysisService.analyzeRecentTrends(
@@ -59,30 +61,34 @@ class InsightService {
     );
 
     final topInMid = trends.topFrequent
-        .where((n) =>
-            n > lottery.mainMin + (lottery.mainMax - lottery.mainMin) * 0.25 &&
-            n < lottery.mainMax - (lottery.mainMax - lottery.mainMin) * 0.25)
+        .where(
+          (n) =>
+              n >
+                  lottery.mainMin +
+                      (lottery.mainMax - lottery.mainMin) * 0.25 &&
+              n < lottery.mainMax - (lottery.mainMax - lottery.mainMin) * 0.25,
+        )
         .length;
 
     switch (trends.trendStrength) {
       case TrendStrength.strong:
-        return 'Recent draws show a notable concentration among a few numbers.';
+        return _l10n.recentDrawsConcentrated;
       case TrendStrength.balanced:
         if (topInMid >= 3) {
-          return 'Mid-range numbers have been slightly more active recently.';
+          return _l10n.periodMidRangeActive;
         }
         final avgSum = trends.averageSum;
         final expectedMid =
             (lottery.mainMin + lottery.mainMax) / 2 * lottery.mainCount;
         if (avgSum > expectedMid * 1.05) {
-          return 'Recent draws have leaned toward higher-range numbers.';
+          return _l10n.recentDrawsHigherRange;
         }
         if (avgSum < expectedMid * 0.95) {
-          return 'Recent draws have leaned toward lower-range numbers.';
+          return _l10n.recentDrawsLowerRange;
         }
-        return 'Recent draws are fairly balanced with a moderate spread.';
+        return _l10n.recentDrawsModerateSpread;
       case TrendStrength.random:
-        return 'Recent draws are fairly balanced with no strong pattern detected.';
+        return _l10n.recentDrawsNoStrongPattern;
     }
   }
 
@@ -105,7 +111,9 @@ class InsightService {
     final prefs = await SharedPreferences.getInstance();
     final today = _dateKey(DateTime.now());
     final lastDate = prefs.getString(_kLastNotifDate);
-    final count = lastDate == today ? (prefs.getInt(_kNotifCountToday) ?? 0) : 0;
+    final count = lastDate == today
+        ? (prefs.getInt(_kNotifCountToday) ?? 0)
+        : 0;
     return count < _kDailyNotifCap;
   }
 
@@ -113,7 +121,9 @@ class InsightService {
     final prefs = await SharedPreferences.getInstance();
     final today = _dateKey(DateTime.now());
     final lastDate = prefs.getString(_kLastNotifDate);
-    final count = lastDate == today ? (prefs.getInt(_kNotifCountToday) ?? 0) : 0;
+    final count = lastDate == today
+        ? (prefs.getInt(_kNotifCountToday) ?? 0)
+        : 0;
     await prefs.setString(_kLastNotifDate, today);
     await prefs.setInt(_kNotifCountToday, count + 1);
   }
@@ -139,7 +149,7 @@ class InsightService {
     required Lottery lottery,
     required List<LotteryDraw> draws,
   }) {
-    if (draws.isEmpty) return 'No strong trend detected this week.';
+    if (draws.isEmpty) return _l10n.weeklyNoStrongTrend;
     final trends = DrawAnalysisService.analyzeRecentTrends(
       lottery: lottery,
       draws: draws,
@@ -147,19 +157,18 @@ class InsightService {
     );
     switch (trends.trendStrength) {
       case TrendStrength.strong:
-        return 'This week showed a notable concentration among a few numbers.';
+        return _l10n.weeklyNotableConcentration;
       case TrendStrength.balanced:
-        return 'This week showed a balanced distribution with moderate spread.';
+        return _l10n.weeklyModerateSpread;
       case TrendStrength.random:
-        return 'This week showed a balanced distribution with no strong trend.';
+        return _l10n.weeklyNoStrongTrend;
     }
   }
 
   String weeklySummaryBody({
     required Lottery lottery,
     required List<LotteryDraw> draws,
-  }) =>
-      _generateWeeklySummary(lottery: lottery, draws: draws);
+  }) => _generateWeeklySummary(lottery: lottery, draws: draws);
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 

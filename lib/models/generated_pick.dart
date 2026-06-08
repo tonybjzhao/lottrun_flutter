@@ -1,3 +1,5 @@
+import '../l10n/generated/app_localizations_en.dart';
+
 enum PickSource { generated, manual }
 
 enum PlayStyle {
@@ -6,16 +8,18 @@ enum PlayStyle {
   cold,
   random;
 
+  static final _l10n = AppLocalizationsEn();
+
   String get label {
     switch (this) {
       case PlayStyle.balanced:
-        return 'Balanced';
+        return _l10n.styleBalanced;
       case PlayStyle.hot:
-        return 'Observed Pattern';
+        return _l10n.styleObservedPattern;
       case PlayStyle.cold:
-        return 'Less common';
+        return _l10n.styleLessCommon;
       case PlayStyle.random:
-        return 'Random';
+        return _l10n.styleRandom;
     }
   }
 
@@ -23,13 +27,13 @@ enum PlayStyle {
   String get tagline {
     switch (this) {
       case PlayStyle.balanced:
-        return '⚖️ Balanced Pick';
+        return _l10n.styleBalancedTagline;
       case PlayStyle.hot:
-        return 'Example Pattern Pick';
+        return _l10n.styleHotTagline;
       case PlayStyle.cold:
-        return '❄️ Historical Number Example';
+        return _l10n.styleColdTagline;
       case PlayStyle.random:
-        return '🎲 Random Pick';
+        return _l10n.styleRandomTagline;
     }
   }
 
@@ -37,13 +41,13 @@ enum PlayStyle {
   String get taglineSubtitle {
     switch (this) {
       case PlayStyle.balanced:
-        return 'Even spread across all number ranges.';
+        return _l10n.styleBalancedSubtitle;
       case PlayStyle.hot:
-        return 'These numbers were observed more often in past results.';
+        return _l10n.styleHotSubtitle;
       case PlayStyle.cold:
-        return 'These numbers were observed less often in past results.';
+        return _l10n.styleColdSubtitle;
       case PlayStyle.random:
-        return 'Completely random selection. Just for fun.';
+        return _l10n.styleRandomSubtitle;
     }
   }
 
@@ -65,13 +69,13 @@ enum PlayStyle {
   String get description {
     switch (this) {
       case PlayStyle.balanced:
-        return 'Even spread across the number range';
+        return _l10n.styleBalancedDescription;
       case PlayStyle.hot:
-        return 'Based on recent frequency in past results (for reference only)';
+        return _l10n.styleHotDescription;
       case PlayStyle.cold:
-        return 'Based on less frequent historical numbers (for reference only)';
+        return _l10n.styleColdDescription;
       case PlayStyle.random:
-        return 'Random selection (for reference only)';
+        return _l10n.styleRandomDescription;
     }
   }
 }

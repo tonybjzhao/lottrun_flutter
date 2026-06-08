@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../l10n/l10n.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery_draw.dart';
 import '../services/draw_analysis_service.dart';
@@ -25,8 +26,9 @@ class SavedPicksAnalysisSection extends StatelessWidget {
         recentDraws: [],
       );
     }
-    final dominantId =
-        lotteryFreq.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
+    final dominantId = lotteryFreq.entries
+        .reduce((a, b) => a.value >= b.value ? a : b)
+        .key;
     final recentDraws = drawsByLottery[dominantId] ?? [];
 
     final filteredMains = picks
@@ -37,8 +39,9 @@ class SavedPicksAnalysisSection extends StatelessWidget {
     final allMainNumbers = picks.map((p) => p.mainNumbers).toList();
 
     return DrawAnalysisService.analyzeSavedPicks(
-      savedMainNumbers:
-          filteredMains.isNotEmpty ? filteredMains : allMainNumbers,
+      savedMainNumbers: filteredMains.isNotEmpty
+          ? filteredMains
+          : allMainNumbers,
       recentDraws: recentDraws,
     );
   }
@@ -46,6 +49,7 @@ class SavedPicksAnalysisSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final analysis = _compute();
 
     return Padding(
@@ -55,13 +59,13 @@ class SavedPicksAnalysisSection extends StatelessWidget {
         children: [
           // ── Header ──────────────────────────────────────────────
           Text(
-            'My Saved Picks Analysis',
+            l10n.savedPicksAnalysisTitle,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w700,
             ),
           ),
           Text(
-            'Compared with recent 20 past results · post-result comparison only',
+            l10n.savedPicksAnalysisSubtitle,
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurface.withAlpha(120),
             ),
@@ -73,9 +77,9 @@ class SavedPicksAnalysisSection extends StatelessWidget {
           Row(
             children: [
               _StatCard(
-                label: 'Top overlap',
+                label: l10n.topOverlap,
                 value: analysis.bestMatchCount > 0
-                    ? '${analysis.bestMatchCount} numbers'
+                    ? l10n.numbersCount(analysis.bestMatchCount)
                     : '—',
                 sub: analysis.bestMatchDrawDate != null
                     ? _formatDate(analysis.bestMatchDrawDate!)
@@ -84,11 +88,11 @@ class SavedPicksAnalysisSection extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               _StatCard(
-                label: 'Avg overlap',
+                label: l10n.avgOverlap,
                 value: analysis.averageMatchCount > 0
                     ? analysis.averageMatchCount.toStringAsFixed(1)
                     : '—',
-                sub: 'per past result',
+                sub: l10n.perPastResult,
                 theme: theme,
               ),
             ],
@@ -104,7 +108,7 @@ class SavedPicksAnalysisSection extends StatelessWidget {
           // ── Frequently picked numbers ────────────────────────────
           if (analysis.frequentlyPickedNumbers.isNotEmpty) ...[
             _MetricRow(
-              label: 'Often picked',
+              label: l10n.oftenPicked,
               child: _NumberChips(
                 numbers: analysis.frequentlyPickedNumbers,
                 color: theme.colorScheme.primary,
@@ -117,7 +121,7 @@ class SavedPicksAnalysisSection extends StatelessWidget {
           // ── Recently appeared ────────────────────────────────────
           if (analysis.recentlyAppearedNumbers.isNotEmpty) ...[
             _MetricRow(
-              label: 'In recent draws',
+              label: l10n.inRecentDraws,
               child: _NumberChips(
                 numbers: analysis.recentlyAppearedNumbers.take(8).toList(),
                 color: Colors.teal.shade600,
@@ -158,10 +162,10 @@ class _MatchLevelChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, color) = avg >= 2.0
-        ? ('Overlap level: High', Colors.green.shade600)
+        ? (context.l10n.overlapLevelHigh, Colors.green.shade600)
         : avg >= 1.0
-            ? ('Overlap level: Medium', Colors.orange.shade600)
-            : ('Overlap level: Low', Colors.grey.shade500);
+        ? (context.l10n.overlapLevelMedium, Colors.orange.shade600)
+        : (context.l10n.overlapLevelLow, Colors.grey.shade500);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

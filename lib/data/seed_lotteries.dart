@@ -1,12 +1,15 @@
+import '../l10n/generated/app_localizations_en.dart';
 import '../models/lottery.dart';
 
-const List<Lottery> kSeedLotteries = [
+final _l10n = AppLocalizationsEn();
+
+final List<Lottery> kSeedLotteries = [
   // ── Australia ──────────────────────────────────────────────────────────────
   Lottery(
     id: 'au_powerball',
     countryCode: 'AU',
-    countryName: 'Australia',
-    name: 'Powerball',
+    countryName: _l10n.countryAustralia,
+    name: _l10n.lotteryPowerball,
     mainCount: 7,
     mainMin: 1,
     mainMax: 35,
@@ -14,13 +17,13 @@ const List<Lottery> kSeedLotteries = [
     bonusMin: 1,
     bonusMax: 20,
     hasSeparateBonusPool: true,
-    bonusLabel: 'Powerball',
+    bonusLabel: _l10n.bonusPowerball,
   ),
   Lottery(
     id: 'au_ozlotto',
     countryCode: 'AU',
-    countryName: 'Australia',
-    name: 'Oz Lotto',
+    countryName: _l10n.countryAustralia,
+    name: _l10n.lotteryOzLotto,
     mainCount: 7,
     mainMin: 1,
     mainMax: 47,
@@ -32,8 +35,8 @@ const List<Lottery> kSeedLotteries = [
   Lottery(
     id: 'au_saturday',
     countryCode: 'AU',
-    countryName: 'Australia',
-    name: 'Saturday Lotto',
+    countryName: _l10n.countryAustralia,
+    name: _l10n.lotterySaturdayLotto,
     mainCount: 6,
     mainMin: 1,
     mainMax: 45,
@@ -47,8 +50,8 @@ const List<Lottery> kSeedLotteries = [
   Lottery(
     id: 'us_powerball',
     countryCode: 'US',
-    countryName: 'United States',
-    name: 'Powerball',
+    countryName: _l10n.countryUnitedStates,
+    name: _l10n.lotteryPowerball,
     mainCount: 5,
     mainMin: 1,
     mainMax: 69,
@@ -56,13 +59,13 @@ const List<Lottery> kSeedLotteries = [
     bonusMin: 1,
     bonusMax: 26,
     hasSeparateBonusPool: true,
-    bonusLabel: 'Powerball',
+    bonusLabel: _l10n.bonusPowerball,
   ),
   Lottery(
     id: 'us_megamillions',
     countryCode: 'US',
-    countryName: 'United States',
-    name: 'Mega Millions',
+    countryName: _l10n.countryUnitedStates,
+    name: _l10n.lotteryMegaMillions,
     mainCount: 5,
     mainMin: 1,
     mainMax: 70,
@@ -70,15 +73,15 @@ const List<Lottery> kSeedLotteries = [
     bonusMin: 1,
     bonusMax: 25,
     hasSeparateBonusPool: true,
-    bonusLabel: 'Mega Ball',
+    bonusLabel: _l10n.bonusMegaBall,
   ),
 
   // ── United Kingdom ────────────────────────────────────────────────────────
   Lottery(
     id: 'uk_lotto',
     countryCode: 'GB',
-    countryName: 'United Kingdom',
-    name: 'UK Lotto',
+    countryName: _l10n.countryUnitedKingdom,
+    name: _l10n.lotteryUkLotto,
     mainCount: 6,
     mainMin: 1,
     mainMax: 59,
@@ -91,8 +94,8 @@ const List<Lottery> kSeedLotteries = [
   Lottery(
     id: 'uk_euromillions',
     countryCode: 'GB',
-    countryName: 'United Kingdom',
-    name: 'EuroMillions',
+    countryName: _l10n.countryUnitedKingdom,
+    name: _l10n.lotteryEuroMillions,
     mainCount: 5,
     mainMin: 1,
     mainMax: 50,
@@ -100,15 +103,15 @@ const List<Lottery> kSeedLotteries = [
     bonusMin: 1,
     bonusMax: 12,
     hasSeparateBonusPool: true,
-    bonusLabel: 'Lucky Stars',
+    bonusLabel: _l10n.bonusLuckyStars,
   ),
 
   // ── Canada ────────────────────────────────────────────────────────────────
   Lottery(
     id: 'ca_lotto_max',
     countryCode: 'CA',
-    countryName: 'Canada',
-    name: 'Lotto Max',
+    countryName: _l10n.countryCanada,
+    name: _l10n.lotteryLottoMax,
     mainCount: 7,
     mainMin: 1,
     mainMax: 52,
@@ -120,8 +123,8 @@ const List<Lottery> kSeedLotteries = [
   Lottery(
     id: 'ca_lotto_649',
     countryCode: 'CA',
-    countryName: 'Canada',
-    name: 'Lotto 6/49',
+    countryName: _l10n.countryCanada,
+    name: _l10n.lotteryLotto649,
     mainCount: 6,
     mainMin: 1,
     mainMax: 49,

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../l10n/l10n.dart';
 import '../widgets/ball_row.dart';
 import '../widgets/pick_share_card.dart';
 import '../models/generated_pick.dart';
@@ -57,21 +58,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     PlayStyle.random,
   ];
   static const _kThreePicksWindows = [100, 60, 30];
-  static final _kThreePicksLabels = [
-    '⭐ Example Pick',
-    'Common Pattern',
-    '🎲 Random Surprise',
-  ];
-  static final _kThreePicksBadges = [
-    'Balanced',
-    'Observed Pattern',
-    'Random',
-  ];
-  static final _kThreePicksMicrocopy = [
-    'Balanced selection based on past results',
-    'These numbers were observed more often in past results',
-    'Random selection for reference only 🎲',
-  ];
   static const _kThreePicksColors = [
     Color(0xFFF59E0B), // amber  — Best Pick
     Color(0xFFEA580C), // orange — Hot
@@ -85,8 +71,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     _restorePrefs();
     _initStreak();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final launchedFromNotif =
-          await NotificationService.instance.checkLaunchedFromNotification();
+      final launchedFromNotif = await NotificationService.instance
+          .checkLaunchedFromNotification();
       if (launchedFromNotif && mounted) {
         Navigator.push(
           context,
@@ -167,8 +153,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     await Future.delayed(const Duration(milliseconds: 700));
 
-    final history =
-        LotteryService.instance.getRecentDraws(_selectedLottery.id, limit: 100);
+    final history = LotteryService.instance.getRecentDraws(
+      _selectedLottery.id,
+      limit: 100,
+    );
     final pick = GeneratorService.instance.generate(
       lottery: _selectedLottery,
       style: _selectedStyle,
@@ -177,12 +165,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     await LocalStorageService.instance.saveLastLotteryId(_selectedLottery.id);
     await LocalStorageService.instance.saveLastStyle(_selectedStyle);
-    unawaited(AnalyticsService.logGenerateNumbers(
-      lottery: _selectedLottery.id,
-      strategy: _selectedStyle.analyticsName,
-      pickCount: 1,
-      source: 'home',
-    ));
+    unawaited(
+      AnalyticsService.logGenerateNumbers(
+        lottery: _selectedLottery.id,
+        strategy: _selectedStyle.analyticsName,
+        pickCount: 1,
+        source: 'home',
+      ),
+    );
 
     if (!mounted) return;
     HapticFeedback.mediumImpact();
@@ -207,8 +197,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     await Future.delayed(const Duration(milliseconds: 700));
 
     final picks = List.generate(3, (i) {
-      final history = LotteryService.instance
-          .getRecentDraws(_selectedLottery.id, limit: _kThreePicksWindows[i]);
+      final history = LotteryService.instance.getRecentDraws(
+        _selectedLottery.id,
+        limit: _kThreePicksWindows[i],
+      );
       return GeneratorService.instance.generate(
         lottery: _selectedLottery,
         style: _kThreePicksStyles[i],
@@ -228,12 +220,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       _isThreePicksLoading = false;
     });
 
-    unawaited(AnalyticsService.logGenerateNumbers(
-      lottery: _selectedLottery.id,
-      strategy: 'three_picks',
-      pickCount: 3,
-      source: 'home_inline',
-    ));
+    unawaited(
+      AnalyticsService.logGenerateNumbers(
+        lottery: _selectedLottery.id,
+        strategy: 'three_picks',
+        pickCount: 3,
+        source: 'home_inline',
+      ),
+    );
   }
 
   List<GeneratedPick> _diversifyBonusBalls(List<GeneratedPick> picks) {
@@ -251,8 +245,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       if (pick.bonusNumbers == null || pick.bonusNumbers!.isEmpty) return pick;
       var bonus = pick.bonusNumbers!.first;
       if (used.contains(bonus)) {
-        final replacement =
-            pool.firstWhere((n) => !used.contains(n), orElse: () => bonus);
+        final replacement = pool.firstWhere(
+          (n) => !used.contains(n),
+          orElse: () => bonus,
+        );
         bonus = replacement;
       }
       used.add(bonus);
@@ -266,31 +262,50 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }).toList();
   }
 
-  static final _insightMessages = {
-    PlayStyle.balanced: [
-      'Based on past data, this shows a balanced spread for reference',
-      'History points to an even distribution',
-      'Balanced number spread seen in past results',
-    ],
-    PlayStyle.hot: [
-      'Recent results show similar patterns',
-      'Frequently observed in past results',
-      'Based on past results, a similar pattern was observed',
-    ],
-    PlayStyle.cold: [
-      'Based on past results, less common numbers were observed ❄️',
-      'Less common numbers from past results',
-      'Less common numbers from past results',
-    ],
-    PlayStyle.random: [
-      'Sometimes randomness is fun 🎲',
-      'Random pattern for reference only',
-      'Random selection for fun',
-    ],
-  };
+  List<String> _threePicksLabels(AppLocalizations l10n) => [
+    l10n.threePickExampleStar,
+    l10n.threePickCommonPattern,
+    l10n.threePickRandomSurpriseDice,
+  ];
 
-  String get _insightText {
-    final msgs = _insightMessages[_selectedStyle]!;
+  List<String> _threePicksBadges(AppLocalizations l10n) => [
+    l10n.styleBalanced,
+    l10n.styleObservedPattern,
+    l10n.styleRandom,
+  ];
+
+  List<String> _threePicksMicrocopy(AppLocalizations l10n) => [
+    l10n.threePickBalancedMicrocopy,
+    l10n.threePickHotMicrocopy,
+    l10n.threePickRandomMicrocopy,
+  ];
+
+  List<String> _insightMessages(AppLocalizations l10n, PlayStyle style) =>
+      switch (style) {
+        PlayStyle.balanced => [
+          l10n.insightBalancedOne,
+          l10n.insightBalancedTwo,
+          l10n.insightBalancedThree,
+        ],
+        PlayStyle.hot => [
+          l10n.insightHotOne,
+          l10n.insightHotTwo,
+          l10n.insightHotThree,
+        ],
+        PlayStyle.cold => [
+          l10n.insightColdOne,
+          l10n.insightColdTwo,
+          l10n.insightColdTwo,
+        ],
+        PlayStyle.random => [
+          l10n.insightRandomOne,
+          l10n.insightRandomTwo,
+          l10n.insightRandomThree,
+        ],
+      };
+
+  String _insightText(AppLocalizations l10n) {
+    final msgs = _insightMessages(l10n, _selectedStyle);
     return msgs[_insightKey % msgs.length];
   }
 
@@ -311,18 +326,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       LocalStorageService.instance.saveLastPick(pickToSave),
       LocalStorageService.instance.savePickToHistory(pickToSave),
     ]);
-    unawaited(AnalyticsService.logNumbersSaved(
-      lottery: _selectedLottery.id,
-      strategy: _selectedStyle.analyticsName,
-    ));
+    unawaited(
+      AnalyticsService.logNumbersSaved(
+        lottery: _selectedLottery.id,
+        strategy: _selectedStyle.analyticsName,
+      ),
+    );
     if (!mounted) return;
+    final l10n = context.l10n;
     setState(() => _isSaved = true);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Saved to Saved Picks'),
+        content: Text(l10n.savedToSavedPicks),
         duration: const Duration(seconds: 3),
         action: SnackBarAction(
-          label: 'View',
+          label: l10n.commonView,
           onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const SavedPicksScreen()),
@@ -335,22 +353,26 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Future<void> _saveThreePick(int index) async {
     HapticFeedback.lightImpact();
     final pick = _threePicks![index];
-    await LocalStorageService.instance.savePickToHistory(GeneratedPick(
-      id: pick.id,
-      lotteryId: pick.lotteryId,
-      style: pick.style,
-      mainNumbers: pick.mainNumbers,
-      bonusNumbers: pick.bonusNumbers,
-      createdAt: pick.createdAt,
-      pickLabel: _kThreePicksLabels[index],
-      drawDate: nextDrawDate(_selectedLottery.id),
-      drawLabel: nextDrawLabel(_selectedLottery.id),
-    ));
+    await LocalStorageService.instance.savePickToHistory(
+      GeneratedPick(
+        id: pick.id,
+        lotteryId: pick.lotteryId,
+        style: pick.style,
+        mainNumbers: pick.mainNumbers,
+        bonusNumbers: pick.bonusNumbers,
+        createdAt: pick.createdAt,
+        pickLabel: _threePicksLabels(context.l10n)[index],
+        drawDate: nextDrawDate(_selectedLottery.id),
+        drawLabel: nextDrawLabel(_selectedLottery.id),
+      ),
+    );
     if (!mounted) return;
     setState(() => _threePicksSaved[index] = true);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-          content: Text('Pick saved'), duration: Duration(seconds: 2)),
+      SnackBar(
+        content: Text(context.l10n.pickSaved),
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 
@@ -358,8 +380,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     HapticFeedback.lightImpact();
     if (_threePicksSaved.every((s) => s)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Already saved'), duration: Duration(seconds: 2)),
+        SnackBar(
+          content: Text(context.l10n.alreadySaved),
+          duration: const Duration(seconds: 2),
+        ),
       );
       return;
     }
@@ -368,29 +392,34 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     await Future.wait([
       for (var i = 0; i < _threePicks!.length; i++)
         if (!_threePicksSaved[i])
-          LocalStorageService.instance.savePickToHistory(GeneratedPick(
-            id: _threePicks![i].id,
-            lotteryId: _threePicks![i].lotteryId,
-            style: _threePicks![i].style,
-            mainNumbers: _threePicks![i].mainNumbers,
-            bonusNumbers: _threePicks![i].bonusNumbers,
-            createdAt: _threePicks![i].createdAt,
-            pickLabel: _kThreePicksLabels[i],
-            drawDate: drawDate,
-            drawLabel: drawLabel,
-          )),
+          LocalStorageService.instance.savePickToHistory(
+            GeneratedPick(
+              id: _threePicks![i].id,
+              lotteryId: _threePicks![i].lotteryId,
+              style: _threePicks![i].style,
+              mainNumbers: _threePicks![i].mainNumbers,
+              bonusNumbers: _threePicks![i].bonusNumbers,
+              createdAt: _threePicks![i].createdAt,
+              pickLabel: _threePicksLabels(context.l10n)[i],
+              drawDate: drawDate,
+              drawLabel: drawLabel,
+            ),
+          ),
     ]);
     if (!mounted) return;
     setState(() => _threePicksSaved = [true, true, true]);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-          content: Text('All 3 picks saved'), duration: Duration(seconds: 2)),
+      SnackBar(
+        content: Text(context.l10n.allThreePicksSaved),
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final isAnyLoading = _isLoading || _isThreePicksLoading;
 
     return Scaffold(
@@ -403,7 +432,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               text: TextSpan(
                 children: [
                   TextSpan(
-                    text: 'NumberRun ',
+                    text: '${l10n.brandTitle} ',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -422,7 +451,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ),
             ),
             Text(
-              'Number sets from past records',
+              l10n.brandSubtitle,
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w400,
@@ -455,16 +484,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               }
             },
             icon: const Icon(Icons.bookmark_rounded),
-            tooltip: 'Saved Picks',
+            tooltip: l10n.savedPicksTooltip,
           ),
           IconButton(
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (_) => HistoryScreen(lottery: _selectedLottery)),
+                builder: (_) => HistoryScreen(lottery: _selectedLottery),
+              ),
             ),
             icon: const Icon(Icons.history_rounded),
-            tooltip: 'History',
+            tooltip: l10n.historyTooltip,
           ),
           IconButton(
             onPressed: () => Navigator.push(
@@ -472,7 +502,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               MaterialPageRoute(builder: (_) => const SettingsScreen()),
             ),
             icon: const Icon(Icons.settings_rounded),
-            tooltip: 'Settings',
+            tooltip: l10n.settingsTooltip,
           ),
         ],
       ),
@@ -485,14 +515,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             const SizedBox(height: 16),
 
             // ── Lottery selector ──────────────────────────────────
-            Text('Number selection', style: theme.textTheme.labelMedium),
+            Text(l10n.numberSelectionLabel, style: theme.textTheme.labelMedium),
             const SizedBox(height: 6),
             InputDecorator(
               decoration: InputDecoration(
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 4,
+                ),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<Lottery>(
@@ -500,14 +533,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   isExpanded: true,
                   items: kSeedLotteries.map((l) {
                     return DropdownMenuItem(
-                        value: l, child: Text(l.displayName));
+                      value: l,
+                      child: Text(l.displayName),
+                    );
                   }).toList(),
                   onChanged: (l) {
                     if (l == null) return;
-                    unawaited(AnalyticsService.logLotteryChanged(
-                      fromLottery: _selectedLottery.id,
-                      toLottery: l.id,
-                    ));
+                    unawaited(
+                      AnalyticsService.logLotteryChanged(
+                        fromLottery: _selectedLottery.id,
+                        toLottery: l.id,
+                      ),
+                    );
                     setState(() {
                       _selectedLottery = l;
                       _pick = null;
@@ -547,7 +584,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Number Picks',
+                    l10n.homeCardTitle,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -555,7 +592,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Choose one style, or generate 3 number sets',
+                    l10n.homeCardSubtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 13,
                       color: theme.colorScheme.onSurface.withAlpha(140),
@@ -565,10 +602,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   StyleChipGroup(
                     selected: _selectedStyle,
                     onChanged: (s) {
-                      unawaited(AnalyticsService.logPickStrategySelected(
-                        strategy: s.analyticsName,
-                        lottery: _selectedLottery.id,
-                      ));
+                      unawaited(
+                        AnalyticsService.logPickStrategySelected(
+                          strategy: s.analyticsName,
+                          lottery: _selectedLottery.id,
+                        ),
+                      );
                       setState(() => _selectedStyle = s);
                     },
                   ),
@@ -582,20 +621,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       onPressed: isAnyLoading ? null : _generate,
                       style: OutlinedButton.styleFrom(
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16)),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                         side: BorderSide(
-                            color: theme.colorScheme.primary.withAlpha(71)),
+                          color: theme.colorScheme.primary.withAlpha(71),
+                        ),
                       ),
                       child: _isLoading
                           ? SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  color: theme.colorScheme.primary),
+                                strokeWidth: 2.5,
+                                color: theme.colorScheme.primary,
+                              ),
                             )
                           : Text(
-                              'Generate 1 Pick',
+                              l10n.generateOnePick,
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
@@ -617,15 +659,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
-                                  strokeWidth: 2.5, color: Colors.white),
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
                             )
                           : const Icon(Icons.auto_awesome_rounded, size: 20),
                       label: Text(
                         _isThreePicksLoading
-                            ? 'Generating…'
-                            : '🎲 Generate 3 Number Sets',
+                            ? l10n.commonGenerating
+                            : l10n.generateThreeNumberSets,
                         style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w700),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                       style: ElevatedButton.styleFrom(
                         elevation: 2,
@@ -633,13 +679,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         backgroundColor: theme.colorScheme.primary,
                         foregroundColor: theme.colorScheme.onPrimary,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16)),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    '3 Number Sets combine Balanced + Observed + Random styles for reference only.',
+                    l10n.generateThreeNumberSetsDescription,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
                       color: theme.colorScheme.onSurface.withAlpha(110),
@@ -647,7 +694,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '✨ Some selections overlapped multiple numbers in past results (for reference only)',
+                    l10n.pastOverlapReferenceNote,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
                       color: theme.colorScheme.primary.withAlpha(160),
@@ -664,9 +711,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             if (_threePicks != null)
               _ThreePicksInline(
                 picks: _threePicks!,
-                labels: _kThreePicksLabels,
-                badges: _kThreePicksBadges,
-                microcopy: _kThreePicksMicrocopy,
+                labels: _threePicksLabels(l10n),
+                badges: _threePicksBadges(l10n),
+                microcopy: _threePicksMicrocopy(l10n),
                 colors: _kThreePicksColors,
                 lottery: _selectedLottery,
                 savedStates: _threePicksSaved,
@@ -680,19 +727,26 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 transitionBuilder: (child, anim) => FadeTransition(
                   opacity: anim,
                   child: SlideTransition(
-                    position: Tween(
-                      begin: const Offset(0, 0.3),
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(
-                        parent: anim, curve: Curves.easeOutCubic)),
+                    position:
+                        Tween(
+                          begin: const Offset(0, 0.3),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: anim,
+                            curve: Curves.easeOutCubic,
+                          ),
+                        ),
                     child: child,
                   ),
                 ),
                 child: _pick != null
                     ? Padding(
-                        key: ValueKey(_showReadyFlash
-                            ? 'ready-$_insightKey'
-                            : 'insight-$_insightKey'),
+                        key: ValueKey(
+                          _showReadyFlash
+                              ? 'ready-$_insightKey'
+                              : 'insight-$_insightKey',
+                        ),
                         padding: const EdgeInsets.only(bottom: 10),
                         child: Row(
                           children: [
@@ -709,13 +763,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             Expanded(
                               child: Text(
                                 _showReadyFlash
-                                    ? '✨ Your number set is ready'
-                                    : _insightText,
+                                    ? l10n.numberSetReady
+                                    : _insightText(l10n),
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   color: _showReadyFlash
                                       ? Colors.green.shade400
-                                      : theme.colorScheme.primary
-                                          .withAlpha(200),
+                                      : theme.colorScheme.primary.withAlpha(
+                                          200,
+                                        ),
                                   fontStyle: FontStyle.italic,
                                   fontWeight: _showReadyFlash
                                       ? FontWeight.w600
@@ -735,11 +790,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 transitionBuilder: (child, animation) => FadeTransition(
                   opacity: animation,
                   child: SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0, 0.08),
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(
-                        parent: animation, curve: Curves.easeOutCubic)),
+                    position:
+                        Tween<Offset>(
+                          begin: const Offset(0, 0.08),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeOutCubic,
+                          ),
+                        ),
                     child: child,
                   ),
                 ),
@@ -749,42 +809,43 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         padding: const EdgeInsets.symmetric(vertical: 32),
                         child: Column(
                           children: [
-                            Icon(Icons.casino_outlined,
-                                size: 52,
-                                color:
-                                    theme.colorScheme.onSurface.withAlpha(55)),
+                            Icon(
+                              Icons.casino_outlined,
+                              size: 52,
+                              color: theme.colorScheme.onSurface.withAlpha(55),
+                            ),
                             const SizedBox(height: 12),
                             Text(
-                              'Generate a number set from past records 🎲',
+                              l10n.generateEmptyPrompt,
                               textAlign: TextAlign.center,
                               style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurface
-                                    .withAlpha(130),
+                                color: theme.colorScheme.onSurface.withAlpha(
+                                  130,
+                                ),
                               ),
                             ),
                           ],
                         ),
                       )
                     : _isPickExpanded
-                        ? ResultPanel(
-                            key: const ValueKey('expanded'),
-                            pick: _pick!,
-                            lottery: _selectedLottery,
-                            recentDraw: LotteryService.instance
-                                .getRecentDraws(_selectedLottery.id, limit: 1)
-                                .firstOrNull,
-                            onSave: _savePick,
-                            isSaved: _isSaved,
-                            onCollapse: () =>
-                                setState(() => _isPickExpanded = false),
-                          )
-                        : _CompactPickBanner(
-                            key: ValueKey(_pick!.createdAt),
-                            pick: _pick!,
-                            lottery: _selectedLottery,
-                            onExpand: () =>
-                                setState(() => _isPickExpanded = true),
-                          ),
+                    ? ResultPanel(
+                        key: const ValueKey('expanded'),
+                        pick: _pick!,
+                        lottery: _selectedLottery,
+                        recentDraw: LotteryService.instance
+                            .getRecentDraws(_selectedLottery.id, limit: 1)
+                            .firstOrNull,
+                        onSave: _savePick,
+                        isSaved: _isSaved,
+                        onCollapse: () =>
+                            setState(() => _isPickExpanded = false),
+                      )
+                    : _CompactPickBanner(
+                        key: ValueKey(_pick!.createdAt),
+                        pick: _pick!,
+                        lottery: _selectedLottery,
+                        onExpand: () => setState(() => _isPickExpanded = true),
+                      ),
               ),
             ],
 
@@ -850,11 +911,12 @@ class _ThreePicksInlineState extends State<_ThreePicksInline> {
           child: OutlinedButton.icon(
             onPressed: widget.onSaveAll,
             icon: const Icon(Icons.bookmark_rounded, size: 18),
-            label: const Text('Save All'),
+            label: Text(context.l10n.saveAll),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(0, 48),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
         ),
@@ -886,22 +948,22 @@ class _InlinePickCard extends StatelessWidget {
     required this.onSave,
   });
 
-  String _buildCopyText() {
+  String _buildCopyText(AppLocalizations l10n) {
     final main = pick.mainNumbers.join('  ');
-    final bonus =
-        (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
-            ? ' + ${pick.bonusNumbers!.join(' ')}'
-            : '';
-    return '$label\n${lottery.name}: $main$bonus\nGenerated for fun — NumberRun 🎯';
+    final bonus = (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
+        ? l10n.inlinePickBonusInline(pick.bonusNumbers!.join(' '))
+        : '';
+    return l10n.inlinePickCopyText(label, lottery.name, main, bonus);
   }
 
   Future<void> _copy(BuildContext context) async {
     HapticFeedback.lightImpact();
-    await Clipboard.setData(ClipboardData(text: _buildCopyText()));
+    final l10n = context.l10n;
+    await Clipboard.setData(ClipboardData(text: _buildCopyText(l10n)));
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$label copied to clipboard.'),
+          content: Text(l10n.pickCopiedToClipboard(label)),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -910,11 +972,7 @@ class _InlinePickCard extends StatelessWidget {
 
   Future<void> _share(BuildContext btnCtx) async {
     HapticFeedback.lightImpact();
-    await showPickShareSheet(
-      context: btnCtx,
-      pick: pick,
-      lottery: lottery,
-    );
+    await showPickShareSheet(context: btnCtx, pick: pick, lottery: lottery);
   }
 
   @override
@@ -969,7 +1027,9 @@ class _InlinePickCard extends StatelessWidget {
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(999),
                             color: accentColor.withAlpha(30),
@@ -1015,13 +1075,13 @@ class _InlinePickCard extends StatelessWidget {
                             builder: (btnCtx) => FilledButton.icon(
                               onPressed: () => _share(btnCtx),
                               icon: const Icon(Icons.share_rounded, size: 14),
-                              label: const Text('Share'),
+                              label: Text(context.l10n.commonShare),
                               style: FilledButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 5),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 5,
+                                ),
                                 textStyle: const TextStyle(fontSize: 12),
-                                tapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
                             ),
                           ),
@@ -1031,12 +1091,11 @@ class _InlinePickCard extends StatelessWidget {
                           child: OutlinedButton.icon(
                             onPressed: () => _copy(context),
                             icon: const Icon(Icons.copy_rounded, size: 14),
-                            label: const Text('Copy'),
+                            label: Text(context.l10n.commonCopy),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 5),
                               textStyle: const TextStyle(fontSize: 12),
-                              tapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
                           ),
                         ),
@@ -1050,12 +1109,15 @@ class _InlinePickCard extends StatelessWidget {
                                   : Icons.bookmark_outline_rounded,
                               size: 14,
                             ),
-                            label: Text(isSaved ? 'Saved ✓' : 'Save'),
+                            label: Text(
+                              isSaved
+                                  ? context.l10n.savedWithCheck
+                                  : context.l10n.commonSave,
+                            ),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 5),
                               textStyle: const TextStyle(fontSize: 12),
-                              tapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
                           ),
                         ),
@@ -1079,11 +1141,7 @@ class _LuckBar extends StatelessWidget {
   final int luckOffset;
   final int streak;
 
-  const _LuckBar({
-    required this.lottery,
-    this.luckOffset = 0,
-    this.streak = 0,
-  });
+  const _LuckBar({required this.lottery, this.luckOffset = 0, this.streak = 0});
 
   int get _luckPct {
     final d = DateTime.now().toLocal();
@@ -1092,7 +1150,7 @@ class _LuckBar extends StatelessWidget {
     return (base + luckOffset).clamp(50, 99);
   }
 
-  String _nextDraw() {
+  String _nextDraw(AppLocalizations l10n) {
     final auWeekday = switch (lottery.id) {
       'au_powerball' => DateTime.thursday,
       'au_ozlotto' => DateTime.tuesday,
@@ -1100,8 +1158,7 @@ class _LuckBar extends StatelessWidget {
       _ => null,
     };
     if (auWeekday != null) {
-      final now =
-          DateTime.now().toUtc().add(const Duration(hours: 10));
+      final now = DateTime.now().toUtc().add(const Duration(hours: 10));
       var next = now;
       while (next.weekday != auWeekday) {
         next = next.add(const Duration(days: 1));
@@ -1111,23 +1168,22 @@ class _LuckBar extends StatelessWidget {
         next = next.add(const Duration(days: 7));
       }
       final diff = next.difference(now);
-      if (diff.inDays >= 2) return 'Next result update in ${diff.inDays}d';
-      if (diff.inHours >= 1) return 'Next result update in ${diff.inHours}h';
-      return 'Result update soon!';
+      if (diff.inDays >= 2) return l10n.nextResultUpdateDays(diff.inDays);
+      if (diff.inHours >= 1) return l10n.nextResultUpdateHours(diff.inHours);
+      return l10n.resultUpdateSoon;
     }
 
     final usDrawDays = switch (lottery.id) {
       'us_powerball' => [
-          DateTime.monday,
-          DateTime.wednesday,
-          DateTime.saturday
-        ],
+        DateTime.monday,
+        DateTime.wednesday,
+        DateTime.saturday,
+      ],
       'us_megamillions' => [DateTime.tuesday, DateTime.friday],
       _ => null,
     };
     if (usDrawDays != null) {
-      final now =
-          DateTime.now().toUtc().subtract(const Duration(hours: 5));
+      final now = DateTime.now().toUtc().subtract(const Duration(hours: 5));
       DateTime? nearest;
       for (final weekday in usDrawDays) {
         var candidate = now;
@@ -1144,9 +1200,9 @@ class _LuckBar extends StatelessWidget {
       }
       if (nearest != null) {
         final diff = nearest.difference(now);
-        if (diff.inDays >= 2) return 'Next result update in ${diff.inDays}d';
-        if (diff.inHours >= 1) return 'Next result update in ${diff.inHours}h';
-        return 'Result update soon!';
+        if (diff.inDays >= 2) return l10n.nextResultUpdateDays(diff.inDays);
+        if (diff.inHours >= 1) return l10n.nextResultUpdateHours(diff.inHours);
+        return l10n.resultUpdateSoon;
       }
     }
 
@@ -1156,18 +1212,19 @@ class _LuckBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final countdown = _nextDraw();
+    final l10n = context.l10n;
+    final countdown = _nextDraw(l10n);
     final right = streak >= 2
-        ? '🔥 $streak-day streak'
+        ? l10n.dayStreak(streak)
         : countdown.isNotEmpty
-            ? '⏳ $countdown'
-            : null;
+        ? l10n.countdownWithHourglass(countdown)
+        : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '📊 Historical similarity (reference only): $_luckPct / 100',
+          l10n.historicalSimilarityReference(_luckPct),
           style: theme.textTheme.labelMedium?.copyWith(
             color: theme.colorScheme.primary,
             fontWeight: FontWeight.w700,
@@ -1213,7 +1270,8 @@ class _CompactPickBannerState extends State<_CompactPickBanner>
   @override
   void initState() {
     super.initState();
-    final total = widget.pick.mainNumbers.length +
+    final total =
+        widget.pick.mainNumbers.length +
         (widget.pick.bonusNumbers?.length ?? 0);
     _ctrl = AnimationController(
       vsync: this,
@@ -1277,7 +1335,8 @@ class _CompactPickBannerState extends State<_CompactPickBanner>
           ),
           child: Card(
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16)),
+              borderRadius: BorderRadius.circular(16),
+            ),
             elevation: 2,
             shadowColor: theme.colorScheme.primary.withAlpha(40),
             clipBehavior: Clip.hardEdge,
@@ -1293,7 +1352,9 @@ class _CompactPickBannerState extends State<_CompactPickBanner>
                       children: [
                         Expanded(
                           child: Text(
-                            'Reference Pick · ${widget.pick.style.tagline}',
+                            context.l10n.referencePickWithStyle(
+                              context.l10n.playStyleTagline(widget.pick.style),
+                            ),
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.primary,
                               fontWeight: FontWeight.w700,
@@ -1304,15 +1365,15 @@ class _CompactPickBannerState extends State<_CompactPickBanner>
                         Builder(
                           builder: (btnCtx) => FilledButton.icon(
                             onPressed: () => _shareCard(btnCtx),
-                            icon:
-                                const Icon(Icons.share_rounded, size: 14),
-                            label: const Text('Share'),
+                            icon: const Icon(Icons.share_rounded, size: 14),
+                            label: Text(context.l10n.commonShare),
                             style: FilledButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               textStyle: const TextStyle(fontSize: 12),
-                              tapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
                           ),
                         ),
@@ -1337,35 +1398,55 @@ class _CompactPickBannerState extends State<_CompactPickBanner>
                                 AnimatedBuilder(
                                   animation: _ballAnim(i, total),
                                   builder: (_, child) => Transform.scale(
-                                    scale: _ballAnim(i, total).value.clamp(0.0, 1.0),
+                                    scale: _ballAnim(
+                                      i,
+                                      total,
+                                    ).value.clamp(0.0, 1.0),
                                     child: child,
                                   ),
-                                  child: LottoBall(number: mainNums[i], size: 38),
+                                  child: LottoBall(
+                                    number: mainNums[i],
+                                    size: 38,
+                                  ),
                                 ),
                                 if (i < mainNums.length - 1 ||
-                                    (bonusNums.isNotEmpty && !widget.lottery.bonusIsSupplementary))
+                                    (bonusNums.isNotEmpty &&
+                                        !widget.lottery.bonusIsSupplementary))
                                   const SizedBox(width: 6),
                               ],
                               // Powerball-style: inline
-                              if (bonusNums.isNotEmpty && !widget.lottery.bonusIsSupplementary) ...[
+                              if (bonusNums.isNotEmpty &&
+                                  !widget.lottery.bonusIsSupplementary) ...[
                                 const SizedBox(width: 2),
                                 for (var i = 0; i < bonusNums.length; i++) ...[
                                   AnimatedBuilder(
-                                    animation: _ballAnim(mainNums.length + i, total),
+                                    animation: _ballAnim(
+                                      mainNums.length + i,
+                                      total,
+                                    ),
                                     builder: (_, child) => Transform.scale(
-                                      scale: _ballAnim(mainNums.length + i, total).value.clamp(0.0, 1.0),
+                                      scale: _ballAnim(
+                                        mainNums.length + i,
+                                        total,
+                                      ).value.clamp(0.0, 1.0),
                                       child: child,
                                     ),
-                                    child: LottoBall(number: bonusNums[i], isBonus: true, size: 38),
+                                    child: LottoBall(
+                                      number: bonusNums[i],
+                                      isBonus: true,
+                                      size: 38,
+                                    ),
                                   ),
-                                  if (i < bonusNums.length - 1) const SizedBox(width: 6),
+                                  if (i < bonusNums.length - 1)
+                                    const SizedBox(width: 6),
                                 ],
                               ],
                             ],
                           ),
                         ),
                         // Supplementary-style: second row
-                        if (bonusNums.isNotEmpty && widget.lottery.bonusIsSupplementary) ...[
+                        if (bonusNums.isNotEmpty &&
+                            widget.lottery.bonusIsSupplementary) ...[
                           const SizedBox(height: 6),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
@@ -1374,24 +1455,36 @@ class _CompactPickBannerState extends State<_CompactPickBanner>
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Supp',
-                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                    color: const Color(0xFFD32F2F),
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 11,
-                                  ),
+                                  context.l10n.commonSupp,
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(
+                                        color: const Color(0xFFD32F2F),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 11,
+                                      ),
                                 ),
                                 const SizedBox(width: 6),
                                 for (var i = 0; i < bonusNums.length; i++) ...[
                                   AnimatedBuilder(
-                                    animation: _ballAnim(mainNums.length + i, total),
+                                    animation: _ballAnim(
+                                      mainNums.length + i,
+                                      total,
+                                    ),
                                     builder: (_, child) => Transform.scale(
-                                      scale: _ballAnim(mainNums.length + i, total).value.clamp(0.0, 1.0),
+                                      scale: _ballAnim(
+                                        mainNums.length + i,
+                                        total,
+                                      ).value.clamp(0.0, 1.0),
                                       child: child,
                                     ),
-                                    child: LottoBall(number: bonusNums[i], isBonus: true, size: 34),
+                                    child: LottoBall(
+                                      number: bonusNums[i],
+                                      isBonus: true,
+                                      size: 34,
+                                    ),
                                   ),
-                                  if (i < bonusNums.length - 1) const SizedBox(width: 6),
+                                  if (i < bonusNums.length - 1)
+                                    const SizedBox(width: 6),
                                 ],
                               ],
                             ),

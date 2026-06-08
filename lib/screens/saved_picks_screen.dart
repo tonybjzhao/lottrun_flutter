@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import '../l10n/l10n.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery.dart';
 import 'manual_pick_entry_screen.dart';
@@ -19,13 +20,17 @@ import '../widgets/saved_picks_analysis_section.dart';
 String _countryFlag(String code) => switch (code) {
   'US' => '🇺🇸',
   'AU' => '🇦🇺',
+  'GB' => '🇬🇧',
+  'CA' => '🇨🇦',
   _ => '🌍',
 };
 
-String _countryName(String code) => switch (code) {
-  'US' => 'United States',
-  'AU' => 'Australia',
-  _ => 'Other',
+String _countryName(BuildContext context, String code) => switch (code) {
+  'US' => context.l10n.countryUnitedStates,
+  'AU' => context.l10n.countryAustralia,
+  'GB' => context.l10n.countryUnitedKingdom,
+  'CA' => context.l10n.countryCanada,
+  _ => context.l10n.countryOther,
 };
 
 const _countryOrder = ['US', 'AU', 'OTHER'];
@@ -110,9 +115,9 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
     setState(() => _picks.removeWhere((p) => p.id == pick.id));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Pick deleted'),
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: Text(context.l10n.pickDeleted),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -129,16 +134,16 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
   Future<void> _clearAll() async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Clear all saved picks?'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(dialogContext.l10n.clearAllSavedPicksTitle),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(dialogContext.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Clear all'),
+            child: Text(dialogContext.l10n.clearAll),
           ),
         ],
       ),
@@ -160,21 +165,22 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Saved Picks'),
+        title: Text(l10n.screenSavedPicksTitle),
         actions: [
           IconButton(
             onPressed: _addManual,
             icon: const Icon(Icons.add_rounded),
-            tooltip: 'Add My Numbers',
+            tooltip: l10n.addMyNumbersTooltip,
           ),
           if (_picks.isNotEmpty)
             TextButton(
               onPressed: _clearAll,
               child: Text(
-                'Clear all',
+                l10n.clearAll,
                 style: TextStyle(color: theme.colorScheme.error),
               ),
             ),
@@ -349,7 +355,7 @@ class _SavedPicksScreenState extends State<SavedPicksScreen> {
       items.add(
         _SectionHeader(
           flag: _countryFlag(country),
-          name: _countryName(country),
+          name: _countryName(context, country),
           count: picks.length,
         ),
       );
@@ -383,21 +389,24 @@ class _StatsCard extends StatelessWidget {
 
   const _StatsCard({required this.stats});
 
-  String _bestText() {
-    if (stats.bestMain == 0 && stats.bestSupp == 0) return 'None yet';
-    if (stats.bestSupp == 0) return '${stats.bestMain} main';
-    if (stats.bestMain == 0) return '${stats.bestSupp} supp';
-    return '${stats.bestMain}+${stats.bestSupp}';
+  String _bestText(AppLocalizations l10n) {
+    if (stats.bestMain == 0 && stats.bestSupp == 0) return l10n.noneYet;
+    if (stats.bestSupp == 0) return l10n.mainCountLabel(stats.bestMain);
+    if (stats.bestMain == 0) return l10n.suppCountLabel(stats.bestSupp);
+    return l10n.mainSuppCountLabel(stats.bestMain, stats.bestSupp);
   }
 
-  String _totalText() {
-    if (stats.totalSuppHits == 0) return '${stats.totalMainHits} main';
-    return '${stats.totalMainHits} main · ${stats.totalSuppHits} supp';
+  String _totalText(AppLocalizations l10n) {
+    if (stats.totalSuppHits == 0) {
+      return l10n.totalMainHits(stats.totalMainHits);
+    }
+    return l10n.totalMainSuppHits(stats.totalMainHits, stats.totalSuppHits);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
@@ -424,7 +433,7 @@ class _StatsCard extends StatelessWidget {
               ),
               const SizedBox(width: 5),
               Text(
-                'Your Stats',
+                l10n.yourStats,
                 style: theme.textTheme.labelMedium?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w800,
@@ -432,7 +441,7 @@ class _StatsCard extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                '${stats.resolvedCount} result${stats.resolvedCount == 1 ? '' : 's'} checked',
+                l10n.resultsChecked(stats.resolvedCount),
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onSurface.withAlpha(110),
                 ),
@@ -444,22 +453,22 @@ class _StatsCard extends StatelessWidget {
             children: [
               _StatCell(
                 icon: '🏆',
-                value: _bestText(),
-                label: 'Top',
+                value: _bestText(l10n),
+                label: l10n.top,
                 theme: theme,
               ),
               _StatDivider(),
               _StatCell(
                 icon: '🎯',
-                value: _totalText(),
-                label: 'Total Hits',
+                value: _totalText(l10n),
+                label: l10n.totalHits,
                 theme: theme,
               ),
               _StatDivider(),
               _StatCell(
                 icon: '🍀',
                 value: '${stats.luckScore}',
-                label: 'Similarity Score',
+                label: l10n.similarityScore,
                 theme: theme,
                 highlight: stats.luckScore >= 80,
               ),
@@ -618,31 +627,34 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
 
   String get _lotteryName => _lottery?.name ?? widget.pick.lotteryId;
 
-  String get _copyText {
+  String _copyText(AppLocalizations l10n) {
     final main = widget.pick.mainNumbers.join('  ');
-    final bonusLabel = switch (widget.pick.lotteryId) {
-      'us_powerball' => 'Powerball',
-      'us_megamillions' => 'Mega Ball',
-      'au_powerball' => 'Powerball',
-      'uk_euromillions' => 'Lucky Stars',
-      _ => 'Bonus',
-    };
+    final bonusLabel = _lottery?.bonusLabel ?? l10n.commonBonus;
     final bonus =
         (widget.pick.bonusNumbers != null &&
             widget.pick.bonusNumbers!.isNotEmpty)
-        ? '\n+ $bonusLabel: ${widget.pick.bonusNumbers!.join(' ')}'
+        ? l10n.copyPickBonusLine(
+            bonusLabel,
+            widget.pick.bonusNumbers!.join(' '),
+          )
         : '';
-    return '🎯 My $_lotteryName Number Set\n${widget.pick.displayLabel}\n\n$main$bonus\n\nGenerated for fun — NumberRun';
+    return l10n.copyPickText(
+      _lotteryName,
+      widget.pick.displayLabel,
+      main,
+      bonus,
+    );
   }
 
   Future<void> _copy(BuildContext context) async {
     HapticFeedback.lightImpact();
-    await Clipboard.setData(ClipboardData(text: _copyText));
+    final l10n = context.l10n;
+    await Clipboard.setData(ClipboardData(text: _copyText(l10n)));
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Copied to clipboard.'),
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: Text(l10n.copiedToClipboard),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -660,7 +672,7 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
     );
   }
 
-  Widget _pendingChip(ThemeData theme) => Container(
+  Widget _pendingChip(BuildContext context, ThemeData theme) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
     decoration: BoxDecoration(
       color: theme.colorScheme.surfaceContainerHighest,
@@ -673,8 +685,8 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
         const SizedBox(width: 4),
         Text(
           widget.pick.drawLabel != null
-              ? 'Pending · ${widget.pick.drawLabel}'
-              : 'Pending',
+              ? context.l10n.pendingWithDate(widget.pick.drawLabel!)
+              : context.l10n.pending,
           style: theme.textTheme.labelSmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -686,6 +698,7 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final dateStr = DateFormat(
       'd MMM yyyy · HH:mm',
     ).format(widget.pick.createdAt.toLocal());
@@ -755,7 +768,7 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      '👤 My Pick',
+                                      l10n.myPick,
                                       style: theme.textTheme.labelSmall
                                           ?.copyWith(
                                             color: theme
@@ -796,7 +809,7 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
                           size: 20,
                         ),
                         color: theme.colorScheme.onSurface.withAlpha(120),
-                        tooltip: 'Delete',
+                        tooltip: l10n.deleteTooltip,
                         visualDensity: VisualDensity.compact,
                       ),
                     ],
@@ -828,7 +841,7 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
                     if (result != null && result.isPending)
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
-                        child: _pendingChip(theme),
+                        child: _pendingChip(context, theme),
                       ),
                   ],
 
@@ -844,7 +857,7 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
                                 ? () => _shareCard(btnCtx)
                                 : null,
                             icon: const Icon(Icons.share_rounded, size: 14),
-                            label: const Text('Share'),
+                            label: Text(l10n.commonShare),
                             style: FilledButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 5),
                               textStyle: const TextStyle(fontSize: 12),
@@ -858,7 +871,7 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
                         child: OutlinedButton.icon(
                           onPressed: () => _copy(context),
                           icon: const Icon(Icons.copy_rounded, size: 14),
-                          label: const Text('Copy'),
+                          label: Text(l10n.commonCopy),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 5),
                             textStyle: const TextStyle(fontSize: 12),
@@ -871,7 +884,7 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
                         child: OutlinedButton.icon(
                           onPressed: widget.onTap,
                           icon: const Icon(Icons.upload_rounded, size: 14),
-                          label: const Text('Load'),
+                          label: Text(l10n.commonLoad),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 5),
                             textStyle: const TextStyle(fontSize: 12),

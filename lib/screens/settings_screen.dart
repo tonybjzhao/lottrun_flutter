@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/l10n.dart';
 import '../services/insight_service.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -25,7 +26,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final svc = InsightService.instance;
     final results = await svc.getNotifPref(kNotifKeyResults);
     final myPicks = await svc.getNotifPref(kNotifKeyMyPicks);
-    final daily = await svc.getNotifPref(kNotifKeyDailyInsight, defaultValue: false);
+    final daily = await svc.getNotifPref(
+      kNotifKeyDailyInsight,
+      defaultValue: false,
+    );
     final weekly = await svc.getNotifPref(kNotifKeyWeeklySummary);
     if (mounted) {
       setState(() {
@@ -45,18 +49,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(l10n.screenSettingsTitle)),
       body: _loaded
           ? ListView(
               children: [
                 // ── Notifications section ──────────────────────────
-                _SectionHeader(label: 'Notifications', theme: theme),
+                _SectionHeader(label: l10n.settingsNotifications, theme: theme),
                 _NotifTile(
                   icon: Icons.notifications_rounded,
-                  title: 'Results',
-                  subtitle: 'When past results are available for your saved picks',
+                  title: l10n.settingsResults,
+                  subtitle: l10n.settingsResultsSubtitle,
                   value: _notifResults,
                   onChanged: (v) {
                     setState(() => _notifResults = v);
@@ -66,8 +71,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 _NotifTile(
                   icon: Icons.bookmark_rounded,
-                  title: 'My Picks',
-                  subtitle: 'When your saved numbers appear in recent results',
+                  title: l10n.settingsMyPicks,
+                  subtitle: l10n.settingsMyPicksSubtitle,
                   value: _notifMyPicks,
                   onChanged: (v) {
                     setState(() => _notifMyPicks = v);
@@ -77,8 +82,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 _NotifTile(
                   icon: Icons.lightbulb_outline_rounded,
-                  title: 'Daily Insights',
-                  subtitle: 'One short trend observation per day',
+                  title: l10n.settingsDailyInsights,
+                  subtitle: l10n.settingsDailyInsightsSubtitle,
                   value: _notifDailyInsight,
                   onChanged: (v) {
                     setState(() => _notifDailyInsight = v);
@@ -88,8 +93,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 _NotifTile(
                   icon: Icons.calendar_today_rounded,
-                  title: 'Weekly Summary',
-                  subtitle: 'A brief weekly pattern summary every Sunday',
+                  title: l10n.settingsWeeklySummary,
+                  subtitle: l10n.settingsWeeklySummarySubtitle,
                   value: _notifWeeklySummary,
                   onChanged: (v) {
                     setState(() => _notifWeeklySummary = v);
@@ -100,7 +105,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
                   child: Text(
-                    'Max 2 notifications per day total.',
+                    l10n.settingsMaxNotifications,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.onSurface.withAlpha(100),
                       fontSize: 10,
@@ -110,16 +115,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const Divider(indent: 16, endIndent: 16),
 
                 // ── About section ──────────────────────────────────
-                _SectionHeader(label: 'About', theme: theme),
+                _SectionHeader(label: l10n.settingsAbout, theme: theme),
                 ListTile(
                   leading: _LeadingIcon(
                     color: theme.colorScheme.surfaceContainerHighest,
                     icon: Icons.info_outline_rounded,
                     iconColor: theme.colorScheme.onSurface.withAlpha(160),
                   ),
-                  title: const Text('Historical results only'),
+                  title: Text(l10n.settingsHistoricalResultsOnly),
                   subtitle: Text(
-                    'All analysis is based on historical results. This app does not provide predictions or improve outcomes.',
+                    l10n.settingsHistoricalResultsOnlyBody,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withAlpha(140),
                     ),
@@ -160,11 +165,7 @@ class _LeadingIcon extends StatelessWidget {
   final IconData icon;
   final Color? iconColor;
 
-  const _LeadingIcon({
-    this.color,
-    required this.icon,
-    this.iconColor,
-  });
+  const _LeadingIcon({this.color, required this.icon, this.iconColor});
 
   @override
   Widget build(BuildContext context) {
@@ -179,7 +180,6 @@ class _LeadingIcon extends StatelessWidget {
     );
   }
 }
-
 
 class _NotifTile extends StatelessWidget {
   final IconData icon;
@@ -201,8 +201,11 @@ class _NotifTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SwitchListTile(
-      secondary: Icon(icon,
-          size: 22, color: theme.colorScheme.onSurface.withAlpha(160)),
+      secondary: Icon(
+        icon,
+        size: 22,
+        color: theme.colorScheme.onSurface.withAlpha(160),
+      ),
       title: Text(title),
       subtitle: Text(
         subtitle,

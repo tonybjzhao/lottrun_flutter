@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/l10n.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import '../services/draw_analysis_service.dart';
@@ -23,14 +24,15 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
   static const _options = [10, 20, 50];
 
   RecentDrawTrends get _trends => DrawAnalysisService.analyzeRecentTrends(
-        lottery: widget.lottery,
-        draws: widget.draws,
-        drawCount: _drawCount,
-      );
+    lottery: widget.lottery,
+    draws: widget.draws,
+    drawCount: _drawCount,
+  );
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final trends = _trends;
 
     return Padding(
@@ -46,19 +48,19 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Recent Past Result Patterns',
+                      l10n.recentPatternsTitle,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     Text(
-                      'Based on the last ${trends.drawCount} past results',
+                      l10n.recentPatternsSubtitle(trends.drawCount),
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface.withAlpha(120),
                       ),
                     ),
                     Text(
-                      'Historical comparison only · no guarantee of outcomes',
+                      l10n.historicalComparisonOnly,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface.withAlpha(80),
                         fontStyle: FontStyle.italic,
@@ -78,12 +80,12 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
           const SizedBox(height: 12),
 
           if (trends.drawCount == 0)
-            _emptyState(theme)
+            _emptyState(context, theme)
           else ...[
             // ── Hot numbers ──────────────────────────────────────
             _MetricRow(
-              label: 'Frequently observed numbers',
-              tooltip: 'Observed more often in past results',
+              label: l10n.frequentNumbers,
+              tooltip: l10n.frequentNumbersTooltip,
               child: _NumberChips(
                 numbers: trends.topFrequent,
                 indicator: '🔥',
@@ -95,8 +97,8 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
 
             // ── Cold numbers ─────────────────────────────────────
             _MetricRow(
-              label: 'Less common numbers',
-              tooltip: 'Observed less often in past results',
+              label: l10n.lessCommonNumbers,
+              tooltip: l10n.lessCommonNumbersTooltip,
               child: _NumberChips(
                 numbers: trends.bottomFrequent,
                 indicator: '❄️',
@@ -113,19 +115,19 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
             Row(
               children: [
                 _StatChip(
-                  label: 'Avg sum',
+                  label: l10n.avgSum,
                   value: trends.averageSum.toStringAsFixed(0),
                   theme: theme,
                 ),
                 const SizedBox(width: 8),
                 _StatChip(
-                  label: 'Odd/Even',
+                  label: l10n.oddEven,
                   value: trends.mostCommonOddEven,
                   theme: theme,
                 ),
                 const SizedBox(width: 8),
                 _StatChip(
-                  label: 'Low/High',
+                  label: l10n.lowHigh,
                   value: trends.mostCommonLowHigh,
                   theme: theme,
                 ),
@@ -137,13 +139,15 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
             Row(
               children: [
                 _StatChip(
-                  label: 'Avg consec pairs',
+                  label: l10n.avgConsecPairs,
                   value: trends.avgConsecutivePairs.toStringAsFixed(1),
                   theme: theme,
                 ),
                 const SizedBox(width: 8),
                 _TrendStrengthChip(
-                    strength: trends.trendStrength, theme: theme),
+                  strength: trends.trendStrength,
+                  theme: theme,
+                ),
               ],
             ),
 
@@ -159,15 +163,15 @@ class _RecentDrawTrendsSectionState extends State<RecentDrawTrendsSection> {
     );
   }
 
-  Widget _emptyState(ThemeData theme) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        child: Text(
-          'Not enough past result history for analysis.',
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withAlpha(120),
-          ),
-        ),
-      );
+  Widget _emptyState(BuildContext context, ThemeData theme) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 12),
+    child: Text(
+      context.l10n.notEnoughHistory,
+      style: theme.textTheme.bodySmall?.copyWith(
+        color: theme.colorScheme.onSurface.withAlpha(120),
+      ),
+    ),
+  );
 }
 
 // ── Draw count selector ───────────────────────────────────────────────────────
@@ -195,8 +199,7 @@ class _DrawCountSelector extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
             margin: const EdgeInsets.only(left: 4),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: selected
                   ? theme.colorScheme.primary
@@ -237,9 +240,12 @@ class _NumberChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (numbers.isEmpty) {
-      return Text('—',
-          style: theme.textTheme.bodySmall
-              ?.copyWith(color: theme.colorScheme.onSurface.withAlpha(100)));
+      return Text(
+        '—',
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurface.withAlpha(100),
+        ),
+      );
     }
     return Wrap(
       spacing: 4,
@@ -310,9 +316,11 @@ class _MetricRow extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 2),
-                  Icon(Icons.info_outline_rounded,
-                      size: 10,
-                      color: theme.colorScheme.onSurface.withAlpha(80)),
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: 10,
+                    color: theme.colorScheme.onSurface.withAlpha(80),
+                  ),
                 ],
               ),
             ),
@@ -378,18 +386,27 @@ class _TrendStrengthChip extends StatelessWidget {
   final TrendStrength strength;
   final ThemeData theme;
 
-  const _TrendStrengthChip(
-      {required this.strength, required this.theme});
+  const _TrendStrengthChip({required this.strength, required this.theme});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final (label, icon, color) = switch (strength) {
-      TrendStrength.strong =>
-        ('Notable pattern', '📈', Colors.orange.shade700),
-      TrendStrength.balanced =>
-        ('Balanced', '⚖️', Colors.teal.shade600),
-      TrendStrength.random =>
-        ('Random-like', '🎲', Colors.grey.shade600),
+      TrendStrength.strong => (
+        l10n.patternNotable,
+        '📈',
+        Colors.orange.shade700,
+      ),
+      TrendStrength.balanced => (
+        l10n.patternBalanced,
+        '⚖️',
+        Colors.teal.shade600,
+      ),
+      TrendStrength.random => (
+        l10n.patternRandomLike,
+        '🎲',
+        Colors.grey.shade600,
+      ),
     };
 
     return Container(

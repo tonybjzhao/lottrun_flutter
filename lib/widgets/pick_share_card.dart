@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../l10n/l10n.dart';
 import '../models/generated_pick.dart';
 import '../models/lottery.dart';
 import '../services/pick_result_service.dart';
@@ -137,6 +138,7 @@ class ShareCardGeneratorState extends State<ShareCardGenerator> {
   ///
   /// [sharePositionOrigin] positions the iPad share popover.
   Future<void> share({Rect? sharePositionOrigin}) async {
+    final shareText = _shareText(context.l10n, widget.result, widget.lottery);
     final bytes = await exportImage();
     if (bytes == null) return;
     final dir = await getTemporaryDirectory();
@@ -144,7 +146,7 @@ class ShareCardGeneratorState extends State<ShareCardGenerator> {
     await file.writeAsBytes(bytes);
     await Share.shareXFiles(
       [XFile(file.path)],
-      text: _shareText(widget.result, widget.lottery),
+      text: shareText,
       sharePositionOrigin: sharePositionOrigin,
     );
   }
@@ -152,6 +154,7 @@ class ShareCardGeneratorState extends State<ShareCardGenerator> {
   @override
   Widget build(BuildContext context) {
     final r = widget.result;
+    final l10n = context.l10n;
     final hasResult = r != null && !r.isPending && r.drawMainNumbers.isNotEmpty;
 
     final Widget card = switch (template) {
@@ -159,17 +162,20 @@ class ShareCardGeneratorState extends State<ShareCardGenerator> {
         pick: widget.pick,
         lottery: widget.lottery,
         result: r!,
+        l10n: l10n,
       ),
       ShareCardTemplate.electric => _ElectricTemplate(
         pick: widget.pick,
         lottery: widget.lottery,
         result: r!,
+        l10n: l10n,
       ),
       ShareCardTemplate.warm => _WarmTemplate(
         pick: widget.pick,
         lottery: widget.lottery,
         result: hasResult ? r : null,
         forceFunnyFail: widget.templateOverride == ShareCardTemplate.warm,
+        l10n: l10n,
       ),
     };
 
@@ -188,11 +194,13 @@ class _FireTemplate extends StatelessWidget {
   final GeneratedPick pick;
   final Lottery lottery;
   final PickMatchResult result;
+  final AppLocalizations l10n;
 
   const _FireTemplate({
     required this.pick,
     required this.lottery,
     required this.result,
+    required this.l10n,
   });
 
   static const _bg1 = Color(0xFF0D0D0D);
@@ -298,7 +306,7 @@ class _FireTemplate extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '🔥 Near match!',
+                    l10n.shareNearMatch,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -313,6 +321,7 @@ class _FireTemplate extends StatelessWidget {
                       isSupp,
                       result.matchedBonus,
                       lottery,
+                      l10n,
                     ),
                     style: const TextStyle(
                       color: Color(0xFFFFE082),
@@ -322,9 +331,9 @@ class _FireTemplate extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Only one number away 👀',
-                    style: TextStyle(color: Colors.white70, fontSize: 13),
+                  Text(
+                    l10n.shareOnlyOneAway,
+                    style: const TextStyle(color: Colors.white70, fontSize: 13),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
@@ -340,9 +349,9 @@ class _FireTemplate extends StatelessWidget {
                     _ballRow(drawSupp, (_) => _BallKind.drawSupp, size: 32),
                   ],
                   const SizedBox(height: 20),
-                  const Text(
-                    'Can you beat this? 👀',
-                    style: TextStyle(
+                  Text(
+                    l10n.shareCanYouBeatThis,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
                       fontSize: 14,
@@ -410,11 +419,13 @@ class _ElectricTemplate extends StatelessWidget {
   final GeneratedPick pick;
   final Lottery lottery;
   final PickMatchResult result;
+  final AppLocalizations l10n;
 
   const _ElectricTemplate({
     required this.pick,
     required this.lottery,
     required this.result,
+    required this.l10n,
   });
 
   static const _bg = Color(0xFF08122A);
@@ -503,7 +514,7 @@ class _ElectricTemplate extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              'of $mainCount',
+                              l10n.shareOfMainCount(mainCount),
                               style: const TextStyle(
                                 color: Colors.white38,
                                 fontSize: 11,
@@ -517,9 +528,9 @@ class _ElectricTemplate extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              '🎯 Not bad!',
-                              style: TextStyle(
+                            Text(
+                              l10n.shareNotBad,
+                              style: const TextStyle(
                                 color: _cyan,
                                 fontSize: 22,
                                 fontWeight: FontWeight.w800,
@@ -533,6 +544,7 @@ class _ElectricTemplate extends StatelessWidget {
                                 isSupp,
                                 result.matchedBonus,
                                 lottery,
+                                l10n,
                               ),
                               style: const TextStyle(
                                 color: Colors.white,
@@ -541,9 +553,9 @@ class _ElectricTemplate extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 6),
-                            const Text(
-                              'Can you beat this? 👀',
-                              style: TextStyle(
+                            Text(
+                              l10n.shareCanYouBeatThis,
+                              style: const TextStyle(
                                 color: Colors.white70,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -647,12 +659,14 @@ class _WarmTemplate extends StatelessWidget {
   final Lottery lottery;
   final PickMatchResult? result;
   final bool forceFunnyFail;
+  final AppLocalizations l10n;
 
   const _WarmTemplate({
     required this.pick,
     required this.lottery,
     this.result,
     this.forceFunnyFail = false,
+    required this.l10n,
   });
 
   @override
@@ -672,27 +686,22 @@ class _WarmTemplate extends StatelessWidget {
 
     if (isFunnyFail) {
       emoji = '😂';
-      headline = 'Not today';
-      subhead = isMiss ? '0 overlapped' : 'Random result';
+      headline = l10n.shareNotToday;
+      subhead = isMiss ? l10n.shareZeroOverlapped : l10n.shareRandomResultPlain;
       blurbText = null;
     } else if (isPending) {
       emoji = '⏳';
-      headline = 'Result update incoming!';
-      subhead = 'Waiting for results 🤞';
-      blurbText = 'Can you beat this? 👀';
+      headline = l10n.shareResultIncoming;
+      subhead = l10n.shareWaitingForResults;
+      blurbText = l10n.shareCanYouBeatThis;
     } else {
       emoji = '🎯';
-      headline = 'My Number Pick';
-      subhead = "Let's see what happens 👀";
-      blurbText = 'These are my numbers ↑';
+      headline = l10n.shareMyNumberPick;
+      subhead = l10n.shareLetsSee;
+      blurbText = l10n.shareTheseAreMyNumbers;
     }
 
-    final bonusLabel = switch (lottery.id) {
-      'au_powerball' => 'Powerball',
-      'us_powerball' => 'Powerball',
-      'us_megamillions' => 'Mega Ball',
-      _ => 'Bonus',
-    };
+    final bonusLabel = lottery.bonusLabel ?? l10n.commonBonus;
 
     final List<Color> gradColors = isFunnyFail
         ? const [Color(0xFF4A0010), Color(0xFF8B0030), Color(0xFFB03050)]
@@ -803,7 +812,7 @@ class _WarmTemplate extends StatelessWidget {
 
                   const SizedBox(height: 18),
                   Text(
-                    'Can you beat this? 👀',
+                    l10n.shareCanYouBeatThis,
                     style: TextStyle(
                       color: theme.accentColor,
                       fontSize: 12,
@@ -838,30 +847,30 @@ class _WarmTemplate extends StatelessWidget {
       borderRadius: BorderRadius.circular(14),
       border: Border.all(color: const Color(0xFFFFEE58), width: 1.5),
     ),
-    child: const Column(
+    child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '😂 Funny fail',
-          style: TextStyle(
+          l10n.shareFunnyFail,
+          style: const TextStyle(
             color: Color(0xFF333333),
             fontWeight: FontWeight.w800,
             fontSize: 16,
           ),
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         Text(
-          'Not today',
-          style: TextStyle(
+          l10n.shareNotToday,
+          style: const TextStyle(
             color: Color(0xFF5F4339),
             fontWeight: FontWeight.w700,
             fontSize: 13,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
-          'Can you beat this? 👀',
-          style: TextStyle(
+          l10n.shareCanYouBeatThis,
+          style: const TextStyle(
             color: Color(0xFF7B2FBE),
             fontWeight: FontWeight.w800,
             fontSize: 13,
@@ -1007,17 +1016,19 @@ String _matchDesc(
   bool isSupp,
   int matchedBonus,
   Lottery lottery,
+  AppLocalizations l10n,
 ) {
   if (!isSupp) {
+    final bonusLabel = lottery.bonusLabel ?? l10n.commonBonus;
     if (matchedBonus > 0 && matchMain > 0) {
-      return '$matchMain main + ${lottery.bonusLabel ?? 'Bonus'} matched';
+      return l10n.mainAndBonusMatched(matchMain, bonusLabel);
     }
-    if (matchedBonus > 0) return '${lottery.bonusLabel ?? 'Bonus'} matched';
-    return '$matchMain matched';
+    if (matchedBonus > 0) return l10n.bonusMatched(bonusLabel);
+    return l10n.matchedCount(matchMain);
   }
-  if (matchMain == 0) return '$suppHits supp matched';
-  if (suppHits == 0) return '$matchMain main matched';
-  return '$matchMain main + $suppHits supp matched';
+  if (matchMain == 0) return l10n.suppMatched(suppHits);
+  if (suppHits == 0) return l10n.mainMatched(matchMain);
+  return l10n.mainAndSuppMatched(matchMain, suppHits);
 }
 
 String _flagEmoji(String countryCode) => switch (countryCode) {
@@ -1028,16 +1039,7 @@ String _flagEmoji(String countryCode) => switch (countryCode) {
   _ => '🌍',
 };
 
-String _lotteryShortName(String name) {
-  if (name.contains('Saturday')) return 'Saturday\nLotto';
-  if (name.contains('Oz')) return 'Oz Lotto';
-  if (name.contains('Powerball')) return 'Powerball';
-  if (name.contains('Mega')) return 'Mega Millions';
-  if (name.contains('Euro')) return 'EuroMillions';
-  if (name.contains('Max')) return 'Lotto Max';
-  if (name.contains('6/49')) return 'Lotto 6/49';
-  return name;
-}
+String _lotteryShortName(String name) => name;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // § 9  Confetti particles (shared decorative layer)
@@ -1146,17 +1148,20 @@ class PickShareCard extends StatelessWidget {
         pick: pick,
         lottery: lottery,
         result: r!,
+        l10n: context.l10n,
       ),
       ShareCardTemplate.electric => _ElectricTemplate(
         pick: pick,
         lottery: lottery,
         result: r!,
+        l10n: context.l10n,
       ),
       ShareCardTemplate.warm => _WarmTemplate(
         pick: pick,
         lottery: lottery,
         result: hasResult ? r : null,
         forceFunnyFail: templateOverride == ShareCardTemplate.warm,
+        l10n: context.l10n,
       ),
     };
   }
@@ -1227,6 +1232,7 @@ class _PickShareSheetState extends State<_PickShareSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
     return FractionallySizedBox(
       heightFactor: 0.94,
@@ -1260,14 +1266,14 @@ class _PickShareSheetState extends State<_PickShareSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Share Card Preview',
+                    l10n.shareCardPreviewTitle,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Pick a style or keep the default option for ${widget.lottery.name}.',
+                    l10n.shareCardPreviewSubtitle(widget.lottery.name),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                       height: 1.35,
@@ -1295,7 +1301,7 @@ class _PickShareSheetState extends State<_PickShareSheet> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'Template',
+                      l10n.shareTemplate,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                       ),
@@ -1306,7 +1312,7 @@ class _PickShareSheetState extends State<_PickShareSheet> {
                       runSpacing: 10,
                       children: [
                         ChoiceChip(
-                          label: Text('⭐ Reference Pick'),
+                          label: Text(l10n.shareReferencePick),
                           selected: _manualTemplate == null,
                           onSelected: (_) {
                             setState(() => _manualTemplate = null);
@@ -1314,7 +1320,7 @@ class _PickShareSheetState extends State<_PickShareSheet> {
                         ),
                         for (final template in ShareCardTemplate.values)
                           ChoiceChip(
-                            label: Text(_templateLabel(template)),
+                            label: Text(_templateLabel(l10n, template)),
                             selected: _manualTemplate == template,
                             onSelected:
                                 (template == ShareCardTemplate.fire ||
@@ -1338,7 +1344,7 @@ class _PickShareSheetState extends State<_PickShareSheet> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
-                        _templateDescription(_effectiveTemplate),
+                        _templateDescription(l10n, _effectiveTemplate),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                           height: 1.35,
@@ -1361,7 +1367,7 @@ class _PickShareSheetState extends State<_PickShareSheet> {
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(0, 52),
                       ),
-                      child: const Text('Cancel'),
+                      child: Text(l10n.commonCancel),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -1383,7 +1389,9 @@ class _PickShareSheetState extends State<_PickShareSheet> {
                                 ),
                               )
                             : const Icon(Icons.share_rounded),
-                        label: Text(_isSharing ? 'Preparing...' : 'Share PNG'),
+                        label: Text(
+                          _isSharing ? l10n.commonPreparing : l10n.sharePng,
+                        ),
                       ),
                     ),
                   ),
@@ -1410,6 +1418,7 @@ Future<void> sharePickCard({
   PickMatchResult? result,
   Lottery? lottery,
 }) async {
+  final shareText = _shareText(btnContext.l10n, result, lottery);
   final box = btnContext.findRenderObject() as RenderBox?;
   final origin = box == null ? null : box.localToGlobal(Offset.zero) & box.size;
 
@@ -1429,7 +1438,7 @@ Future<void> sharePickCard({
 
     await Share.shareXFiles(
       [XFile(file.path)],
-      text: _shareText(result, lottery),
+      text: shareText,
       sharePositionOrigin: origin,
     );
   } catch (e) {
@@ -1442,6 +1451,7 @@ Future<void> sharePickCards({
   required List<GlobalKey> repaintKeys,
   required BuildContext btnContext,
 }) async {
+  final shareText = btnContext.l10n.shareDefaultPicks;
   final box = btnContext.findRenderObject() as RenderBox?;
   final origin = box == null ? null : box.localToGlobal(Offset.zero) & box.size;
 
@@ -1467,7 +1477,7 @@ Future<void> sharePickCards({
     if (files.isEmpty) return;
     await Share.shareXFiles(
       files,
-      text: 'My number picks 🎯 — Generated by NumberRun',
+      text: shareText,
       sharePositionOrigin: origin,
     );
   } catch (e) {
@@ -1475,9 +1485,13 @@ Future<void> sharePickCards({
   }
 }
 
-String _shareText(PickMatchResult? result, Lottery? lottery) {
+String _shareText(
+  AppLocalizations l10n,
+  PickMatchResult? result,
+  Lottery? lottery,
+) {
   if (result == null || result.isPending) {
-    return 'My number pick 🎯 — Generated by NumberRun';
+    return l10n.shareDefaultPick;
   }
   final isSupp = lottery?.bonusIsSupplementary ?? false;
   final total =
@@ -1503,26 +1517,25 @@ String _shareText(PickMatchResult? result, Lottery? lottery) {
         ),
   );
   return switch (tmpl) {
-    ShareCardTemplate.fire => '🔥 Number comparison from NumberRun',
-    ShareCardTemplate.electric => '🎯 Number overlap from NumberRun',
+    ShareCardTemplate.fire => l10n.shareNumberComparison,
+    ShareCardTemplate.electric => l10n.shareNumberOverlap,
     ShareCardTemplate.warm =>
-      total == 0
-          ? '😆 Random result from NumberRun'
-          : 'My number pick 🎯 — Generated by NumberRun',
+      total == 0 ? l10n.shareRandomResult : l10n.shareDefaultPick,
   };
 }
 
-String _templateLabel(ShareCardTemplate template) => switch (template) {
-  ShareCardTemplate.fire => '🔥 Almost Overlap',
-  ShareCardTemplate.electric => '🎯 Number Overlap',
-  ShareCardTemplate.warm => '😂 Random Result',
-};
+String _templateLabel(AppLocalizations l10n, ShareCardTemplate template) =>
+    switch (template) {
+      ShareCardTemplate.fire => l10n.shareTemplateFireLabel,
+      ShareCardTemplate.electric => l10n.shareTemplateElectricLabel,
+      ShareCardTemplate.warm => l10n.shareTemplateWarmLabel,
+    };
 
-String _templateDescription(ShareCardTemplate template) => switch (template) {
-  ShareCardTemplate.fire =>
-    'Dramatic gold-on-dark card for close calls and strong hit streaks.',
-  ShareCardTemplate.electric =>
-    'Clean neon stats card for smaller wins and partial matches.',
-  ShareCardTemplate.warm =>
-    'Playful motivational card for pending draws, misses, or pick-only sharing.',
+String _templateDescription(
+  AppLocalizations l10n,
+  ShareCardTemplate template,
+) => switch (template) {
+  ShareCardTemplate.fire => l10n.shareTemplateFireDescription,
+  ShareCardTemplate.electric => l10n.shareTemplateElectricDescription,
+  ShareCardTemplate.warm => l10n.shareTemplateWarmDescription,
 };

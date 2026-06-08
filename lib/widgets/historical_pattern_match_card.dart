@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../l10n/l10n.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import '../services/draw_analysis_service.dart';
@@ -19,6 +20,7 @@ class HistoricalPatternMatchCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     final result = DrawAnalysisService.analyzeHistoricalPattern(
       lottery: lottery,
@@ -31,7 +33,7 @@ class HistoricalPatternMatchCard extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Text(
-          'Not enough history for pattern analysis (requires 52+ past draws).',
+          l10n.historicalPatternNotEnough,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurface.withAlpha(120),
           ),
@@ -53,20 +55,20 @@ class HistoricalPatternMatchCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Historical Pattern Comparison',
+                      l10n.historicalPatternTitle,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     Text(
-                      'Based on past results from the last 5 years',
+                      l10n.historicalPatternSubtitle,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface.withAlpha(120),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      _scoreLabel(result.historicalMatchScore),
+                      _scoreLabel(l10n, result.historicalMatchScore),
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: _scoreColor(result.historicalMatchScore),
                         fontWeight: FontWeight.w600,
@@ -75,8 +77,7 @@ class HistoricalPatternMatchCard extends StatelessWidget {
                   ],
                 ),
               ),
-              _ScoreBadge(
-                  score: result.historicalMatchScore, theme: theme),
+              _ScoreBadge(score: result.historicalMatchScore, theme: theme),
             ],
           ),
 
@@ -84,29 +85,35 @@ class HistoricalPatternMatchCard extends StatelessWidget {
 
           // ── Component scores ─────────────────────────────────────
           _ComponentScoreRow(
-              label: 'Trend comparison',
-              score: result.trendScore,
-              theme: theme),
-              _ComponentScoreRow(
-              label: 'Observed/less-common comparison',
-              score: result.hotColdAlignmentScore,
-              theme: theme),
+            label: l10n.trendComparison,
+            score: result.trendScore,
+            theme: theme,
+          ),
           _ComponentScoreRow(
-              label: 'Odd/even structure',
-              score: result.oddEvenStructureScore,
-              theme: theme),
+            label: l10n.observedLessCommonComparison,
+            score: result.hotColdAlignmentScore,
+            theme: theme,
+          ),
           _ComponentScoreRow(
-              label: 'Low/high structure',
-              score: result.lowHighStructureScore,
-              theme: theme),
+            label: l10n.oddEvenStructure,
+            score: result.oddEvenStructureScore,
+            theme: theme,
+          ),
           _ComponentScoreRow(
-              label: 'Sum range',
-              score: result.sumRangeScore,
-              theme: theme),
+            label: l10n.lowHighStructure,
+            score: result.lowHighStructureScore,
+            theme: theme,
+          ),
           _ComponentScoreRow(
-              label: 'Consecutive pairs',
-              score: result.consecutiveScore,
-              theme: theme),
+            label: l10n.sumRange,
+            score: result.sumRangeScore,
+            theme: theme,
+          ),
+          _ComponentScoreRow(
+            label: l10n.consecutivePairs,
+            score: result.consecutiveScore,
+            theme: theme,
+          ),
 
           const SizedBox(height: 10),
           const Divider(height: 1),
@@ -118,26 +125,30 @@ class HistoricalPatternMatchCard extends StatelessWidget {
             runSpacing: 6,
             children: [
               _InfoChip(
-                  label: result.oddEvenPattern,
-                  icon: Icons.balance_rounded,
-                  theme: theme),
+                label: result.oddEvenPattern,
+                icon: Icons.balance_rounded,
+                theme: theme,
+              ),
               _InfoChip(
-                  label: result.lowHighPattern,
-                  icon: Icons.bar_chart_rounded,
-                  theme: theme),
+                label: result.lowHighPattern,
+                icon: Icons.bar_chart_rounded,
+                theme: theme,
+              ),
               _InfoChip(
-                  label: result.sumRangeLabel,
-                  icon: Icons.functions_rounded,
-                  theme: theme),
+                label: result.sumRangeLabel,
+                icon: Icons.functions_rounded,
+                theme: theme,
+              ),
               _InfoChip(
-                label:
-                    '${result.consecutiveNumberCount} consec pair${result.consecutiveNumberCount == 1 ? '' : 's'}',
+                label: l10n.consecutivePairCount(result.consecutiveNumberCount),
                 icon: Icons.link_rounded,
                 theme: theme,
               ),
               _InfoChip(
-                label:
-                    '🔥 ${result.hotNumberCount} observed more often · ❄️ ${result.coldNumberCount} less common',
+                label: l10n.observedMoreLessCommonCounts(
+                  result.hotNumberCount,
+                  result.coldNumberCount,
+                ),
                 icon: null,
                 theme: theme,
               ),
@@ -152,7 +163,7 @@ class HistoricalPatternMatchCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  'Top 10 similar past results (for reference only)',
+                  l10n.topSimilarPastResults,
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: theme.colorScheme.onSurface.withAlpha(160),
@@ -161,8 +172,9 @@ class HistoricalPatternMatchCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            ...result.similarPastDraws
-                .map((s) => _SimilarDrawRow(similar: s, theme: theme)),
+            ...result.similarPastDraws.map(
+              (s) => _SimilarDrawRow(similar: s, theme: theme),
+            ),
           ],
 
           const SizedBox(height: 12),
@@ -176,10 +188,10 @@ class HistoricalPatternMatchCard extends StatelessWidget {
     );
   }
 
-  String _scoreLabel(int score) {
-    if (score >= 80) return 'Strong comparison with historical patterns (for reference only)';
-    if (score >= 60) return 'Moderate comparison with historical patterns (for reference only)';
-    return 'Limited comparison with historical patterns (for reference only)';
+  String _scoreLabel(AppLocalizations l10n, int score) {
+    if (score >= 80) return l10n.historicalPatternStrong;
+    if (score >= 60) return l10n.historicalPatternModerate;
+    return l10n.historicalPatternLimited;
   }
 
   Color _scoreColor(int score) {
@@ -279,8 +291,7 @@ class _ComponentScoreRow extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: score / 100,
                 minHeight: 6,
-                backgroundColor:
-                    theme.colorScheme.onSurface.withAlpha(18),
+                backgroundColor: theme.colorScheme.onSurface.withAlpha(18),
                 valueColor: AlwaysStoppedAnimation(_barColor()),
               ),
             ),
@@ -310,8 +321,11 @@ class _InfoChip extends StatelessWidget {
   final IconData? icon;
   final ThemeData theme;
 
-  const _InfoChip(
-      {required this.label, required this.icon, required this.theme});
+  const _InfoChip({
+    required this.label,
+    required this.icon,
+    required this.theme,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -325,9 +339,11 @@ class _InfoChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon,
-                size: 12,
-                color: theme.colorScheme.onSurface.withAlpha(140)),
+            Icon(
+              icon,
+              size: 12,
+              color: theme.colorScheme.onSurface.withAlpha(140),
+            ),
             const SizedBox(width: 4),
           ],
           Text(
@@ -353,8 +369,10 @@ class _SimilarDrawRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateStr =
-        DateFormat('d MMM yyyy').format(similar.draw.drawDate.toLocal());
+    final l10n = context.l10n;
+    final dateStr = DateFormat(
+      'd MMM yyyy',
+    ).format(similar.draw.drawDate.toLocal());
     final nums = similar.draw.mainNumbers.join('  ');
 
     return Padding(
@@ -386,14 +404,16 @@ class _SimilarDrawRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${similar.sharedNumbers} numbers overlapped',
+                l10n.similarSharedNumbers(similar.sharedNumbers),
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               Text(
-                '${similar.similarityScore.toStringAsFixed(0)}% structural similarity',
+                l10n.similarStructuralSimilarity(
+                  similar.similarityScore.toStringAsFixed(0),
+                ),
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onSurface.withAlpha(120),
                   fontSize: 10,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/l10n.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import '../services/insight_service.dart';
@@ -44,6 +45,7 @@ class _DailyInsightBannerState extends State<DailyInsightBanner> {
   Widget build(BuildContext context) {
     if (_insight == null) return const SizedBox.shrink();
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
@@ -52,7 +54,9 @@ class _DailyInsightBannerState extends State<DailyInsightBanner> {
         decoration: BoxDecoration(
           color: theme.colorScheme.primaryContainer.withAlpha(80),
           border: Border.all(
-              color: theme.colorScheme.primary.withAlpha(40), width: 1),
+            color: theme.colorScheme.primary.withAlpha(40),
+            width: 1,
+          ),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -65,7 +69,7 @@ class _DailyInsightBannerState extends State<DailyInsightBanner> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Today's Insight",
+                    l10n.dailyInsightTitle,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w700,

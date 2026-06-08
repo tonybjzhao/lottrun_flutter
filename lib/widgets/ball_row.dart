@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/l10n.dart';
 import 'lotto_ball.dart';
 
 /// Displays main + bonus lottery balls.
@@ -27,7 +28,12 @@ class BallRow extends StatelessWidget {
     this.spacing = 8,
   });
 
-  Widget _ballRow(List<int> numbers, {bool isBonus = false, required double size, required double gap}) {
+  Widget _ballRow(
+    List<int> numbers, {
+    bool isBonus = false,
+    required double size,
+    required double gap,
+  }) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
@@ -49,6 +55,7 @@ class BallRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     // ── Inline mode (powerball-style) ──────────────────────────────────────
     if (bonusLabel != null || bonusNumbers.isEmpty) {
@@ -77,7 +84,11 @@ class BallRow extends StatelessWidget {
                   SizedBox(width: spacing),
                 ],
                 for (var i = 0; i < bonusNumbers.length; i++) ...[
-                  LottoBall(number: bonusNumbers[i], isBonus: true, size: ballSize),
+                  LottoBall(
+                    number: bonusNumbers[i],
+                    isBonus: true,
+                    size: ballSize,
+                  ),
                   if (i < bonusNumbers.length - 1) SizedBox(width: spacing),
                 ],
               ],
@@ -98,7 +109,7 @@ class BallRow extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'Supp',
+              l10n.commonSupp,
               style: theme.textTheme.labelSmall?.copyWith(
                 color: const Color(0xFFD32F2F),
                 fontWeight: FontWeight.w700,
@@ -108,7 +119,11 @@ class BallRow extends StatelessWidget {
             SizedBox(width: spacing),
             ...[
               for (var i = 0; i < bonusNumbers.length; i++) ...[
-                LottoBall(number: bonusNumbers[i], isBonus: true, size: suppSize),
+                LottoBall(
+                  number: bonusNumbers[i],
+                  isBonus: true,
+                  size: suppSize,
+                ),
                 if (i < bonusNumbers.length - 1) SizedBox(width: spacing - 2),
               ],
             ],
