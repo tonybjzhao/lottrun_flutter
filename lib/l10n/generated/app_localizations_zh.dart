@@ -860,6 +860,91 @@ class AppLocalizationsZh extends AppLocalizations {
   String get weeklyNoStrongTrend => '本周分布均衡，没有明显趋势。';
 
   @override
+  String dailyInsightStrongDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+  ) {
+    return '$lotteryName：基于最近 $drawCount 期开奖，活跃号码是 $hotNumbers。';
+  }
+
+  @override
+  String dailyInsightMidRangeDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+  ) {
+    return '$lotteryName：最近 $drawCount 期开奖中段号码更活跃。活跃号码：$hotNumbers。';
+  }
+
+  @override
+  String dailyInsightHigherRangeDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object averageSum,
+  ) {
+    return '$lotteryName：最近 $drawCount 期开奖偏向高号码区间，主号平均和值为 $averageSum。';
+  }
+
+  @override
+  String dailyInsightLowerRangeDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object averageSum,
+  ) {
+    return '$lotteryName：最近 $drawCount 期开奖偏向低号码区间，主号平均和值为 $averageSum。';
+  }
+
+  @override
+  String dailyInsightBalancedDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+    Object oddEvenPattern,
+  ) {
+    return '$lotteryName：最近 $drawCount 期开奖分布较均衡。活跃号码：$hotNumbers；常见结构：$oddEvenPattern。';
+  }
+
+  @override
+  String dailyInsightNoTrendDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object oddEvenPattern,
+  ) {
+    return '$lotteryName：最近 $drawCount 期开奖未检测到强模式。常见结构：$oddEvenPattern。';
+  }
+
+  @override
+  String weeklySummaryStrongDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+    Object oddEvenPattern,
+  ) {
+    return '$lotteryName：每周摘要基于最近 $drawCount 期开奖。热门号码：$hotNumbers；常见结构：$oddEvenPattern。';
+  }
+
+  @override
+  String weeklySummaryBalancedDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+    Object lowHighPattern,
+  ) {
+    return '$lotteryName：每周摘要基于最近 $drawCount 期开奖。热门号码：$hotNumbers；高低区间：$lowHighPattern。';
+  }
+
+  @override
+  String weeklySummaryNoTrendDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object oddEvenPattern,
+    Object lowHighPattern,
+  ) {
+    return '$lotteryName：每周摘要显示最近 $drawCount 期开奖没有强趋势。结构：$oddEvenPattern；区间：$lowHighPattern。';
+  }
+
+  @override
   String get savedPicksModerate => '你的已保存号码与近期结果有中等程度匹配。';
 
   @override

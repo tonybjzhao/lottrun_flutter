@@ -966,6 +966,91 @@ class AppLocalizationsDe extends AppLocalizations {
       'Diese Woche zeigte eine ausgewogene Verteilung ohne starken Trend.';
 
   @override
+  String dailyInsightStrongDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+  ) {
+    return '$lotteryName: Basierend auf den letzten $drawCount Ziehungen sind die aktivsten Zahlen $hotNumbers.';
+  }
+
+  @override
+  String dailyInsightMidRangeDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+  ) {
+    return '$lotteryName: Die letzten $drawCount Ziehungen zeigen mehr Aktivität im mittleren Bereich. Aktive Zahlen: $hotNumbers.';
+  }
+
+  @override
+  String dailyInsightHigherRangeDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object averageSum,
+  ) {
+    return '$lotteryName: Die letzten $drawCount Ziehungen tendieren zu höheren Zahlen, mit einer durchschnittlichen Hauptzahlensumme von $averageSum.';
+  }
+
+  @override
+  String dailyInsightLowerRangeDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object averageSum,
+  ) {
+    return '$lotteryName: Die letzten $drawCount Ziehungen tendieren zu niedrigeren Zahlen, mit einer durchschnittlichen Hauptzahlensumme von $averageSum.';
+  }
+
+  @override
+  String dailyInsightBalancedDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+    Object oddEvenPattern,
+  ) {
+    return '$lotteryName: Die letzten $drawCount Ziehungen wirken ausgewogen. Aktive Zahlen: $hotNumbers; häufige Struktur: $oddEvenPattern.';
+  }
+
+  @override
+  String dailyInsightNoTrendDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object oddEvenPattern,
+  ) {
+    return '$lotteryName: Kein starkes Muster in den letzten $drawCount Ziehungen. Häufige Struktur: $oddEvenPattern.';
+  }
+
+  @override
+  String weeklySummaryStrongDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+    Object oddEvenPattern,
+  ) {
+    return '$lotteryName: Wochenübersicht basierend auf den letzten $drawCount Ziehungen. Heiße Zahlen: $hotNumbers; häufige Struktur: $oddEvenPattern.';
+  }
+
+  @override
+  String weeklySummaryBalancedDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+    Object lowHighPattern,
+  ) {
+    return '$lotteryName: Wochenübersicht basierend auf den letzten $drawCount Ziehungen. Heiße Zahlen: $hotNumbers; Bereichsmuster: $lowHighPattern.';
+  }
+
+  @override
+  String weeklySummaryNoTrendDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object oddEvenPattern,
+    Object lowHighPattern,
+  ) {
+    return '$lotteryName: Die Wochenübersicht der letzten $drawCount Ziehungen zeigt keinen starken Trend. Struktur: $oddEvenPattern; Bereich: $lowHighPattern.';
+  }
+
+  @override
   String get savedPicksModerate =>
       'Deine gespeicherten Tipps stimmten mäßig mit aktuellen Ziehungen überein.';
 

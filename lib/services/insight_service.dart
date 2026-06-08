@@ -1,5 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import '../l10n/generated/app_localizations.dart';
+import '../l10n/l10n.dart';
 import '../l10n/generated/app_localizations_en.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
@@ -59,6 +59,10 @@ class InsightService {
       drawCount: 20,
       l10n: l10n,
     );
+    final lotteryName = l10n.lotteryName(lottery);
+    final drawCount = trends.drawCount;
+    final hotNumbers = _formatNumbers(trends.topFrequent);
+    final averageSum = trends.averageSum.toStringAsFixed(1);
 
     final topInMid = trends.topFrequent
         .where(
@@ -72,23 +76,48 @@ class InsightService {
 
     switch (trends.trendStrength) {
       case TrendStrength.strong:
-        return l10n.recentDrawsConcentrated;
+        return l10n.dailyInsightStrongDynamic(
+          lotteryName,
+          drawCount,
+          hotNumbers,
+        );
       case TrendStrength.balanced:
         if (topInMid >= 3) {
-          return l10n.periodMidRangeActive;
+          return l10n.dailyInsightMidRangeDynamic(
+            lotteryName,
+            drawCount,
+            hotNumbers,
+          );
         }
         final avgSum = trends.averageSum;
         final expectedMid =
             (lottery.mainMin + lottery.mainMax) / 2 * lottery.mainCount;
         if (avgSum > expectedMid * 1.05) {
-          return l10n.recentDrawsHigherRange;
+          return l10n.dailyInsightHigherRangeDynamic(
+            lotteryName,
+            drawCount,
+            averageSum,
+          );
         }
         if (avgSum < expectedMid * 0.95) {
-          return l10n.recentDrawsLowerRange;
+          return l10n.dailyInsightLowerRangeDynamic(
+            lotteryName,
+            drawCount,
+            averageSum,
+          );
         }
-        return l10n.recentDrawsModerateSpread;
+        return l10n.dailyInsightBalancedDynamic(
+          lotteryName,
+          drawCount,
+          hotNumbers,
+          trends.mostCommonOddEven,
+        );
       case TrendStrength.random:
-        return l10n.recentDrawsNoStrongPattern;
+        return l10n.dailyInsightNoTrendDynamic(
+          lotteryName,
+          drawCount,
+          trends.mostCommonOddEven,
+        );
     }
   }
 
@@ -158,13 +187,30 @@ class InsightService {
       drawCount: 20,
       l10n: localizations,
     );
+    final lotteryName = localizations.lotteryName(lottery);
+    final hotNumbers = _formatNumbers(trends.topFrequent);
     switch (trends.trendStrength) {
       case TrendStrength.strong:
-        return localizations.weeklyNotableConcentration;
+        return localizations.weeklySummaryStrongDynamic(
+          lotteryName,
+          trends.drawCount,
+          hotNumbers,
+          trends.mostCommonOddEven,
+        );
       case TrendStrength.balanced:
-        return localizations.weeklyModerateSpread;
+        return localizations.weeklySummaryBalancedDynamic(
+          lotteryName,
+          trends.drawCount,
+          hotNumbers,
+          trends.mostCommonLowHigh,
+        );
       case TrendStrength.random:
-        return localizations.weeklyNoStrongTrend;
+        return localizations.weeklySummaryNoTrendDynamic(
+          lotteryName,
+          trends.drawCount,
+          trends.mostCommonOddEven,
+          trends.mostCommonLowHigh,
+        );
     }
   }
 
@@ -183,4 +229,6 @@ class InsightService {
     final monday = d.subtract(Duration(days: d.weekday - 1));
     return _dateKey(monday);
   }
+
+  String _formatNumbers(List<int> numbers) => numbers.take(5).join(', ');
 }

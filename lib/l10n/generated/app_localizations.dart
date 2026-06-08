@@ -1644,6 +1644,100 @@ abstract class AppLocalizations {
   /// **'This week showed a balanced distribution with no strong trend.'**
   String get weeklyNoStrongTrend;
 
+  /// No description provided for @dailyInsightStrongDynamic.
+  ///
+  /// In en, this message translates to:
+  /// **'{lotteryName}: based on the latest {drawCount} draws, the most active numbers are {hotNumbers}.'**
+  String dailyInsightStrongDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+  );
+
+  /// No description provided for @dailyInsightMidRangeDynamic.
+  ///
+  /// In en, this message translates to:
+  /// **'{lotteryName}: the latest {drawCount} draws show extra activity in the mid range. Active numbers: {hotNumbers}.'**
+  String dailyInsightMidRangeDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+  );
+
+  /// No description provided for @dailyInsightHigherRangeDynamic.
+  ///
+  /// In en, this message translates to:
+  /// **'{lotteryName}: the latest {drawCount} draws lean high, with an average main-number sum of {averageSum}.'**
+  String dailyInsightHigherRangeDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object averageSum,
+  );
+
+  /// No description provided for @dailyInsightLowerRangeDynamic.
+  ///
+  /// In en, this message translates to:
+  /// **'{lotteryName}: the latest {drawCount} draws lean low, with an average main-number sum of {averageSum}.'**
+  String dailyInsightLowerRangeDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object averageSum,
+  );
+
+  /// No description provided for @dailyInsightBalancedDynamic.
+  ///
+  /// In en, this message translates to:
+  /// **'{lotteryName}: the latest {drawCount} draws look balanced. Active numbers: {hotNumbers}; common structure: {oddEvenPattern}.'**
+  String dailyInsightBalancedDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+    Object oddEvenPattern,
+  );
+
+  /// No description provided for @dailyInsightNoTrendDynamic.
+  ///
+  /// In en, this message translates to:
+  /// **'{lotteryName}: no strong pattern in the latest {drawCount} draws. Common structure: {oddEvenPattern}.'**
+  String dailyInsightNoTrendDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object oddEvenPattern,
+  );
+
+  /// No description provided for @weeklySummaryStrongDynamic.
+  ///
+  /// In en, this message translates to:
+  /// **'{lotteryName}: weekly summary from the latest {drawCount} draws. Hot numbers: {hotNumbers}; common structure: {oddEvenPattern}.'**
+  String weeklySummaryStrongDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+    Object oddEvenPattern,
+  );
+
+  /// No description provided for @weeklySummaryBalancedDynamic.
+  ///
+  /// In en, this message translates to:
+  /// **'{lotteryName}: weekly summary from the latest {drawCount} draws. Hot numbers: {hotNumbers}; range pattern: {lowHighPattern}.'**
+  String weeklySummaryBalancedDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+    Object lowHighPattern,
+  );
+
+  /// No description provided for @weeklySummaryNoTrendDynamic.
+  ///
+  /// In en, this message translates to:
+  /// **'{lotteryName}: weekly summary from the latest {drawCount} draws shows no strong trend. Structure: {oddEvenPattern}; range: {lowHighPattern}.'**
+  String weeklySummaryNoTrendDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object oddEvenPattern,
+    Object lowHighPattern,
+  );
+
   /// No description provided for @savedPicksModerate.
   ///
   /// In en, this message translates to:

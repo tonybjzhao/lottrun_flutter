@@ -517,6 +517,100 @@
   "weeklyNotableConcentration": "This week showed a notable concentration among a few numbers.",
   "weeklyModerateSpread": "This week showed a balanced distribution with moderate spread.",
   "weeklyNoStrongTrend": "This week showed a balanced distribution with no strong trend.",
+  "dailyInsightStrongDynamic": "{lotteryName}: based on the latest {drawCount} draws, the most active numbers are {hotNumbers}.",
+  "@dailyInsightStrongDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "hotNumbers": {}
+    }
+  },
+  "dailyInsightMidRangeDynamic": "{lotteryName}: the latest {drawCount} draws show extra activity in the mid range. Active numbers: {hotNumbers}.",
+  "@dailyInsightMidRangeDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "hotNumbers": {}
+    }
+  },
+  "dailyInsightHigherRangeDynamic": "{lotteryName}: the latest {drawCount} draws lean high, with an average main-number sum of {averageSum}.",
+  "@dailyInsightHigherRangeDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "averageSum": {}
+    }
+  },
+  "dailyInsightLowerRangeDynamic": "{lotteryName}: the latest {drawCount} draws lean low, with an average main-number sum of {averageSum}.",
+  "@dailyInsightLowerRangeDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "averageSum": {}
+    }
+  },
+  "dailyInsightBalancedDynamic": "{lotteryName}: the latest {drawCount} draws look balanced. Active numbers: {hotNumbers}; common structure: {oddEvenPattern}.",
+  "@dailyInsightBalancedDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "hotNumbers": {},
+      "oddEvenPattern": {}
+    }
+  },
+  "dailyInsightNoTrendDynamic": "{lotteryName}: no strong pattern in the latest {drawCount} draws. Common structure: {oddEvenPattern}.",
+  "@dailyInsightNoTrendDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "oddEvenPattern": {}
+    }
+  },
+  "weeklySummaryStrongDynamic": "{lotteryName}: weekly summary from the latest {drawCount} draws. Hot numbers: {hotNumbers}; common structure: {oddEvenPattern}.",
+  "@weeklySummaryStrongDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "hotNumbers": {},
+      "oddEvenPattern": {}
+    }
+  },
+  "weeklySummaryBalancedDynamic": "{lotteryName}: weekly summary from the latest {drawCount} draws. Hot numbers: {hotNumbers}; range pattern: {lowHighPattern}.",
+  "@weeklySummaryBalancedDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "hotNumbers": {},
+      "lowHighPattern": {}
+    }
+  },
+  "weeklySummaryNoTrendDynamic": "{lotteryName}: weekly summary from the latest {drawCount} draws shows no strong trend. Structure: {oddEvenPattern}; range: {lowHighPattern}.",
+  "@weeklySummaryNoTrendDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "oddEvenPattern": {},
+      "lowHighPattern": {}
+    }
+  },
   "savedPicksModerate": "Your saved picks have matched recent draws moderately.",
   "savedNumbersAppeared": "Several numbers you saved appeared in recent results.",
   "savedPicksLimited": "Your saved picks show limited overlap with recent draw results.",

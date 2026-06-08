@@ -938,6 +938,91 @@ class AppLocalizationsEn extends AppLocalizations {
       'This week showed a balanced distribution with no strong trend.';
 
   @override
+  String dailyInsightStrongDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+  ) {
+    return '$lotteryName: based on the latest $drawCount draws, the most active numbers are $hotNumbers.';
+  }
+
+  @override
+  String dailyInsightMidRangeDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+  ) {
+    return '$lotteryName: the latest $drawCount draws show extra activity in the mid range. Active numbers: $hotNumbers.';
+  }
+
+  @override
+  String dailyInsightHigherRangeDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object averageSum,
+  ) {
+    return '$lotteryName: the latest $drawCount draws lean high, with an average main-number sum of $averageSum.';
+  }
+
+  @override
+  String dailyInsightLowerRangeDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object averageSum,
+  ) {
+    return '$lotteryName: the latest $drawCount draws lean low, with an average main-number sum of $averageSum.';
+  }
+
+  @override
+  String dailyInsightBalancedDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+    Object oddEvenPattern,
+  ) {
+    return '$lotteryName: the latest $drawCount draws look balanced. Active numbers: $hotNumbers; common structure: $oddEvenPattern.';
+  }
+
+  @override
+  String dailyInsightNoTrendDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object oddEvenPattern,
+  ) {
+    return '$lotteryName: no strong pattern in the latest $drawCount draws. Common structure: $oddEvenPattern.';
+  }
+
+  @override
+  String weeklySummaryStrongDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+    Object oddEvenPattern,
+  ) {
+    return '$lotteryName: weekly summary from the latest $drawCount draws. Hot numbers: $hotNumbers; common structure: $oddEvenPattern.';
+  }
+
+  @override
+  String weeklySummaryBalancedDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object hotNumbers,
+    Object lowHighPattern,
+  ) {
+    return '$lotteryName: weekly summary from the latest $drawCount draws. Hot numbers: $hotNumbers; range pattern: $lowHighPattern.';
+  }
+
+  @override
+  String weeklySummaryNoTrendDynamic(
+    Object lotteryName,
+    int drawCount,
+    Object oddEvenPattern,
+    Object lowHighPattern,
+  ) {
+    return '$lotteryName: weekly summary from the latest $drawCount draws shows no strong trend. Structure: $oddEvenPattern; range: $lowHighPattern.';
+  }
+
+  @override
   String get savedPicksModerate =>
       'Your saved picks have matched recent draws moderately.';
 
