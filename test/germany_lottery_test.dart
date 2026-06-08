@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lottfun_flutter/data/seed_lotteries.dart';
+import 'package:lottfun_flutter/services/lottery_service.dart';
 
 void main() {
   group('Germany Lottery Tests', () {
@@ -116,6 +117,67 @@ void main() {
       expect(euro.bonusLabel, isNotNull);
       expect(lotto.bonusLabel, contains('Superzahl'));
       expect(euro.bonusLabel, contains('Euro'));
+    });
+
+    test('Lotto 6aus49 has seed draw data', () {
+      final draws = LotteryService.instance.getDraws('de_lotto_6aus49');
+
+      expect(draws, isNotEmpty);
+      expect(draws.length, 50);
+
+      // Check first draw
+      final firstDraw = draws.first;
+      expect(firstDraw.lotteryId, 'de_lotto_6aus49');
+      expect(firstDraw.mainNumbers.length, 6);
+      expect(firstDraw.bonusNumbers, isNotNull);
+      expect(firstDraw.bonusNumbers!.length, 1);
+
+      // Verify number ranges
+      expect(firstDraw.mainNumbers.every((n) => n >= 1 && n <= 49), true);
+      expect(firstDraw.bonusNumbers!.first >= 0 && firstDraw.bonusNumbers!.first <= 9, true);
+    });
+
+    test('EuroJackpot has seed draw data', () {
+      final draws = LotteryService.instance.getDraws('de_eurojackpot');
+
+      expect(draws, isNotEmpty);
+      expect(draws.length, 50);
+
+      // Check first draw
+      final firstDraw = draws.first;
+      expect(firstDraw.lotteryId, 'de_eurojackpot');
+      expect(firstDraw.mainNumbers.length, 5);
+      expect(firstDraw.bonusNumbers, isNotNull);
+      expect(firstDraw.bonusNumbers!.length, 2);
+
+      // Verify number ranges
+      expect(firstDraw.mainNumbers.every((n) => n >= 1 && n <= 50), true);
+      expect(firstDraw.bonusNumbers!.every((n) => n >= 1 && n <= 12), true);
+    });
+
+    test('Germany draws are sorted by date (newest first)', () {
+      final lottoDraws = LotteryService.instance.getDraws('de_lotto_6aus49');
+      final euroDraws = LotteryService.instance.getDraws('de_eurojackpot');
+
+      // Check Lotto 6aus49 is sorted
+      for (var i = 0; i < lottoDraws.length - 1; i++) {
+        expect(
+          lottoDraws[i].drawDate.isAfter(lottoDraws[i + 1].drawDate) ||
+          lottoDraws[i].drawDate.isAtSameMomentAs(lottoDraws[i + 1].drawDate),
+          true,
+          reason: 'Lotto 6aus49 draws should be sorted newest first',
+        );
+      }
+
+      // Check EuroJackpot is sorted
+      for (var i = 0; i < euroDraws.length - 1; i++) {
+        expect(
+          euroDraws[i].drawDate.isAfter(euroDraws[i + 1].drawDate) ||
+          euroDraws[i].drawDate.isAtSameMomentAs(euroDraws[i + 1].drawDate),
+          true,
+          reason: 'EuroJackpot draws should be sorted newest first',
+        );
+      }
     });
   });
 }
