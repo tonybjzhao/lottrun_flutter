@@ -34,9 +34,11 @@ class _DailyInsightBannerState extends State<DailyInsightBanner> {
   }
 
   Future<void> _load() async {
+    final l10n = context.l10n;
     final text = await InsightService.instance.getDailyInsight(
       lottery: widget.lottery,
       draws: widget.draws,
+      l10n: l10n,
     );
     if (mounted) setState(() => _insight = text);
   }

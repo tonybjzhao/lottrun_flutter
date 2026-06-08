@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lottfun_flutter/data/seed_lotteries.dart';
 import 'package:lottfun_flutter/l10n/generated/app_localizations.dart';
 import 'package:lottfun_flutter/models/lottery_draw.dart';
-import 'package:lottfun_flutter/screens/history_screen.dart';
 import 'package:lottfun_flutter/widgets/recent_draw_trends_section.dart';
 
 void main() {

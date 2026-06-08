@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import '../l10n/generated/app_localizations.dart';
 import '../l10n/generated/app_localizations_en.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
@@ -18,7 +19,7 @@ const String _kNotifCountToday = 'notif_count_today';
 const String _kLastWeeklySummaryDate = 'last_weekly_summary_date';
 
 const int _kDailyNotifCap = 2;
-final _l10n = AppLocalizationsEn();
+final _l10nFallback = AppLocalizationsEn();
 
 class InsightService {
   InsightService._();
@@ -27,37 +28,38 @@ class InsightService {
   // ── Daily Insight ─────────────────────────────────────────────────────────
 
   /// Returns a cached insight for today, or generates a fresh one.
+  /// Note: Cache is locale-independent. For localized insights, always regenerate.
   Future<String> getDailyInsight({
     required Lottery lottery,
     required List<LotteryDraw> draws,
+    AppLocalizations? l10n,
   }) async {
-    final prefs = await SharedPreferences.getInstance();
-    final today = _dateKey(DateTime.now());
-    final cachedDate = prefs.getString(_kDailyInsightDate);
-    final cachedText = prefs.getString(_kDailyInsightText);
+    final localizations = l10n ?? _l10nFallback;
 
-    if (cachedDate == today && cachedText != null && cachedText.isNotEmpty) {
-      return cachedText;
-    }
-
-    final text = _generateInsight(lottery: lottery, draws: draws);
-    await prefs.setString(_kDailyInsightDate, today);
-    await prefs.setString(_kDailyInsightText, text);
+    // For now, skip caching to ensure localized insights are always fresh
+    // TODO: Consider locale-aware caching if needed
+    final text = _generateInsight(
+      lottery: lottery,
+      draws: draws,
+      l10n: localizations,
+    );
     return text;
   }
 
   String _generateInsight({
     required Lottery lottery,
     required List<LotteryDraw> draws,
+    required AppLocalizations l10n,
   }) {
     if (draws.isEmpty) {
-      return _l10n.recentDrawsNoStrongPattern;
+      return l10n.recentDrawsNoStrongPattern;
     }
 
     final trends = DrawAnalysisService.analyzeRecentTrends(
       lottery: lottery,
       draws: draws,
       drawCount: 20,
+      l10n: l10n,
     );
 
     final topInMid = trends.topFrequent
@@ -72,23 +74,23 @@ class InsightService {
 
     switch (trends.trendStrength) {
       case TrendStrength.strong:
-        return _l10n.recentDrawsConcentrated;
+        return l10n.recentDrawsConcentrated;
       case TrendStrength.balanced:
         if (topInMid >= 3) {
-          return _l10n.periodMidRangeActive;
+          return l10n.periodMidRangeActive;
         }
         final avgSum = trends.averageSum;
         final expectedMid =
             (lottery.mainMin + lottery.mainMax) / 2 * lottery.mainCount;
         if (avgSum > expectedMid * 1.05) {
-          return _l10n.recentDrawsHigherRange;
+          return l10n.recentDrawsHigherRange;
         }
         if (avgSum < expectedMid * 0.95) {
-          return _l10n.recentDrawsLowerRange;
+          return l10n.recentDrawsLowerRange;
         }
-        return _l10n.recentDrawsModerateSpread;
+        return l10n.recentDrawsModerateSpread;
       case TrendStrength.random:
-        return _l10n.recentDrawsNoStrongPattern;
+        return l10n.recentDrawsNoStrongPattern;
     }
   }
 
@@ -148,27 +150,31 @@ class InsightService {
   String _generateWeeklySummary({
     required Lottery lottery,
     required List<LotteryDraw> draws,
+    AppLocalizations? l10n,
   }) {
-    if (draws.isEmpty) return _l10n.weeklyNoStrongTrend;
+    final localizations = l10n ?? _l10nFallback;
+    if (draws.isEmpty) return localizations.weeklyNoStrongTrend;
     final trends = DrawAnalysisService.analyzeRecentTrends(
       lottery: lottery,
       draws: draws,
       drawCount: 20,
+      l10n: localizations,
     );
     switch (trends.trendStrength) {
       case TrendStrength.strong:
-        return _l10n.weeklyNotableConcentration;
+        return localizations.weeklyNotableConcentration;
       case TrendStrength.balanced:
-        return _l10n.weeklyModerateSpread;
+        return localizations.weeklyModerateSpread;
       case TrendStrength.random:
-        return _l10n.weeklyNoStrongTrend;
+        return localizations.weeklyNoStrongTrend;
     }
   }
 
   String weeklySummaryBody({
     required Lottery lottery,
     required List<LotteryDraw> draws,
-  }) => _generateWeeklySummary(lottery: lottery, draws: draws);
+    AppLocalizations? l10n,
+  }) => _generateWeeklySummary(lottery: lottery, draws: draws, l10n: l10n);
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
