@@ -443,6 +443,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'A brief weekly pattern summary every Sunday';
 
   @override
+  String get settingsNotificationTime => 'Notification time';
+
+  @override
+  String settingsNotificationTimeSubtitle(Object time) {
+    return 'Daily and weekly insights are scheduled for $time.';
+  }
+
+  @override
   String get settingsMaxNotifications => 'Max 2 notifications per day total.';
 
   @override

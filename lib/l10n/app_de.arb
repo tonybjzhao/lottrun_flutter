@@ -216,6 +216,8 @@
   "settingsDailyInsightsSubtitle": "Eine kurze Trendbeobachtung pro Tag",
   "settingsWeeklySummary": "Wöchentliche Zusammenfassung",
   "settingsWeeklySummarySubtitle": "Eine kurze Musterzusammenfassung jeden Sonntag",
+  "settingsNotificationTime": "Benachrichtigungszeit",
+  "settingsNotificationTimeSubtitle": "Tägliche und wöchentliche Einblicke sind für {time} geplant.",
   "settingsMaxNotifications": "Max. 2 Benachrichtigungen pro Tag insgesamt.",
   "settingsLanguage": "Sprache",
   "languageEnglish": "English",

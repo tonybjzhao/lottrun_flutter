@@ -11,12 +11,16 @@ const String kNotifKeyResults = 'notif_results';
 const String kNotifKeyMyPicks = 'notif_my_picks';
 const String kNotifKeyDailyInsight = 'notif_daily_insight';
 const String kNotifKeyWeeklySummary = 'notif_weekly_summary';
+const String kNotifScheduleHour = 'notif_schedule_hour';
+const String kNotifScheduleMinute = 'notif_schedule_minute';
 
 const String _kLastNotifDate = 'last_notif_date';
 const String _kNotifCountToday = 'notif_count_today';
 const String _kLastWeeklySummaryDate = 'last_weekly_summary_date';
 
 const int _kDailyNotifCap = 2;
+const int kDefaultNotifScheduleHour = 19;
+const int kDefaultNotifScheduleMinute = 0;
 final _l10nFallback = AppLocalizationsEn();
 
 class InsightService {
@@ -131,6 +135,23 @@ class InsightService {
   Future<void> setNotifPref(String key, bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(key, value);
+  }
+
+  Future<({int hour, int minute})> getNotificationScheduleTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    return (
+      hour: prefs.getInt(kNotifScheduleHour) ?? kDefaultNotifScheduleHour,
+      minute: prefs.getInt(kNotifScheduleMinute) ?? kDefaultNotifScheduleMinute,
+    );
+  }
+
+  Future<void> setNotificationScheduleTime({
+    required int hour,
+    required int minute,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(kNotifScheduleHour, hour);
+    await prefs.setInt(kNotifScheduleMinute, minute);
   }
 
   // ── Daily cap tracking ────────────────────────────────────────────────────

@@ -11,6 +11,7 @@ import 'services/analysis_style_service.dart';
 import 'services/analytics_service.dart';
 import 'services/locale_service.dart';
 import 'services/notification_service.dart';
+import 'services/result_notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,9 @@ Future<void> main() async {
   AnalyticsService.init(_initFirebase());
   await LocaleService.instance.load();
   await AnalysisStyleService.instance.load();
+  unawaited(
+    ResultNotificationService.instance.refreshScheduledInsightNotifications(),
+  );
   await _initAds();
   runApp(LottFunApp(localeService: LocaleService.instance));
 }

@@ -216,6 +216,13 @@
   "settingsDailyInsightsSubtitle": "One short trend observation per day",
   "settingsWeeklySummary": "Weekly Summary",
   "settingsWeeklySummarySubtitle": "A brief weekly pattern summary every Sunday",
+  "settingsNotificationTime": "Notification time",
+  "settingsNotificationTimeSubtitle": "Daily and weekly insights are scheduled for {time}.",
+  "@settingsNotificationTimeSubtitle": {
+    "placeholders": {
+      "time": {}
+    }
+  },
   "settingsMaxNotifications": "Max 2 notifications per day total.",
   "settingsLanguage": "Language",
   "languageEnglish": "English",

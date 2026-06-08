@@ -439,6 +439,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Un bref résumé des motifs chaque dimanche';
 
   @override
+  String get settingsNotificationTime => 'Heure de notification';
+
+  @override
+  String settingsNotificationTimeSubtitle(Object time) {
+    return 'Les aperçus quotidiens et hebdomadaires sont programmés pour $time.';
+  }
+
+  @override
   String get settingsMaxNotifications =>
       'Maximum 2 notifications par jour au total.';
 

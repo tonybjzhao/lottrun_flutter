@@ -411,6 +411,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsWeeklySummarySubtitle => '每周日一份简短模式摘要';
 
   @override
+  String get settingsNotificationTime => '通知时间';
+
+  @override
+  String settingsNotificationTimeSubtitle(Object time) {
+    return '每日洞察和每周摘要会安排在 $time 发送。';
+  }
+
+  @override
   String get settingsMaxNotifications => '每天最多 2 条通知。';
 
   @override

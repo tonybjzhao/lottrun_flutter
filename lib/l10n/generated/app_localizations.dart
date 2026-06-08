@@ -860,6 +860,18 @@ abstract class AppLocalizations {
   /// **'A brief weekly pattern summary every Sunday'**
   String get settingsWeeklySummarySubtitle;
 
+  /// No description provided for @settingsNotificationTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification time'**
+  String get settingsNotificationTime;
+
+  /// No description provided for @settingsNotificationTimeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily and weekly insights are scheduled for {time}.'**
+  String settingsNotificationTimeSubtitle(Object time);
+
   /// No description provided for @settingsMaxNotifications.
   ///
   /// In en, this message translates to:

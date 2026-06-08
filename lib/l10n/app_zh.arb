@@ -216,6 +216,8 @@
   "settingsDailyInsightsSubtitle": "每天一条简短趋势观察",
   "settingsWeeklySummary": "每周摘要",
   "settingsWeeklySummarySubtitle": "每周日一份简短模式摘要",
+  "settingsNotificationTime": "通知时间",
+  "settingsNotificationTimeSubtitle": "每日洞察和每周摘要会安排在 {time} 发送。",
   "settingsMaxNotifications": "每天最多 2 条通知。",
   "settingsLanguage": "语言",
   "languageEnglish": "English",

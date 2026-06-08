@@ -21,6 +21,53 @@ class ResultNotificationService {
     LocaleService.instance.locale ?? const Locale('en'),
   );
 
+  /// Rebuilds local OS schedules for daily and weekly insight notifications.
+  /// The body is generated from the latest history available in the app when
+  /// schedules are refreshed.
+  Future<void> refreshScheduledInsightNotifications() async {
+    debugPrint('[ResultNotificationService] Refreshing scheduled insights...');
+    await NotificationService.instance.cancelScheduledInsights();
+
+    if (kSeedLotteries.isEmpty) return;
+    final time = await InsightService.instance.getNotificationScheduleTime();
+    final lottery = kSeedLotteries.first;
+    final draws = LotteryService.instance.getDraws(lottery.id);
+    final l10n = _l10n;
+
+    final dailyEnabled = await InsightService.instance.getNotifPref(
+      kNotifKeyDailyInsight,
+      defaultValue: false,
+    );
+    if (dailyEnabled) {
+      final body = await InsightService.instance.getDailyInsight(
+        lottery: lottery,
+        draws: draws,
+        l10n: l10n,
+      );
+      await NotificationService.instance.scheduleDailyInsight(
+        hour: time.hour,
+        minute: time.minute,
+        body: body,
+      );
+    }
+
+    final weeklyEnabled = await InsightService.instance.getNotifPref(
+      kNotifKeyWeeklySummary,
+    );
+    if (weeklyEnabled) {
+      final body = InsightService.instance.weeklySummaryBody(
+        lottery: lottery,
+        draws: draws,
+        l10n: l10n,
+      );
+      await NotificationService.instance.scheduleWeeklySummary(
+        hour: time.hour,
+        minute: time.minute,
+        body: body,
+      );
+    }
+  }
+
   /// Checks all saved picks for newly resolved results and fires a local
   /// notification if any pick transitioned from pending → result ready.
   /// Also fires daily insight and weekly summary notifications when enabled.

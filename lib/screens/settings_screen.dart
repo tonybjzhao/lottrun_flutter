@@ -4,6 +4,7 @@ import '../models/analysis_style.dart';
 import '../services/analysis_style_service.dart';
 import '../services/insight_service.dart';
 import '../services/locale_service.dart';
+import '../services/result_notification_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -17,6 +18,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _notifMyPicks = true;
   bool _notifDailyInsight = false;
   bool _notifWeeklySummary = true;
+  TimeOfDay _notifScheduleTime = const TimeOfDay(
+    hour: kDefaultNotifScheduleHour,
+    minute: kDefaultNotifScheduleMinute,
+  );
   bool _loaded = false;
 
   @override
@@ -34,12 +39,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       defaultValue: false,
     );
     final weekly = await svc.getNotifPref(kNotifKeyWeeklySummary);
+    final scheduleTime = await svc.getNotificationScheduleTime();
     if (mounted) {
       setState(() {
         _notifResults = results;
         _notifMyPicks = myPicks;
         _notifDailyInsight = daily;
         _notifWeeklySummary = weekly;
+        _notifScheduleTime = TimeOfDay(
+          hour: scheduleTime.hour,
+          minute: scheduleTime.minute,
+        );
         _loaded = true;
       });
     }
@@ -47,6 +57,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _setNotif(String key, bool value) async {
     await InsightService.instance.setNotifPref(key, value);
+    if (key == kNotifKeyDailyInsight || key == kNotifKeyWeeklySummary) {
+      await ResultNotificationService.instance
+          .refreshScheduledInsightNotifications();
+    }
+  }
+
+  Future<void> _pickNotificationTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _notifScheduleTime,
+    );
+    if (picked == null) return;
+    await InsightService.instance.setNotificationScheduleTime(
+      hour: picked.hour,
+      minute: picked.minute,
+    );
+    await ResultNotificationService.instance
+        .refreshScheduledInsightNotifications();
+    if (mounted) {
+      setState(() => _notifScheduleTime = picked);
+    }
   }
 
   @override
@@ -104,6 +135,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _setNotif(kNotifKeyWeeklySummary, v);
                   },
                   theme: theme,
+                ),
+                ListTile(
+                  leading: _LeadingIcon(
+                    color: theme.colorScheme.primaryContainer,
+                    icon: Icons.schedule_rounded,
+                    iconColor: theme.colorScheme.primary,
+                  ),
+                  title: Text(l10n.settingsNotificationTime),
+                  subtitle: Text(
+                    l10n.settingsNotificationTimeSubtitle(
+                      _notifScheduleTime.format(context),
+                    ),
+                  ),
+                  trailing: TextButton(
+                    onPressed: _pickNotificationTime,
+                    child: Text(_notifScheduleTime.format(context)),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
