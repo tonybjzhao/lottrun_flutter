@@ -22,6 +22,7 @@ String _countryFlag(String code) => switch (code) {
   'AU' => '🇦🇺',
   'GB' => '🇬🇧',
   'CA' => '🇨🇦',
+  'DE' => '🇩🇪',
   _ => '🌍',
 };
 
@@ -30,6 +31,7 @@ String _countryName(BuildContext context, String code) => switch (code) {
   'AU' => context.l10n.countryAustralia,
   'GB' => context.l10n.countryUnitedKingdom,
   'CA' => context.l10n.countryCanada,
+  'DE' => context.l10n.countryGermany,
   _ => context.l10n.countryOther,
 };
 
