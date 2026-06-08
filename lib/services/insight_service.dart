@@ -12,8 +12,6 @@ const String kNotifKeyMyPicks = 'notif_my_picks';
 const String kNotifKeyDailyInsight = 'notif_daily_insight';
 const String kNotifKeyWeeklySummary = 'notif_weekly_summary';
 
-const String _kDailyInsightText = 'daily_insight_text';
-const String _kDailyInsightDate = 'daily_insight_date';
 const String _kLastNotifDate = 'last_notif_date';
 const String _kNotifCountToday = 'notif_count_today';
 const String _kLastWeeklySummaryDate = 'last_weekly_summary_date';

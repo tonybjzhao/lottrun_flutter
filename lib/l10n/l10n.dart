@@ -67,6 +67,7 @@ extension PlayStyleL10n on AppLocalizations {
     'US' => countryUnitedStates,
     'GB' => countryUnitedKingdom,
     'CA' => countryCanada,
+    'DE' => countryGermany,
     _ => countryOther,
   };
 
@@ -79,6 +80,8 @@ extension PlayStyleL10n on AppLocalizations {
     'uk_euromillions' => lotteryEuroMillions,
     'ca_lotto_max' => lotteryLottoMax,
     'ca_lotto_649' => lotteryLotto649,
+    'de_lotto_6aus49' => lotteryLotto6aus49,
+    'de_eurojackpot' => lotteryEuroJackpot,
     _ => lottery.name,
   };
 
@@ -89,6 +92,8 @@ extension PlayStyleL10n on AppLocalizations {
     'au_powerball' || 'us_powerball' => bonusPowerball,
     'us_megamillions' => bonusMegaBall,
     'uk_euromillions' => bonusLuckyStars,
+    'de_lotto_6aus49' => bonusSuperzahl,
+    'de_eurojackpot' => bonusEuroNumbers,
     _ => lottery.bonusLabel ?? commonSupp,
   };
 }
