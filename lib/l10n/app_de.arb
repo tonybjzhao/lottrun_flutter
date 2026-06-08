@@ -1,0 +1,666 @@
+{
+  "@@locale": "de",
+  "appTitle": "LottFun",
+  "brandTitle": "NumberRun",
+  "brandSubtitle": "Zahlensets aus vergangenen Aufzeichnungen",
+  "commonCancel": "Abbrechen",
+  "commonRetry": "Wiederholen",
+  "commonShare": "Teilen",
+  "commonCopy": "Kopieren",
+  "commonSave": "Speichern",
+  "commonSaved": "Gespeichert",
+  "commonLoad": "Laden",
+  "commonDelete": "Löschen",
+  "commonBonus": "Bonus",
+  "commonSupp": "Zus",
+  "commonView": "Ansehen",
+  "commonLoading": "Laden...",
+  "commonGenerating": "Wird generiert…",
+  "commonPreparing": "Wird vorbereitet...",
+  "countryUnitedStates": "Vereinigte Staaten",
+  "countryAustralia": "Australien",
+  "countryUnitedKingdom": "Vereinigtes Königreich",
+  "countryCanada": "Kanada",
+  "countryGermany": "Deutschland",
+  "countryOther": "Andere",
+  "lotteryPowerball": "Powerball",
+  "lotteryOzLotto": "Oz Lotto",
+  "lotterySaturdayLotto": "Saturday Lotto",
+  "lotteryMegaMillions": "Mega Millions",
+  "lotteryUkLotto": "UK Lotto",
+  "lotteryEuroMillions": "EuroMillions",
+  "lotteryLottoMax": "Lotto Max",
+  "lotteryLotto649": "Lotto 6/49",
+  "lotteryLotto6aus49": "Lotto 6aus49",
+  "lotteryEuroJackpot": "EuroJackpot",
+  "bonusPowerball": "Powerball",
+  "bonusMegaBall": "Mega Ball",
+  "bonusLuckyStars": "Lucky Stars",
+  "bonusSuperzahl": "Superzahl",
+  "bonusEuroNumbers": "Eurozahlen",
+  "screenHistoryTitle": "Verlauf",
+  "screenSettingsTitle": "Einstellungen",
+  "screenSavedPicksTitle": "Gespeicherte Tipps",
+  "screenAddMyNumbersTitle": "Meine Zahlen hinzufügen",
+  "numberSelectionLabel": "Zahlenauswahl",
+  "lotteryLabel": "Lotterie",
+  "homeCardTitle": "Zahlentipps",
+  "homeCardSubtitle": "Wähle einen Stil oder generiere 3 Zahlensets",
+  "generateOnePick": "1 Tipp generieren",
+  "generateThreeNumberSets": "🎲 3 Zahlensets generieren",
+  "generateThreeNumberSetsDescription": "3 Zahlensets kombinieren Ausgewogen + Beobachtet + Zufällig nur als Referenz.",
+  "pastOverlapReferenceNote": "✨ Einige Auswahlen überschnitten sich mit mehreren Zahlen in vergangenen Ergebnissen (nur als Referenz)",
+  "generateEmptyPrompt": "Generiere ein Zahlenset aus vergangenen Aufzeichnungen 🎲",
+  "numberSetReady": "✨ Dein Zahlenset ist bereit",
+  "historicalSimilarityReference": "📊 Historische Ähnlichkeit (nur Referenz): {score} / 100",
+  "@historicalSimilarityReference": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "dayStreak": "🔥 {count}-Tage-Serie",
+  "@dayStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "countdownWithHourglass": "⏳ {text}",
+  "@countdownWithHourglass": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "saveAll": "Alle speichern",
+  "savedToSavedPicks": "Zu gespeicherten Tipps hinzugefügt",
+  "pickSaved": "Tipp gespeichert",
+  "alreadySaved": "Bereits gespeichert",
+  "allThreePicksSaved": "Alle 3 Tipps gespeichert",
+  "copiedToClipboard": "In die Zwischenablage kopiert.",
+  "pickCopiedToClipboard": "{label} in die Zwischenablage kopiert.",
+  "@pickCopiedToClipboard": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "savedPicksTooltip": "Gespeicherte Tipps",
+  "historyTooltip": "Verlauf",
+  "settingsTooltip": "Einstellungen",
+  "addMyNumbersTooltip": "Meine Zahlen hinzufügen",
+  "deleteTooltip": "Löschen",
+  "collapseTooltip": "Einklappen",
+  "styleBalanced": "Ausgewogen",
+  "styleObservedPattern": "Beobachtetes Muster",
+  "styleLessCommon": "Weniger häufig",
+  "styleRandom": "Zufällig",
+  "styleBalancedTagline": "Ausgewogener Tipp",
+  "styleHotTagline": "Beispiel-Mustertipp",
+  "styleColdTagline": "Historisches Zahlenbeispiel",
+  "styleRandomTagline": "Zufälliger Tipp",
+  "styleBalancedSubtitle": "Gleichmäßige Verteilung über alle Zahlenbereiche.",
+  "styleHotSubtitle": "Diese Zahlen wurden in vergangenen Ergebnissen häufiger beobachtet.",
+  "styleColdSubtitle": "Diese Zahlen wurden in vergangenen Ergebnissen seltener beobachtet.",
+  "styleRandomSubtitle": "Völlig zufällige Auswahl. Nur zum Spaß.",
+  "styleBalancedDescription": "Gleichmäßige Verteilung über den Zahlenbereich",
+  "styleHotDescription": "Basierend auf aktueller Häufigkeit in vergangenen Ergebnissen (nur als Referenz)",
+  "styleColdDescription": "Basierend auf weniger häufigen historischen Zahlen (nur als Referenz)",
+  "styleRandomDescription": "Zufällige Auswahl (nur als Referenz)",
+  "threePickExample": "Beispieltipp",
+  "threePickExampleStar": "⭐ Beispieltipp",
+  "threePickCommonPattern": "Häufiges Muster",
+  "threePickRandomSurprise": "Zufällige Überraschung",
+  "threePickRandomSurpriseDice": "🎲 Zufällige Überraschung",
+  "threePickBalancedMicrocopy": "Ausgewogene Auswahl basierend auf vergangenen Ergebnissen",
+  "threePickHotMicrocopy": "Diese Zahlen wurden in vergangenen Ergebnissen häufiger beobachtet",
+  "threePickRandomMicrocopy": "Zufällige Auswahl nur als Referenz 🎲",
+  "insightBalancedOne": "Basierend auf vergangenen Daten zeigt dies eine ausgewogene Verteilung als Referenz",
+  "insightBalancedTwo": "Die Historie deutet auf eine gleichmäßige Verteilung hin",
+  "insightBalancedThree": "Ausgewogene Zahlenverteilung in vergangenen Ergebnissen gesehen",
+  "insightHotOne": "Aktuelle Ergebnisse zeigen ähnliche Muster",
+  "insightHotTwo": "Häufig in vergangenen Ergebnissen beobachtet",
+  "insightHotThree": "Basierend auf vergangenen Ergebnissen wurde ein ähnliches Muster beobachtet",
+  "insightColdOne": "Basierend auf vergangenen Ergebnissen wurden weniger häufige Zahlen beobachtet ❄️",
+  "insightColdTwo": "Weniger häufige Zahlen aus vergangenen Ergebnissen",
+  "insightRandomOne": "Manchmal macht Zufall Spaß 🎲",
+  "insightRandomTwo": "Zufälliges Muster nur als Referenz",
+  "insightRandomThree": "Zufällige Auswahl zum Spaß",
+  "nextResultUpdateDays": "Nächste Ergebnisaktualisierung in {days}T",
+  "@nextResultUpdateDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "nextResultUpdateHours": "Nächste Ergebnisaktualisierung in {hours}Std",
+  "@nextResultUpdateHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "resultUpdateSoon": "Ergebnisaktualisierung bald!",
+  "referencePickLabel": "Referenztipp",
+  "referencePickWithStyle": "Referenztipp · {style}",
+  "@referencePickWithStyle": {
+    "placeholders": {
+      "style": {}
+    }
+  },
+  "manualPickLabel": "👤 Meine Zahlen",
+  "trackingResult": "Verfolgtes Ergebnis: {date}",
+  "@trackingResult": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "pickMainNumbers": "Wähle {count} Zahlen  ({min}–{max})",
+  "@pickMainNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "pickBonusNumbers": "Wähle {count} {label}  ({min}–{max})",
+  "@pickBonusNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "label": {},
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "saveMyNumbers": "Meine Zahlen speichern",
+  "pickMoreNumbers": "Wähle {count} weitere {count, plural, one{Zahl} other{Zahlen}}",
+  "@pickMoreNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pickMoreBonus": "Wähle {count} weitere {label}{count, plural, one{} other{n}}",
+  "@pickMoreBonus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "label": {}
+    }
+  },
+  "disclaimerTitle": "Nur zum Spaß — spiele verantwortungsvoll.",
+  "disclaimerBody": "Diese App bietet Zahlenauswahlen nur basierend auf historischen Daten. Sie prognostiziert KEINE Ergebnisse, verbessert keine Chancen und garantiert keine Ergebnisse.",
+  "settingsNotifications": "Benachrichtigungen",
+  "settingsResults": "Ergebnisse",
+  "settingsResultsSubtitle": "Wenn vergangene Ergebnisse für deine gespeicherten Tipps verfügbar sind",
+  "settingsMyPicks": "Meine Tipps",
+  "settingsMyPicksSubtitle": "Wenn deine gespeicherten Zahlen in aktuellen Ergebnissen erscheinen",
+  "settingsDailyInsights": "Tägliche Einblicke",
+  "settingsDailyInsightsSubtitle": "Eine kurze Trendbeobachtung pro Tag",
+  "settingsWeeklySummary": "Wöchentliche Zusammenfassung",
+  "settingsWeeklySummarySubtitle": "Eine kurze Musterzusammenfassung jeden Sonntag",
+  "settingsMaxNotifications": "Max. 2 Benachrichtigungen pro Tag insgesamt.",
+  "settingsLanguage": "Sprache",
+  "languageEnglish": "English",
+  "languageChinese": "中文",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "settingsAbout": "Über",
+  "settingsHistoricalResultsOnly": "Nur historische Ergebnisse",
+  "settingsHistoricalResultsOnlyBody": "Alle Analysen basieren auf historischen Ergebnissen. Diese App bietet keine Vorhersagen und verbessert keine Ergebnisse.",
+  "clearAllSavedPicksTitle": "Alle gespeicherten Tipps löschen?",
+  "clearAll": "Alle löschen",
+  "pickDeleted": "Tipp gelöscht",
+  "yourStats": "Deine Statistiken",
+  "resultsChecked": "{count} {count, plural, one{Ergebnis} other{Ergebnisse}} geprüft",
+  "@resultsChecked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "top": "Top",
+  "topWithTrophy": "🏆 Top",
+  "totalHits": "Treffer Gesamt",
+  "similarityScore": "Ähnlichkeitswert",
+  "myPick": "👤 Mein Tipp",
+  "noneYet": "Noch keine",
+  "mainCountLabel": "{count} Haupt{count, plural, one{zahl} other{zahlen}}",
+  "@mainCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "suppCountLabel": "{count} Zus",
+  "@suppCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mainSuppCountLabel": "{main}+{supp}",
+  "@mainSuppCountLabel": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "totalMainHits": "{main} Haupt{main, plural, one{zahl} other{zahlen}}",
+  "@totalMainHits": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      }
+    }
+  },
+  "totalMainSuppHits": "{main} Haupt{main, plural, one{zahl} other{zahlen}} · {supp} Zus",
+  "@totalMainSuppHits": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "pending": "Ausstehend",
+  "pendingWithDate": "Ausstehend · {date}",
+  "@pendingWithDate": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "copyPickText": "🎯 Mein {lotteryName} Zahlenset\n{label}\n\n{main}{bonus}\n\nZum Spaß generiert — NumberRun",
+  "@copyPickText": {
+    "placeholders": {
+      "lotteryName": {},
+      "label": {},
+      "main": {},
+      "bonus": {}
+    }
+  },
+  "copyPickBonusLine": "\n+ {label}: {numbers}",
+  "@copyPickBonusLine": {
+    "placeholders": {
+      "label": {},
+      "numbers": {}
+    }
+  },
+  "inlinePickCopyText": "{label}\n{lotteryName}: {main}{bonus}\nZum Spaß generiert — NumberRun 🎯",
+  "@inlinePickCopyText": {
+    "placeholders": {
+      "label": {},
+      "lotteryName": {},
+      "main": {},
+      "bonus": {}
+    }
+  },
+  "inlinePickBonusInline": " + {numbers}",
+  "@inlinePickBonusInline": {
+    "placeholders": {
+      "numbers": {}
+    }
+  },
+  "savedWithCheck": "Gespeichert ✓",
+  "historyPastResultsCount": "{count} vergangene Ergebnisse",
+  "@historyPastResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineModeSavedResults": "Offline-Modus: gespeicherte Ergebnisse werden angezeigt",
+  "offlineModeSavedResultsFrom": "Offline-Modus: gespeicherte Ergebnisse von {date} werden angezeigt",
+  "@offlineModeSavedResultsFrom": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "noHistoryData": "Noch keine Verlaufsdaten verfügbar.",
+  "noInternetNoSavedHistory": "Keine Internetverbindung und noch kein gespeicherter Lotterieverlauf.",
+  "noInternetNoSavedResultHistory": "Keine Internetverbindung und noch kein gespeicherter Ergebnisverlauf.",
+  "failedToLoadHistory": "Laden des Verlaufs fehlgeschlagen.",
+  "recentPatternsTitle": "Aktuelle Muster vergangener Ergebnisse",
+  "recentPatternsSubtitle": "Basierend auf den letzten {count} vergangenen Ergebnissen",
+  "@recentPatternsSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historicalComparisonOnly": "Nur historischer Vergleich · keine Garantie für Ergebnisse",
+  "frequentNumbers": "Häufig beobachtete Zahlen",
+  "frequentNumbersTooltip": "Häufiger in vergangenen Ergebnissen beobachtet",
+  "lessCommonNumbers": "Weniger häufige Zahlen",
+  "lessCommonNumbersTooltip": "Seltener in vergangenen Ergebnissen beobachtet",
+  "avgSum": "Durchschn. Summe",
+  "oddEven": "Ungerade/Gerade",
+  "lowHigh": "Niedrig/Hoch",
+  "avgConsecPairs": "Durchschn. aufeinand. Paare",
+  "notEnoughHistory": "Nicht genug vergangene Ergebnisse für Analyse.",
+  "patternNotable": "Bemerkenswertes Muster",
+  "patternBalanced": "Ausgewogen",
+  "patternRandomLike": "Zufallsartig",
+  "odd": "ungerade",
+  "even": "gerade",
+  "low": "niedrig",
+  "high": "hoch",
+  "dailyInsightTitle": "Heutiger Einblick",
+  "savedPicksAnalysisTitle": "Analyse meiner gespeicherten Tipps",
+  "savedPicksAnalysisSubtitle": "Verglichen mit den letzten 20 vergangenen Ergebnissen · nur Vergleich nach Ergebnis",
+  "topOverlap": "Höchste Übereinstimmung",
+  "numbersCount": "{count} {count, plural, one{Zahl} other{Zahlen}}",
+  "@numbersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "avgOverlap": "Durchschn. Übereinstimmung",
+  "perPastResult": "pro vergangenem Ergebnis",
+  "oftenPicked": "Oft gewählt",
+  "inRecentDraws": "In aktuellen Ziehungen",
+  "overlapLevelHigh": "Übereinstimmungsstufe: Hoch",
+  "overlapLevelMedium": "Übereinstimmungsstufe: Mittel",
+  "overlapLevelLow": "Übereinstimmungsstufe: Niedrig",
+  "historicalPatternNotEnough": "Nicht genug Verlauf für Musteranalyse (52+ vergangene Ziehungen erforderlich).",
+  "historicalPatternTitle": "Historischer Mustervergleich",
+  "historicalPatternSubtitle": "Basierend auf vergangenen Ergebnissen der letzten 5 Jahre",
+  "trendComparison": "Trendvergleich",
+  "observedLessCommonComparison": "Beobachtet/weniger häufig Vergleich",
+  "oddEvenStructure": "Ungerade/Gerade-Struktur",
+  "lowHighStructure": "Niedrig/Hoch-Struktur",
+  "sumRange": "Summenbereich",
+  "consecutivePairs": "Aufeinanderfolgende Paare",
+  "consecutivePairCount": "{count} aufeinand. {count, plural, one{Paar} other{Paare}}",
+  "@consecutivePairCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "topSimilarPastResults": "Top 10 ähnliche vergangene Ergebnisse (nur als Referenz)",
+  "similarSharedNumbers": "{count} {count, plural, one{Zahl stimmte überein} other{Zahlen stimmten überein}}",
+  "@similarSharedNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "similarStructuralSimilarity": "{percent}% strukturelle Ähnlichkeit",
+  "@similarStructuralSimilarity": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "observedMoreLessCommonCounts": "🔥 {hotCount} häufiger beobachtet · ❄️ {coldCount} weniger häufig",
+  "@observedMoreLessCommonCounts": {
+    "placeholders": {
+      "hotCount": {
+        "type": "int"
+      },
+      "coldCount": {
+        "type": "int"
+      }
+    }
+  },
+  "historicalPatternStrong": "Starker Vergleich mit historischen Mustern (nur als Referenz)",
+  "historicalPatternModerate": "Mäßiger Vergleich mit historischen Mustern (nur als Referenz)",
+  "historicalPatternLimited": "Begrenzter Vergleich mit historischen Mustern (nur als Referenz)",
+  "drawResult": "ZIEHUNGSERGEBNIS",
+  "supplementary": "ZUSATZZAHLEN",
+  "yourNumbers": "DEINE ZAHLEN",
+  "noMainMatched": "Keine Hauptzahl getroffen",
+  "checkOfficialResults": "Prüfe offizielle Ergebnisse für Details",
+  "noNumbersMatched": "Keine Zahlen getroffen",
+  "bonusMatched": "{label} getroffen",
+  "@bonusMatched": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "matchedCount": "{count} getroffen",
+  "@matchedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchedCountWithBonus": "{count} getroffen + {label}",
+  "@matchedCountWithBonus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "label": {}
+    }
+  },
+  "noMainWithSupp": "Keine Haupt · {count}Zus",
+  "@noMainWithSupp": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchedWithSupp": "{main} getroffen + {supp}Zus",
+  "@matchedWithSupp": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "noMatch": "Kein Treffer",
+  "levelLightHit": "Leichter Treffer",
+  "levelNice": "Gut",
+  "levelSolid": "Solide",
+  "levelStrong": "Stark",
+  "levelGreat": "Großartig",
+  "unknown": "Unbekannt",
+  "belowTypicalRange": "Unter typischem Bereich",
+  "aboveTypicalRange": "Über typischem Bereich",
+  "withinTypicalRange": "Innerhalb typischem Bereich",
+  "drawAnalysisNotEnough": "Nicht genug Ziehungsverlauf für Analyse.",
+  "drawAnalysisNoSavedPicks": "Keine gespeicherten Tipps oder Ziehungsverlauf zum Vergleichen.",
+  "recentDrawsConcentrated": "Aktuelle Ziehungen zeigen höhere Aktivität bei wenigen Zahlen — eine bemerkenswerte Konzentration in diesem Zeitraum.",
+  "periodMidRangeActive": "Dieser Zeitraum zeigt höhere Aktivität bei mehreren Zahlen im mittleren Bereich.",
+  "recentDrawsHigherRange": "Aktuelle Ziehungen tendierten zu Zahlen im höheren Bereich.",
+  "recentDrawsLowerRange": "Aktuelle Ziehungen tendierten zu Zahlen im niedrigeren Bereich.",
+  "recentDrawsModerateSpread": "Aktuelle Ziehungen sind ziemlich ausgewogen mit mäßiger Streuung über Zahlen.",
+  "recentDrawsNoStrongPattern": "Aktuelle Ziehungen sind ziemlich ausgewogen ohne starkes erkanntes Muster.",
+  "weeklyNotableConcentration": "Diese Woche zeigte eine bemerkenswerte Konzentration bei wenigen Zahlen.",
+  "weeklyModerateSpread": "Diese Woche zeigte eine ausgewogene Verteilung mit mäßiger Streuung.",
+  "weeklyNoStrongTrend": "Diese Woche zeigte eine ausgewogene Verteilung ohne starken Trend.",
+  "savedPicksModerate": "Deine gespeicherten Tipps stimmten mäßig mit aktuellen Ziehungen überein.",
+  "savedNumbersAppeared": "Mehrere deiner gespeicherten Zahlen erschienen in aktuellen Ergebnissen.",
+  "savedPicksLimited": "Deine gespeicherten Tipps zeigen begrenzte Übereinstimmung mit aktuellen Ziehungsergebnissen.",
+  "drawStrongHistoricalComparison": "Diese Ziehung zeigt einen starken Vergleich mit historischen Mustern der letzten 5 Jahre.",
+  "drawModerateHistoricalComparison": "Diese Ziehung zeigt einen mäßigen Vergleich mit historischen Verteilungsmustern.",
+  "drawLimitedHistoricalComparison": "Diese Ziehung zeigt einen begrenzten Vergleich mit typischen historischen Mustern.",
+  "generatedForFunHistoricalPatterns": "Zum Spaß generiert mit historischen Mustern.",
+  "suppShort": "Z",
+  "mainAndBonusMatched": "{main} Haupt{main, plural, one{zahl} other{zahlen}} + {bonusLabel} getroffen",
+  "@mainAndBonusMatched": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "bonusLabel": {}
+    }
+  },
+  "mainMatched": "{main} Haupt{main, plural, one{zahl} other{zahlen}} getroffen",
+  "@mainMatched": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      }
+    }
+  },
+  "suppMatched": "{supp} Zus getroffen",
+  "@suppMatched": {
+    "placeholders": {
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "mainAndSuppMatched": "{main} Haupt{main, plural, one{zahl} other{zahlen}} + {supp} Zus getroffen",
+  "@mainAndSuppMatched": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "shareNearMatch": "🔥 Fast getroffen!",
+  "shareOnlyOneAway": "Nur eine Zahl daneben 👀",
+  "shareCanYouBeatThis": "Kannst du das toppen? 👀",
+  "shareNotBad": "🎯 Nicht schlecht!",
+  "shareOfMainCount": "von {count}",
+  "@shareOfMainCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shareTemplate": "Vorlage",
+  "shareReferencePick": "⭐ Referenztipp",
+  "sharePng": "PNG teilen",
+  "shareDefaultPick": "Mein Zahlentipp 🎯 — Generiert von NumberRun",
+  "shareDefaultPicks": "Meine Zahlentipps 🎯 — Generiert von NumberRun",
+  "shareNumberComparison": "🔥 Zahlenvergleich von NumberRun",
+  "shareNumberOverlap": "🎯 Zahlenübereinstimmung von NumberRun",
+  "shareRandomResult": "😆 Zufälliges Ergebnis von NumberRun",
+  "shareTemplateFireLabel": "🔥 Fast getroffen",
+  "shareTemplateElectricLabel": "🎯 Zahlenübereinstimmung",
+  "shareTemplateWarmLabel": "😂 Zufälliges Ergebnis",
+  "shareTemplateFireDescription": "Dramatische Gold-auf-Dunkel-Karte für knappe Treffer und starke Trefferserien.",
+  "shareTemplateElectricDescription": "Saubere Neon-Statistikkarte für kleinere Gewinne und Teiltreffer.",
+  "shareTemplateWarmDescription": "Verspielte Motivationskarte für ausstehende Ziehungen, Fehlversuche oder nur zum Teilen des Tipps.",
+  "shareNotToday": "Heute nicht",
+  "shareZeroOverlapped": "0 getroffen",
+  "shareRandomResultPlain": "Zufälliges Ergebnis",
+  "shareResultIncoming": "Ergebnisaktualisierung kommt!",
+  "shareWaitingForResults": "Warte auf Ergebnisse 🤞",
+  "shareMyNumberPick": "Mein Zahlentipp",
+  "shareLetsSee": "Mal sehen was passiert 👀",
+  "shareTheseAreMyNumbers": "Das sind meine Zahlen ↑",
+  "shareFunnyFail": "😂 Lustiger Fehlschlag",
+  "shareCardPreviewTitle": "Vorschau der Freigabekarte",
+  "shareCardPreviewSubtitle": "Wähle einen Stil oder behalte die Standardoption für {lotteryName}.",
+  "@shareCardPreviewSubtitle": {
+    "placeholders": {
+      "lotteryName": {}
+    }
+  },
+  "resultPanelNoOverlap": "Keine Übereinstimmung im letzten vergangenen Ergebnis ({date})",
+  "@resultPanelNoOverlap": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "resultPanelBonusAppeared": "{bonusLabel} erschien im letzten vergangenen Ergebnis ({date})",
+  "@resultPanelBonusAppeared": {
+    "placeholders": {
+      "bonusLabel": {},
+      "date": {}
+    }
+  },
+  "resultPanelOverlap": "{count}{bonusSuffix} stimmte{count, plural, one{} other{n}} im letzten vergangenen Ergebnis überein ({date})",
+  "@resultPanelOverlap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "bonusSuffix": {},
+      "date": {}
+    }
+  },
+  "bonusSuffix": " + {bonusLabel}",
+  "@bonusSuffix": {
+    "placeholders": {
+      "bonusLabel": {}
+    }
+  },
+  "notificationResultReadyChannel": "Ergebnis Bereit",
+  "notificationResultReadyTitle": "Ergebnis Bereit 🎯",
+  "notificationResultsReadyTitle": "{count} Ergebnisse Bereit 🎯",
+  "@notificationResultsReadyTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationSavedNumbersReady": "Deine gespeicherten Lottozahlen sind bereit zum Prüfen",
+  "notificationDailyInsightsChannel": "Tägliche Einblicke",
+  "notificationDailyInsightTitle": "Heutiger Einblick 📊",
+  "notificationWeeklySummaryChannel": "Wöchentliche Zusammenfassung",
+  "notificationWeeklySummaryTitle": "Wöchentliche Zusammenfassung 📅",
+  "notificationResultsDescription": "Benachrichtigt wenn Lottoziehungsergebnisse verfügbar sind",
+  "notificationDailyDescription": "Tägliche Ziehungstrendbeobachtungen",
+  "notificationWeeklyDescription": "Wöchentliche Ziehungsmusterzusammenfassung",
+  "lotteryHistoryNoRemoteCsv": "Keine Remote-CSV für {lottery} konfiguriert.",
+  "@lotteryHistoryNoRemoteCsv": {
+    "placeholders": {
+      "lottery": {}
+    }
+  },
+  "lotteryHistoryLoadFailed": "Laden der Verlaufs-CSV fehlgeschlagen ({statusCode}).",
+  "@lotteryHistoryLoadFailed": {
+    "placeholders": {
+      "statusCode": {
+        "type": "int"
+      }
+    }
+  },
+  "lotteryHistoryCsvEmpty": "Verlaufs-CSV ist leer.",
+  "lotteryHistoryNoValidRows": "Keine gültigen Ziehungszeilen in CSV gefunden.",
+  "lotteryHistoryParseFailed": "Parsen der Verlaufs-CSV fehlgeschlagen: {error}",
+  "@lotteryHistoryParseFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  }
+}

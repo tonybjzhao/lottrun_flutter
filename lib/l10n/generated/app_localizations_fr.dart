@@ -446,13 +446,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsLanguage => 'Langue';
 
   @override
-  String get languageEnglish => 'Anglais';
+  String get languageEnglish => 'English';
 
   @override
-  String get languageChinese => 'Chinois';
+  String get languageChinese => '中文';
 
   @override
   String get languageFrench => 'Français';
+
+  @override
+  String get languageSpanish => 'Español';
+
+  @override
+  String get languageGerman => 'Deutsch';
 
   @override
   String get settingsAbout => 'À propos';
