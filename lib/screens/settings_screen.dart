@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../l10n/l10n.dart';
 import '../models/analysis_style.dart';
 import '../services/analysis_style_service.dart';
+import '../services/background_notification_service.dart';
 import '../services/insight_service.dart';
 import '../services/locale_service.dart';
 import '../services/result_notification_service.dart';
@@ -60,6 +61,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (key == kNotifKeyDailyInsight || key == kNotifKeyWeeklySummary) {
       await ResultNotificationService.instance
           .refreshScheduledInsightNotifications();
+      await BackgroundNotificationService.instance.refreshRegistration();
     }
   }
 
@@ -75,6 +77,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     await ResultNotificationService.instance
         .refreshScheduledInsightNotifications();
+    await BackgroundNotificationService.instance.refreshRegistration();
     if (mounted) {
       setState(() => _notifScheduleTime = picked);
     }

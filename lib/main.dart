@@ -9,6 +9,7 @@ import 'app.dart';
 import 'firebase_options.dart';
 import 'services/analysis_style_service.dart';
 import 'services/analytics_service.dart';
+import 'services/background_notification_service.dart';
 import 'services/locale_service.dart';
 import 'services/notification_service.dart';
 import 'services/result_notification_service.dart';
@@ -19,11 +20,16 @@ Future<void> main() async {
   AnalyticsService.init(_initFirebase());
   await LocaleService.instance.load();
   await AnalysisStyleService.instance.load();
-  unawaited(
-    ResultNotificationService.instance.refreshScheduledInsightNotifications(),
-  );
+  await BackgroundNotificationService.instance.initialize();
+  unawaited(_refreshNotifications());
   await _initAds();
   runApp(LottFunApp(localeService: LocaleService.instance));
+}
+
+Future<void> _refreshNotifications() async {
+  await ResultNotificationService.instance
+      .refreshScheduledInsightNotifications();
+  await BackgroundNotificationService.instance.refreshRegistration();
 }
 
 /// Initializes AdMob and registers test device IDs in debug builds

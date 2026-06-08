@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../data/seed_lotteries.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 import '../services/insight_service.dart';
 import '../services/locale_service.dart';
@@ -28,10 +29,10 @@ class ResultNotificationService {
     debugPrint('[ResultNotificationService] Refreshing scheduled insights...');
     await NotificationService.instance.cancelScheduledInsights();
 
-    if (kSeedLotteries.isEmpty) return;
     final time = await InsightService.instance.getNotificationScheduleTime();
-    final lottery = kSeedLotteries.first;
-    final draws = LotteryService.instance.getDraws(lottery.id);
+    final lottery = await _notificationInsightLottery();
+    if (lottery == null) return;
+    final draws = await _notificationInsightDraws(lottery.id);
     final l10n = _l10n;
 
     final dailyEnabled = await InsightService.instance.getNotifPref(
@@ -65,6 +66,29 @@ class ResultNotificationService {
         minute: time.minute,
         body: body,
       );
+    }
+  }
+
+  Future<Lottery?> _notificationInsightLottery() async {
+    if (kSeedLotteries.isEmpty) return null;
+    final lastLotteryId = await LocalStorageService.instance.getLastLotteryId();
+    if (lastLotteryId != null) {
+      final lottery = LotteryService.instance.getLotteryById(lastLotteryId);
+      if (lottery != null) return lottery;
+    }
+    return kSeedLotteries.first;
+  }
+
+  Future<List<LotteryDraw>> _notificationInsightDraws(String lotteryId) async {
+    final lottery = LotteryService.instance.getLotteryById(lotteryId);
+    if (lottery == null) return [];
+    try {
+      final result = await LotteryHistoryCsvService.instance.fetchDraws(
+        lottery,
+      );
+      return result.draws;
+    } catch (_) {
+      return LotteryService.instance.getDraws(lotteryId);
     }
   }
 
