@@ -18,21 +18,29 @@ class ResultNotificationService {
   /// Also fires daily insight and weekly summary notifications when enabled.
   /// Hard cap: max 2 notifications per day total.
   Future<void> checkAndNotify() async {
+    debugPrint('[ResultNotificationService] ═══ Starting notification check at ${DateTime.now()} ═══');
     try {
       await _checkResults();
       await _checkWeeklySummary();
       await _checkDailyInsight();
-    } catch (e) {
-      debugPrint('ResultNotificationService error: $e');
+      debugPrint('[ResultNotificationService] ═══ Notification check complete ═══');
+    } catch (e, stack) {
+      debugPrint('[ResultNotificationService] ❌ ERROR: $e');
+      debugPrint('[ResultNotificationService] Stack trace: $stack');
     }
   }
 
   Future<void> _checkResults() async {
+    debugPrint('[ResultNotificationService] Checking results...');
     final resultsEnabled = await InsightService.instance
         .getNotifPref(kNotifKeyResults);
     final myPicksEnabled = await InsightService.instance
         .getNotifPref(kNotifKeyMyPicks);
-    if (!resultsEnabled || !myPicksEnabled) return;
+    debugPrint('[ResultNotificationService] Results enabled: $resultsEnabled, My Picks enabled: $myPicksEnabled');
+    if (!resultsEnabled || !myPicksEnabled) {
+      debugPrint('[ResultNotificationService] Result notifications disabled, skipping');
+      return;
+    }
 
     final picks = await LocalStorageService.instance.getSavedPicks();
     final newlyResolved = <String>[];
@@ -68,21 +76,46 @@ class ResultNotificationService {
       }
     }
 
-    if (newlyResolved.isEmpty) return;
-    if (!await InsightService.instance.canSendNotification()) return;
+    debugPrint('[ResultNotificationService] Found ${newlyResolved.length} newly resolved picks');
+    if (newlyResolved.isEmpty) {
+      debugPrint('[ResultNotificationService] No newly resolved picks, skipping notification');
+      return;
+    }
+    final canSend = await InsightService.instance.canSendNotification();
+    debugPrint('[ResultNotificationService] Can send notification (daily cap check): $canSend');
+    if (!canSend) {
+      debugPrint('[ResultNotificationService] Daily notification cap reached, skipping');
+      return;
+    }
 
     await LocalStorageService.instance
         .markPicksNotified(newlyResolved.toSet());
     await NotificationService.instance.showResultReady(newlyResolved.length);
     await InsightService.instance.recordNotificationSent();
+    debugPrint('[ResultNotificationService] ✓ Result notification sent for ${newlyResolved.length} picks');
   }
 
   Future<void> _checkWeeklySummary() async {
+    debugPrint('[ResultNotificationService] Checking weekly summary...');
     final enabled = await InsightService.instance
         .getNotifPref(kNotifKeyWeeklySummary);
-    if (!enabled) return;
-    if (!await InsightService.instance.shouldSendWeeklySummary()) return;
-    if (!await InsightService.instance.canSendNotification()) return;
+    debugPrint('[ResultNotificationService] Weekly summary enabled: $enabled');
+    if (!enabled) {
+      debugPrint('[ResultNotificationService] Weekly summary disabled, skipping');
+      return;
+    }
+    final shouldSend = await InsightService.instance.shouldSendWeeklySummary();
+    debugPrint('[ResultNotificationService] Should send weekly (timing check): $shouldSend');
+    if (!shouldSend) {
+      debugPrint('[ResultNotificationService] Not Sunday or already sent this week, skipping');
+      return;
+    }
+    final canSend = await InsightService.instance.canSendNotification();
+    debugPrint('[ResultNotificationService] Can send notification (daily cap check): $canSend');
+    if (!canSend) {
+      debugPrint('[ResultNotificationService] Daily notification cap reached, skipping');
+      return;
+    }
 
     // Use the first available lottery for the summary
     if (kSeedLotteries.isEmpty) return;
@@ -95,13 +128,24 @@ class ResultNotificationService {
     await NotificationService.instance.showWeeklySummary(body);
     await InsightService.instance.recordNotificationSent();
     await InsightService.instance.recordWeeklySummarySent();
+    debugPrint('[ResultNotificationService] ✓ Weekly summary notification sent');
   }
 
   Future<void> _checkDailyInsight() async {
+    debugPrint('[ResultNotificationService] Checking daily insight...');
     final enabled = await InsightService.instance
         .getNotifPref(kNotifKeyDailyInsight, defaultValue: false);
-    if (!enabled) return;
-    if (!await InsightService.instance.canSendNotification()) return;
+    debugPrint('[ResultNotificationService] Daily insight enabled: $enabled');
+    if (!enabled) {
+      debugPrint('[ResultNotificationService] Daily insight disabled, skipping');
+      return;
+    }
+    final canSend = await InsightService.instance.canSendNotification();
+    debugPrint('[ResultNotificationService] Can send notification (daily cap check): $canSend');
+    if (!canSend) {
+      debugPrint('[ResultNotificationService] Daily notification cap reached, skipping');
+      return;
+    }
 
     if (kSeedLotteries.isEmpty) return;
     final lottery = kSeedLotteries.first;
@@ -112,5 +156,6 @@ class ResultNotificationService {
 
     await NotificationService.instance.showDailyInsight(body);
     await InsightService.instance.recordNotificationSent();
+    debugPrint('[ResultNotificationService] ✓ Daily insight notification sent');
   }
 }

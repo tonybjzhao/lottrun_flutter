@@ -22,8 +22,12 @@ class NotificationService {
   static const _weeklyNotifId = 44;
 
   Future<void> init() async {
-    if (_initialized) return;
+    if (_initialized) {
+      debugPrint('[NotificationService] Already initialized');
+      return;
+    }
     _initialized = true;
+    debugPrint('[NotificationService] Initializing...');
 
     const androidSettings = AndroidInitializationSettings(
       '@mipmap/ic_launcher',
@@ -38,6 +42,7 @@ class NotificationService {
       const InitializationSettings(android: androidSettings, iOS: iosSettings),
       onDidReceiveNotificationResponse: _handleTap,
     );
+    debugPrint('[NotificationService] Initialized successfully');
   }
 
   void _handleTap(NotificationResponse response) {
@@ -54,8 +59,12 @@ class NotificationService {
 
   /// Requests OS permission and shows the result-ready notification.
   Future<void> showResultReady(int count) async {
+    debugPrint('[NotificationService] Attempting to show result-ready notification (count: $count)');
     final granted = await _requestPermission();
-    if (!granted) return;
+    if (!granted) {
+      debugPrint('[NotificationService] Permission denied for result-ready notification');
+      return;
+    }
 
     final androidDetails = AndroidNotificationDetails(
       _channelId,
@@ -80,12 +89,17 @@ class NotificationService {
       _l10n.notificationSavedNumbersReady,
       NotificationDetails(android: androidDetails, iOS: iosDetails),
     );
+    debugPrint('[NotificationService] Result-ready notification sent successfully');
   }
 
   /// Shows a daily insight notification.
   Future<void> showDailyInsight(String body) async {
+    debugPrint('[NotificationService] Attempting to show daily insight notification');
     final granted = await _requestPermission();
-    if (!granted) return;
+    if (!granted) {
+      debugPrint('[NotificationService] Permission denied for daily insight notification');
+      return;
+    }
 
     final androidDetails = AndroidNotificationDetails(
       'insights',
@@ -106,12 +120,17 @@ class NotificationService {
       body,
       NotificationDetails(android: androidDetails, iOS: iosDetails),
     );
+    debugPrint('[NotificationService] Daily insight notification sent successfully');
   }
 
   /// Shows a weekly summary notification.
   Future<void> showWeeklySummary(String body) async {
+    debugPrint('[NotificationService] Attempting to show weekly summary notification');
     final granted = await _requestPermission();
-    if (!granted) return;
+    if (!granted) {
+      debugPrint('[NotificationService] Permission denied for weekly summary notification');
+      return;
+    }
 
     final androidDetails = AndroidNotificationDetails(
       'weekly_summary',
@@ -132,25 +151,28 @@ class NotificationService {
       body,
       NotificationDetails(android: androidDetails, iOS: iosDetails),
     );
+    debugPrint('[NotificationService] Weekly summary notification sent successfully');
   }
 
   Future<bool> _requestPermission() async {
+    debugPrint('[NotificationService] Requesting notification permission...');
+    bool granted = false;
     if (Platform.isIOS) {
-      return await _plugin
+      granted = await _plugin
               .resolvePlatformSpecificImplementation<
                 IOSFlutterLocalNotificationsPlugin
               >()
               ?.requestPermissions(alert: true, badge: false, sound: true) ??
           false;
-    }
-    if (Platform.isAndroid) {
-      return await _plugin
+    } else if (Platform.isAndroid) {
+      granted = await _plugin
               .resolvePlatformSpecificImplementation<
                 AndroidFlutterLocalNotificationsPlugin
               >()
               ?.requestNotificationsPermission() ??
           false;
     }
-    return false;
+    debugPrint('[NotificationService] Permission ${granted ? "GRANTED" : "DENIED"}');
+    return granted;
   }
 }
