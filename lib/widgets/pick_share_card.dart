@@ -371,7 +371,7 @@ class _FireTemplate extends StatelessWidget {
   Widget _topBar() => Row(
     children: [
       Text(
-        '${_flagEmoji(lottery.countryCode)}  ${_lotteryShortName(lottery.name)}',
+        '${_flagEmoji(lottery.countryCode)}  ${l10n.lotteryName(lottery)}',
         style: const TextStyle(
           color: Colors.white70,
           fontSize: 12,
@@ -592,7 +592,7 @@ class _ElectricTemplate extends StatelessWidget {
   Widget _topBar() => Row(
     children: [
       Text(
-        '${_flagEmoji(lottery.countryCode)}  ${_lotteryShortName(lottery.name)}',
+        '${_flagEmoji(lottery.countryCode)}  ${l10n.lotteryName(lottery)}',
         style: const TextStyle(
           color: Colors.white70,
           fontSize: 12,
@@ -701,7 +701,9 @@ class _WarmTemplate extends StatelessWidget {
       blurbText = l10n.shareTheseAreMyNumbers;
     }
 
-    final bonusLabel = lottery.bonusLabel ?? l10n.commonBonus;
+    final bonusLabel = lottery.bonusLabel == null
+        ? l10n.commonBonus
+        : l10n.lotteryBonusLabel(lottery);
 
     final List<Color> gradColors = isFunnyFail
         ? const [Color(0xFF4A0010), Color(0xFF8B0030), Color(0xFFB03050)]
@@ -902,7 +904,7 @@ class _WarmTemplate extends StatelessWidget {
   Widget _topBar(_StyleTheme theme) => Row(
     children: [
       Text(
-        '${_flagEmoji(lottery.countryCode)}  ${lottery.name}',
+        '${_flagEmoji(lottery.countryCode)}  ${l10n.lotteryName(lottery)}',
         style: const TextStyle(
           color: Colors.white,
           fontSize: 13,
@@ -1019,7 +1021,9 @@ String _matchDesc(
   AppLocalizations l10n,
 ) {
   if (!isSupp) {
-    final bonusLabel = lottery.bonusLabel ?? l10n.commonBonus;
+    final bonusLabel = lottery.bonusLabel == null
+        ? l10n.commonBonus
+        : l10n.lotteryBonusLabel(lottery);
     if (matchedBonus > 0 && matchMain > 0) {
       return l10n.mainAndBonusMatched(matchMain, bonusLabel);
     }
@@ -1038,8 +1042,6 @@ String _flagEmoji(String countryCode) => switch (countryCode) {
   'CA' => '🇨🇦',
   _ => '🌍',
 };
-
-String _lotteryShortName(String name) => name;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // § 9  Confetti particles (shared decorative layer)
@@ -1273,7 +1275,9 @@ class _PickShareSheetState extends State<_PickShareSheet> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    l10n.shareCardPreviewSubtitle(widget.lottery.name),
+                    l10n.shareCardPreviewSubtitle(
+                      l10n.lotteryName(widget.lottery),
+                    ),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                       height: 1.35,

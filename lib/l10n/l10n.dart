@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../models/generated_pick.dart';
+import '../models/lottery.dart';
 import 'generated/app_localizations.dart';
 
 export 'generated/app_localizations.dart';
@@ -60,4 +61,34 @@ extension PlayStyleL10n on AppLocalizations {
         'electric' => shareTemplateElectricDescription,
         _ => shareTemplateWarmDescription,
       };
+
+  String countryNameForCode(String code) => switch (code) {
+    'AU' => countryAustralia,
+    'US' => countryUnitedStates,
+    'GB' => countryUnitedKingdom,
+    'CA' => countryCanada,
+    _ => countryOther,
+  };
+
+  String lotteryName(Lottery lottery) => switch (lottery.id) {
+    'au_powerball' || 'us_powerball' => lotteryPowerball,
+    'au_ozlotto' => lotteryOzLotto,
+    'au_saturday' => lotterySaturdayLotto,
+    'us_megamillions' => lotteryMegaMillions,
+    'uk_lotto' => lotteryUkLotto,
+    'uk_euromillions' => lotteryEuroMillions,
+    'ca_lotto_max' => lotteryLottoMax,
+    'ca_lotto_649' => lotteryLotto649,
+    _ => lottery.name,
+  };
+
+  String lotteryDisplayName(Lottery lottery) =>
+      '${countryNameForCode(lottery.countryCode)} · ${lotteryName(lottery)}';
+
+  String lotteryBonusLabel(Lottery lottery) => switch (lottery.id) {
+    'au_powerball' || 'us_powerball' => bonusPowerball,
+    'us_megamillions' => bonusMegaBall,
+    'uk_euromillions' => bonusLuckyStars,
+    _ => lottery.bonusLabel ?? commonSupp,
+  };
 }

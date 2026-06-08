@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../l10n/l10n.dart';
 import '../services/insight_service.dart';
+import '../services/locale_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -109,6 +110,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.onSurface.withAlpha(100),
                       fontSize: 10,
+                    ),
+                  ),
+                ),
+                const Divider(indent: 16, endIndent: 16),
+
+                // ── Language section ─────────────────────────────────
+                _SectionHeader(label: l10n.settingsLanguage, theme: theme),
+                ListTile(
+                  leading: _LeadingIcon(
+                    color: theme.colorScheme.primaryContainer,
+                    icon: Icons.language_rounded,
+                    iconColor: theme.colorScheme.primary,
+                  ),
+                  title: Text(l10n.settingsLanguage),
+                  trailing: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: LocaleService.instance.languageCode,
+                      items: [
+                        DropdownMenuItem(
+                          value: 'en',
+                          child: Text(l10n.languageEnglish),
+                        ),
+                        DropdownMenuItem(
+                          value: 'zh',
+                          child: Text(l10n.languageChinese),
+                        ),
+                        DropdownMenuItem(
+                          value: 'fr',
+                          child: Text(l10n.languageFrench),
+                        ),
+                      ],
+                      onChanged: (code) {
+                        if (code == null) return;
+                        setState(() {});
+                        LocaleService.instance.setLanguageCode(code);
+                      },
                     ),
                   ),
                 ),

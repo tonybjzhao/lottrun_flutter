@@ -1,0 +1,655 @@
+{
+  "@@locale": "fr",
+  "appTitle": "LottFun",
+  "brandTitle": "NumberRun",
+  "brandSubtitle": "Combinaisons issues des anciens tirages",
+  "commonCancel": "Annuler",
+  "commonRetry": "Réessayer",
+  "commonShare": "Partager",
+  "commonCopy": "Copier",
+  "commonSave": "Enregistrer",
+  "commonSaved": "Enregistré",
+  "commonLoad": "Charger",
+  "commonDelete": "Supprimer",
+  "commonBonus": "Bonus",
+  "commonSupp": "Suppl.",
+  "commonView": "Voir",
+  "commonLoading": "Chargement...",
+  "commonGenerating": "Génération…",
+  "commonPreparing": "Préparation...",
+  "countryUnitedStates": "États-Unis",
+  "countryAustralia": "Australie",
+  "countryUnitedKingdom": "Royaume-Uni",
+  "countryCanada": "Canada",
+  "countryOther": "Autre",
+  "lotteryPowerball": "Powerball",
+  "lotteryOzLotto": "Oz Lotto",
+  "lotterySaturdayLotto": "Saturday Lotto",
+  "lotteryMegaMillions": "Mega Millions",
+  "lotteryUkLotto": "UK Lotto",
+  "lotteryEuroMillions": "EuroMillions",
+  "lotteryLottoMax": "Lotto Max",
+  "lotteryLotto649": "Lotto 6/49",
+  "bonusPowerball": "Powerball",
+  "bonusMegaBall": "Mega Ball",
+  "bonusLuckyStars": "Lucky Stars",
+  "screenHistoryTitle": "Historique",
+  "screenSettingsTitle": "Réglages",
+  "screenSavedPicksTitle": "Numéros enregistrés",
+  "screenAddMyNumbersTitle": "Ajouter mes numéros",
+  "numberSelectionLabel": "Sélection de numéros",
+  "lotteryLabel": "Loterie",
+  "homeCardTitle": "Numéros",
+  "homeCardSubtitle": "Choisissez un style ou générez 3 combinaisons",
+  "generateOnePick": "Générer 1 combinaison",
+  "generateThreeNumberSets": "🎲 Générer 3 combinaisons",
+  "generateThreeNumberSetsDescription": "Les 3 combinaisons associent les styles Équilibré, Observé et Aléatoire, à titre indicatif seulement.",
+  "pastOverlapReferenceNote": "✨ Certaines sélections ont recoupé plusieurs numéros dans les anciens résultats (à titre indicatif seulement)",
+  "generateEmptyPrompt": "Générer une combinaison à partir des anciens résultats 🎲",
+  "numberSetReady": "✨ Votre combinaison est prête",
+  "historicalSimilarityReference": "📊 Similarité historique (indicative) : {score} / 100",
+  "@historicalSimilarityReference": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "dayStreak": "🔥 Série de {count} jours",
+  "@dayStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "countdownWithHourglass": "⏳ {text}",
+  "@countdownWithHourglass": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "saveAll": "Tout enregistrer",
+  "savedToSavedPicks": "Enregistré dans les numéros sauvegardés",
+  "pickSaved": "Combinaison enregistrée",
+  "alreadySaved": "Déjà enregistrée",
+  "allThreePicksSaved": "Les 3 combinaisons sont enregistrées",
+  "copiedToClipboard": "Copié dans le presse-papiers.",
+  "pickCopiedToClipboard": "{label} copié dans le presse-papiers.",
+  "@pickCopiedToClipboard": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "savedPicksTooltip": "Numéros enregistrés",
+  "historyTooltip": "Historique",
+  "settingsTooltip": "Réglages",
+  "addMyNumbersTooltip": "Ajouter mes numéros",
+  "deleteTooltip": "Supprimer",
+  "collapseTooltip": "Réduire",
+  "styleBalanced": "Équilibré",
+  "styleObservedPattern": "Motif observé",
+  "styleLessCommon": "Moins fréquent",
+  "styleRandom": "Aléatoire",
+  "styleBalancedTagline": "Combinaison équilibrée",
+  "styleHotTagline": "Exemple de motif",
+  "styleColdTagline": "Exemple de numéros historiques rares",
+  "styleRandomTagline": "Combinaison aléatoire",
+  "styleBalancedSubtitle": "Répartition uniforme sur toutes les plages de numéros.",
+  "styleHotSubtitle": "Ces numéros sont apparus plus souvent dans les anciens résultats.",
+  "styleColdSubtitle": "Ces numéros sont apparus moins souvent dans les anciens résultats.",
+  "styleRandomSubtitle": "Sélection entièrement aléatoire. Juste pour le plaisir.",
+  "styleBalancedDescription": "Répartition équilibrée sur la plage de numéros",
+  "styleHotDescription": "Basé sur la fréquence récente des anciens résultats (à titre indicatif)",
+  "styleColdDescription": "Basé sur des numéros historiquement moins fréquents (à titre indicatif)",
+  "styleRandomDescription": "Sélection aléatoire (à titre indicatif)",
+  "threePickExample": "Exemple de combinaison",
+  "threePickExampleStar": "⭐ Exemple de combinaison",
+  "threePickCommonPattern": "Motif courant",
+  "threePickRandomSurprise": "Surprise aléatoire",
+  "threePickRandomSurpriseDice": "🎲 Surprise aléatoire",
+  "threePickBalancedMicrocopy": "Sélection équilibrée basée sur les anciens résultats",
+  "threePickHotMicrocopy": "Ces numéros sont apparus plus souvent dans les anciens résultats",
+  "threePickRandomMicrocopy": "Sélection aléatoire à titre indicatif 🎲",
+  "insightBalancedOne": "Selon les données passées, cela montre une répartition équilibrée à titre indicatif",
+  "insightBalancedTwo": "L’historique indique une distribution régulière",
+  "insightBalancedThree": "Répartition équilibrée observée dans les anciens résultats",
+  "insightHotOne": "Les résultats récents montrent des motifs similaires",
+  "insightHotTwo": "Souvent observé dans les anciens résultats",
+  "insightHotThree": "Selon les anciens résultats, un motif similaire a été observé",
+  "insightColdOne": "Selon les anciens résultats, des numéros moins fréquents ont été observés ❄️",
+  "insightColdTwo": "Numéros moins fréquents issus des anciens résultats",
+  "insightRandomOne": "Parfois, le hasard est amusant 🎲",
+  "insightRandomTwo": "Motif aléatoire à titre indicatif",
+  "insightRandomThree": "Sélection aléatoire pour le plaisir",
+  "nextResultUpdateDays": "Prochaine mise à jour dans {days} j",
+  "@nextResultUpdateDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "nextResultUpdateHours": "Prochaine mise à jour dans {hours} h",
+  "@nextResultUpdateHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "resultUpdateSoon": "Mise à jour bientôt !",
+  "referencePickLabel": "Combinaison de référence",
+  "referencePickWithStyle": "Combinaison de référence · {style}",
+  "@referencePickWithStyle": {
+    "placeholders": {
+      "style": {}
+    }
+  },
+  "manualPickLabel": "👤 Mes numéros",
+  "trackingResult": "Résultat suivi : {date}",
+  "@trackingResult": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "pickMainNumbers": "Choisissez {count} numéros ({min}–{max})",
+  "@pickMainNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "pickBonusNumbers": "Choisissez {count} {label} ({min}–{max})",
+  "@pickBonusNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "label": {},
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "saveMyNumbers": "Enregistrer mes numéros",
+  "pickMoreNumbers": "Choisissez encore {count} numéro(s)",
+  "@pickMoreNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pickMoreBonus": "Choisissez encore {count} {label}",
+  "@pickMoreBonus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "label": {}
+    }
+  },
+  "disclaimerTitle": "Juste pour le plaisir — jouez de façon responsable.",
+  "disclaimerBody": "Cette application fournit des sélections basées uniquement sur les données historiques. Elle ne prédit pas les résultats, n’améliore pas les chances et ne garantit aucun résultat.",
+  "settingsNotifications": "Notifications",
+  "settingsResults": "Résultats",
+  "settingsResultsSubtitle": "Quand des résultats passés sont disponibles pour vos numéros enregistrés",
+  "settingsMyPicks": "Mes numéros",
+  "settingsMyPicksSubtitle": "Quand vos numéros enregistrés apparaissent dans les résultats récents",
+  "settingsDailyInsights": "Aperçus quotidiens",
+  "settingsDailyInsightsSubtitle": "Une courte observation de tendance par jour",
+  "settingsWeeklySummary": "Résumé hebdomadaire",
+  "settingsWeeklySummarySubtitle": "Un bref résumé des motifs chaque dimanche",
+  "settingsMaxNotifications": "Maximum 2 notifications par jour au total.",
+  "settingsLanguage": "Langue",
+  "languageEnglish": "Anglais",
+  "languageChinese": "Chinois",
+  "languageFrench": "Français",
+  "settingsAbout": "À propos",
+  "settingsHistoricalResultsOnly": "Résultats historiques uniquement",
+  "settingsHistoricalResultsOnlyBody": "Toutes les analyses sont basées sur les résultats historiques. Cette application ne fournit pas de prédictions et n’améliore pas les résultats.",
+  "clearAllSavedPicksTitle": "Effacer tous les numéros enregistrés ?",
+  "clearAll": "Tout effacer",
+  "pickDeleted": "Combinaison supprimée",
+  "yourStats": "Vos statistiques",
+  "resultsChecked": "{count} résultat(s) vérifié(s)",
+  "@resultsChecked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "top": "Meilleur",
+  "topWithTrophy": "🏆 Meilleur",
+  "totalHits": "Total des correspondances",
+  "similarityScore": "Score de similarité",
+  "myPick": "👤 Ma combinaison",
+  "noneYet": "Aucun pour le moment",
+  "mainCountLabel": "{count} principal(aux)",
+  "@mainCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "suppCountLabel": "{count} suppl.",
+  "@suppCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mainSuppCountLabel": "{main}+{supp}",
+  "@mainSuppCountLabel": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "totalMainHits": "{main} principal(aux)",
+  "@totalMainHits": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      }
+    }
+  },
+  "totalMainSuppHits": "{main} principal(aux) · {supp} suppl.",
+  "@totalMainSuppHits": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "pending": "En attente",
+  "pendingWithDate": "En attente · {date}",
+  "@pendingWithDate": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "copyPickText": "🎯 Ma combinaison {lotteryName}\n{label}\n\n{main}{bonus}\n\nGénéré pour le plaisir — NumberRun",
+  "@copyPickText": {
+    "placeholders": {
+      "lotteryName": {},
+      "label": {},
+      "main": {},
+      "bonus": {}
+    }
+  },
+  "copyPickBonusLine": "\n+ {label} : {numbers}",
+  "@copyPickBonusLine": {
+    "placeholders": {
+      "label": {},
+      "numbers": {}
+    }
+  },
+  "inlinePickCopyText": "{label}\n{lotteryName} : {main}{bonus}\nGénéré pour le plaisir — NumberRun 🎯",
+  "@inlinePickCopyText": {
+    "placeholders": {
+      "label": {},
+      "lotteryName": {},
+      "main": {},
+      "bonus": {}
+    }
+  },
+  "inlinePickBonusInline": " + {numbers}",
+  "@inlinePickBonusInline": {
+    "placeholders": {
+      "numbers": {}
+    }
+  },
+  "savedWithCheck": "Enregistré ✓",
+  "historyPastResultsCount": "{count} résultats passés",
+  "@historyPastResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineModeSavedResults": "Mode hors ligne : affichage des résultats enregistrés",
+  "offlineModeSavedResultsFrom": "Mode hors ligne : résultats enregistrés depuis {date}",
+  "@offlineModeSavedResultsFrom": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "noHistoryData": "Aucune donnée historique disponible pour le moment.",
+  "noInternetNoSavedHistory": "Aucune connexion Internet et aucun historique de loterie enregistré.",
+  "noInternetNoSavedResultHistory": "Aucune connexion Internet et aucun historique de résultats enregistré.",
+  "failedToLoadHistory": "Impossible de charger l’historique.",
+  "recentPatternsTitle": "Motifs récents des anciens tirages",
+  "recentPatternsSubtitle": "Basé sur les {count} derniers résultats passés",
+  "@recentPatternsSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historicalComparisonOnly": "Comparaison historique uniquement · aucun résultat garanti",
+  "frequentNumbers": "Numéros fréquemment observés",
+  "frequentNumbersTooltip": "Observés plus souvent dans les anciens résultats",
+  "lessCommonNumbers": "Numéros moins fréquents",
+  "lessCommonNumbersTooltip": "Observés moins souvent dans les anciens résultats",
+  "avgSum": "Somme moy.",
+  "oddEven": "Pair/impair",
+  "lowHigh": "Bas/haut",
+  "avgConsecPairs": "Paires conséc. moy.",
+  "notEnoughHistory": "Pas assez d’historique pour l’analyse.",
+  "patternNotable": "Motif notable",
+  "patternBalanced": "Équilibré",
+  "patternRandomLike": "Proche du hasard",
+  "dailyInsightTitle": "Aperçu du jour",
+  "savedPicksAnalysisTitle": "Analyse de mes numéros enregistrés",
+  "savedPicksAnalysisSubtitle": "Comparé aux 20 derniers résultats passés · comparaison après tirage seulement",
+  "topOverlap": "Meilleur recoupement",
+  "numbersCount": "{count} numéro(s)",
+  "@numbersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "avgOverlap": "Recoupement moy.",
+  "perPastResult": "par résultat passé",
+  "oftenPicked": "Souvent choisi",
+  "inRecentDraws": "Dans les tirages récents",
+  "overlapLevelHigh": "Niveau de recoupement : élevé",
+  "overlapLevelMedium": "Niveau de recoupement : moyen",
+  "overlapLevelLow": "Niveau de recoupement : faible",
+  "historicalPatternNotEnough": "Historique insuffisant pour l’analyse des motifs (52+ tirages passés requis).",
+  "historicalPatternTitle": "Comparaison des motifs historiques",
+  "historicalPatternSubtitle": "Basé sur les résultats passés des 5 dernières années",
+  "trendComparison": "Comparaison de tendance",
+  "observedLessCommonComparison": "Comparaison observé/moins fréquent",
+  "oddEvenStructure": "Structure pair/impair",
+  "lowHighStructure": "Structure bas/haut",
+  "sumRange": "Plage de somme",
+  "consecutivePairs": "Paires consécutives",
+  "consecutivePairCount": "{count} paire(s) conséc.",
+  "@consecutivePairCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "topSimilarPastResults": "Top 10 des résultats passés similaires (à titre indicatif)",
+  "similarSharedNumbers": "{count} numéro(s) recoupé(s)",
+  "@similarSharedNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "similarStructuralSimilarity": "{percent} % de similarité structurelle",
+  "@similarStructuralSimilarity": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "observedMoreLessCommonCounts": "🔥 {hotCount} plus observé(s) · ❄️ {coldCount} moins fréquent(s)",
+  "@observedMoreLessCommonCounts": {
+    "placeholders": {
+      "hotCount": {
+        "type": "int"
+      },
+      "coldCount": {
+        "type": "int"
+      }
+    }
+  },
+  "historicalPatternStrong": "Forte comparaison avec les motifs historiques (à titre indicatif)",
+  "historicalPatternModerate": "Comparaison modérée avec les motifs historiques (à titre indicatif)",
+  "historicalPatternLimited": "Comparaison limitée avec les motifs historiques (à titre indicatif)",
+  "drawResult": "RÉSULTAT DU TIRAGE",
+  "supplementary": "SUPPLÉMENTAIRE",
+  "yourNumbers": "VOS NUMÉROS",
+  "noMainMatched": "Aucun numéro principal",
+  "checkOfficialResults": "Consultez les résultats officiels pour plus de détails",
+  "noNumbersMatched": "Aucun numéro correspondant",
+  "bonusMatched": "{label} correspondant",
+  "@bonusMatched": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "matchedCount": "{count} correspondant(s)",
+  "@matchedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchedCountWithBonus": "{count} correspondant(s) + {label}",
+  "@matchedCountWithBonus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "label": {}
+    }
+  },
+  "noMainWithSupp": "Aucun principal · {count} suppl.",
+  "@noMainWithSupp": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchedWithSupp": "{main} correspondant(s) + {supp} suppl.",
+  "@matchedWithSupp": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "noMatch": "Aucune correspondance",
+  "levelLightHit": "Petit coup",
+  "levelNice": "Bien",
+  "levelSolid": "Solide",
+  "levelStrong": "Fort",
+  "levelGreat": "Excellent",
+  "unknown": "Inconnu",
+  "belowTypicalRange": "Sous la plage typique",
+  "aboveTypicalRange": "Au-dessus de la plage typique",
+  "withinTypicalRange": "Dans la plage typique",
+  "drawAnalysisNotEnough": "Pas assez d’historique de tirages pour l’analyse.",
+  "drawAnalysisNoSavedPicks": "Aucun numéro enregistré ou historique de tirages à comparer.",
+  "recentDrawsConcentrated": "Les tirages récents montrent une activité plus forte sur quelques numéros — concentration notable sur cette période.",
+  "periodMidRangeActive": "Cette période montre une activité plus forte sur plusieurs numéros de milieu de plage.",
+  "recentDrawsHigherRange": "Les tirages récents ont penché vers les numéros élevés.",
+  "recentDrawsLowerRange": "Les tirages récents ont penché vers les numéros bas.",
+  "recentDrawsModerateSpread": "Les tirages récents sont assez équilibrés avec une dispersion modérée.",
+  "recentDrawsNoStrongPattern": "Les tirages récents sont assez équilibrés, sans motif fort détecté.",
+  "weeklyNotableConcentration": "Cette semaine a montré une concentration notable autour de quelques numéros.",
+  "weeklyModerateSpread": "Cette semaine a montré une distribution équilibrée avec une dispersion modérée.",
+  "weeklyNoStrongTrend": "Cette semaine a montré une distribution équilibrée sans tendance forte.",
+  "savedPicksModerate": "Vos numéros enregistrés correspondent modérément aux tirages récents.",
+  "savedNumbersAppeared": "Plusieurs numéros enregistrés sont apparus dans les résultats récents.",
+  "savedPicksLimited": "Vos numéros enregistrés montrent un recoupement limité avec les résultats récents.",
+  "drawStrongHistoricalComparison": "Ce tirage présente une forte comparaison avec les motifs historiques des 5 dernières années.",
+  "drawModerateHistoricalComparison": "Ce tirage présente une comparaison modérée avec les distributions historiques.",
+  "drawLimitedHistoricalComparison": "Ce tirage présente une comparaison limitée avec les motifs historiques typiques.",
+  "generatedForFunHistoricalPatterns": "Généré pour le plaisir à partir de motifs historiques.",
+  "suppShort": "S",
+  "mainAndBonusMatched": "{main} principal(aux) + {bonusLabel} correspondant",
+  "@mainAndBonusMatched": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "bonusLabel": {}
+    }
+  },
+  "mainMatched": "{main} principal(aux) correspondant(s)",
+  "@mainMatched": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      }
+    }
+  },
+  "suppMatched": "{supp} suppl. correspondant(s)",
+  "@suppMatched": {
+    "placeholders": {
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "mainAndSuppMatched": "{main} principal(aux) + {supp} suppl. correspondant(s)",
+  "@mainAndSuppMatched": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "shareNearMatch": "🔥 Presque !",
+  "shareOnlyOneAway": "À un numéro près 👀",
+  "shareCanYouBeatThis": "Pouvez-vous faire mieux ? 👀",
+  "shareNotBad": "🎯 Pas mal !",
+  "shareOfMainCount": "sur {count}",
+  "@shareOfMainCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shareTemplate": "Modèle",
+  "shareReferencePick": "⭐ Combinaison de référence",
+  "sharePng": "Partager le PNG",
+  "shareDefaultPick": "Ma combinaison 🎯 — Générée par NumberRun",
+  "shareDefaultPicks": "Mes combinaisons 🎯 — Générées par NumberRun",
+  "shareNumberComparison": "🔥 Comparaison de numéros par NumberRun",
+  "shareNumberOverlap": "🎯 Recoupement de numéros par NumberRun",
+  "shareRandomResult": "😆 Résultat aléatoire de NumberRun",
+  "shareTemplateFireLabel": "🔥 Recoupement proche",
+  "shareTemplateElectricLabel": "🎯 Recoupement de numéros",
+  "shareTemplateWarmLabel": "😂 Résultat aléatoire",
+  "shareTemplateFireDescription": "Carte dorée sur fond sombre pour les quasi-réussites et les fortes séries.",
+  "shareTemplateElectricDescription": "Carte de statistiques néon propre pour les petites réussites et correspondances partielles.",
+  "shareTemplateWarmDescription": "Carte motivante et ludique pour les tirages en attente, les manqués ou le partage simple.",
+  "shareNotToday": "Pas aujourd’hui",
+  "shareZeroOverlapped": "0 recoupement",
+  "shareRandomResultPlain": "Résultat aléatoire",
+  "shareResultIncoming": "Résultat bientôt disponible !",
+  "shareWaitingForResults": "En attente des résultats 🤞",
+  "shareMyNumberPick": "Ma combinaison",
+  "shareLetsSee": "Voyons ce qui se passe 👀",
+  "shareTheseAreMyNumbers": "Voici mes numéros ↑",
+  "shareFunnyFail": "😂 Manqué amusant",
+  "shareCardPreviewTitle": "Aperçu de la carte à partager",
+  "shareCardPreviewSubtitle": "Choisissez un style ou gardez l’option par défaut pour {lotteryName}.",
+  "@shareCardPreviewSubtitle": {
+    "placeholders": {
+      "lotteryName": {}
+    }
+  },
+  "resultPanelNoOverlap": "Aucun recoupement dans le dernier résultat passé ({date})",
+  "@resultPanelNoOverlap": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "resultPanelBonusAppeared": "{bonusLabel} est apparu dans le dernier résultat passé ({date})",
+  "@resultPanelBonusAppeared": {
+    "placeholders": {
+      "bonusLabel": {},
+      "date": {}
+    }
+  },
+  "resultPanelOverlap": "{count}{bonusSuffix} recoupé(s) dans le dernier résultat passé ({date})",
+  "@resultPanelOverlap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "bonusSuffix": {},
+      "date": {}
+    }
+  },
+  "bonusSuffix": " + {bonusLabel}",
+  "@bonusSuffix": {
+    "placeholders": {
+      "bonusLabel": {}
+    }
+  },
+  "notificationResultReadyChannel": "Résultat prêt",
+  "notificationResultReadyTitle": "Résultat prêt 🎯",
+  "notificationResultsReadyTitle": "{count} résultats prêts 🎯",
+  "@notificationResultsReadyTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationSavedNumbersReady": "Vos numéros enregistrés sont prêts à vérifier",
+  "notificationDailyInsightsChannel": "Aperçus quotidiens",
+  "notificationDailyInsightTitle": "Aperçu du jour 📊",
+  "notificationWeeklySummaryChannel": "Résumé hebdomadaire",
+  "notificationWeeklySummaryTitle": "Résumé hebdomadaire 📅",
+  "notificationResultsDescription": "Préviens lorsque les résultats du tirage sont disponibles",
+  "notificationDailyDescription": "Observations quotidiennes de tendance",
+  "notificationWeeklyDescription": "Résumé hebdomadaire des motifs de tirage",
+  "lotteryHistoryNoRemoteCsv": "Aucun CSV distant configuré pour {lottery}.",
+  "@lotteryHistoryNoRemoteCsv": {
+    "placeholders": {
+      "lottery": {}
+    }
+  },
+  "lotteryHistoryLoadFailed": "Échec du chargement du CSV historique ({statusCode}).",
+  "@lotteryHistoryLoadFailed": {
+    "placeholders": {
+      "statusCode": {
+        "type": "int"
+      }
+    }
+  },
+  "lotteryHistoryCsvEmpty": "Le CSV historique est vide.",
+  "lotteryHistoryNoValidRows": "Aucune ligne de tirage valide trouvée dans le CSV.",
+  "lotteryHistoryParseFailed": "Échec de l’analyse du CSV historique : {error}",
+  "@lotteryHistoryParseFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  }
+}

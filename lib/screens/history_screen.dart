@@ -112,7 +112,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   items: kSeedLotteries.map((l) {
                     return DropdownMenuItem(
                       value: l,
-                      child: Text(l.displayName),
+                      child: Text(l10n.lotteryDisplayName(l)),
                     );
                   }).toList(),
                   onChanged: _onLotteryChanged,
@@ -426,7 +426,9 @@ class _DrawTile extends StatelessWidget {
 
     final mainNums = draw.mainNumbers;
     final bonusNums = draw.bonusNumbers ?? [];
-    final bonusLabel = lottery.bonusLabel; // null = supplementary
+    final bonusLabel = lottery.bonusLabel == null
+        ? null
+        : context.l10n.lotteryBonusLabel(lottery);
 
     return InkWell(
       onTap: () => _showDetail(context),

@@ -625,11 +625,17 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
   Lottery? get _lottery =>
       LotteryService.instance.getLotteryById(widget.pick.lotteryId);
 
-  String get _lotteryName => _lottery?.name ?? widget.pick.lotteryId;
+  String _lotteryName(AppLocalizations l10n) =>
+      _lottery == null ? widget.pick.lotteryId : l10n.lotteryName(_lottery!);
+
+  String _pickDisplayLabel(AppLocalizations l10n) =>
+      widget.pick.pickLabel ?? l10n.playStyleTagline(widget.pick.style);
 
   String _copyText(AppLocalizations l10n) {
     final main = widget.pick.mainNumbers.join('  ');
-    final bonusLabel = _lottery?.bonusLabel ?? l10n.commonBonus;
+    final bonusLabel = _lottery == null
+        ? l10n.commonBonus
+        : l10n.lotteryBonusLabel(_lottery!);
     final bonus =
         (widget.pick.bonusNumbers != null &&
             widget.pick.bonusNumbers!.isNotEmpty)
@@ -639,8 +645,8 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
           )
         : '';
     return l10n.copyPickText(
-      _lotteryName,
-      widget.pick.displayLabel,
+      _lotteryName(l10n),
+      _pickDisplayLabel(l10n),
       main,
       bonus,
     );
@@ -747,7 +753,7 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    _lotteryName,
+                                    _lotteryName(l10n),
                                     style: theme.textTheme.labelMedium
                                         ?.copyWith(
                                           color: theme.colorScheme.primary,
@@ -783,7 +789,7 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              widget.pick.displayLabel,
+                              _pickDisplayLabel(l10n),
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: theme.colorScheme.onSurface.withAlpha(
                                   160,
@@ -834,7 +840,9 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
                     BallRow(
                       mainNumbers: widget.pick.mainNumbers,
                       bonusNumbers: bonusNums,
-                      bonusLabel: _lottery?.bonusLabel,
+                      bonusLabel: _lottery == null
+                          ? null
+                          : l10n.lotteryBonusLabel(_lottery!),
                       ballSize: 36,
                       spacing: 6,
                     ),

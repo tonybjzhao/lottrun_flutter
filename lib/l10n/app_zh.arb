@@ -1,0 +1,655 @@
+{
+  "@@locale": "zh",
+  "appTitle": "LottFun",
+  "brandTitle": "NumberRun",
+  "brandSubtitle": "基于历史记录的号码组合",
+  "commonCancel": "取消",
+  "commonRetry": "重试",
+  "commonShare": "分享",
+  "commonCopy": "复制",
+  "commonSave": "保存",
+  "commonSaved": "已保存",
+  "commonLoad": "加载",
+  "commonDelete": "删除",
+  "commonBonus": "特别号",
+  "commonSupp": "附加号",
+  "commonView": "查看",
+  "commonLoading": "加载中...",
+  "commonGenerating": "生成中…",
+  "commonPreparing": "准备中...",
+  "countryUnitedStates": "美国",
+  "countryAustralia": "澳大利亚",
+  "countryUnitedKingdom": "英国",
+  "countryCanada": "加拿大",
+  "countryOther": "其他",
+  "lotteryPowerball": "Powerball",
+  "lotteryOzLotto": "Oz Lotto",
+  "lotterySaturdayLotto": "Saturday Lotto",
+  "lotteryMegaMillions": "Mega Millions",
+  "lotteryUkLotto": "UK Lotto",
+  "lotteryEuroMillions": "EuroMillions",
+  "lotteryLottoMax": "Lotto Max",
+  "lotteryLotto649": "Lotto 6/49",
+  "bonusPowerball": "Powerball",
+  "bonusMegaBall": "Mega Ball",
+  "bonusLuckyStars": "幸运星",
+  "screenHistoryTitle": "历史记录",
+  "screenSettingsTitle": "设置",
+  "screenSavedPicksTitle": "已保存号码",
+  "screenAddMyNumbersTitle": "添加我的号码",
+  "numberSelectionLabel": "号码选择",
+  "lotteryLabel": "彩票",
+  "homeCardTitle": "号码组合",
+  "homeCardSubtitle": "选择一种风格，或生成 3 组号码",
+  "generateOnePick": "生成 1 组号码",
+  "generateThreeNumberSets": "🎲 生成 3 组号码",
+  "generateThreeNumberSetsDescription": "3 组号码会结合均衡、观察模式和随机风格，仅供参考。",
+  "pastOverlapReferenceNote": "✨ 有些号码组合曾与历史结果中的多个号码重合（仅供参考）",
+  "generateEmptyPrompt": "根据历史记录生成一组号码 🎲",
+  "numberSetReady": "✨ 你的号码组合已准备好",
+  "historicalSimilarityReference": "📊 历史相似度（仅供参考）：{score} / 100",
+  "@historicalSimilarityReference": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "dayStreak": "🔥 连续 {count} 天",
+  "@dayStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "countdownWithHourglass": "⏳ {text}",
+  "@countdownWithHourglass": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "saveAll": "全部保存",
+  "savedToSavedPicks": "已保存到已保存号码",
+  "pickSaved": "号码已保存",
+  "alreadySaved": "已保存过",
+  "allThreePicksSaved": "3 组号码已全部保存",
+  "copiedToClipboard": "已复制到剪贴板。",
+  "pickCopiedToClipboard": "{label} 已复制到剪贴板。",
+  "@pickCopiedToClipboard": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "savedPicksTooltip": "已保存号码",
+  "historyTooltip": "历史记录",
+  "settingsTooltip": "设置",
+  "addMyNumbersTooltip": "添加我的号码",
+  "deleteTooltip": "删除",
+  "collapseTooltip": "收起",
+  "styleBalanced": "均衡",
+  "styleObservedPattern": "观察模式",
+  "styleLessCommon": "较少出现",
+  "styleRandom": "随机",
+  "styleBalancedTagline": "均衡号码",
+  "styleHotTagline": "示例模式号码",
+  "styleColdTagline": "历史低频号码示例",
+  "styleRandomTagline": "随机号码",
+  "styleBalancedSubtitle": "在所有号码区间中分布均匀。",
+  "styleHotSubtitle": "这些号码在过去结果中出现得更频繁。",
+  "styleColdSubtitle": "这些号码在过去结果中出现得较少。",
+  "styleRandomSubtitle": "完全随机选择。仅供娱乐。",
+  "styleBalancedDescription": "号码区间分布均衡",
+  "styleHotDescription": "基于近期历史结果频率（仅供参考）",
+  "styleColdDescription": "基于历史中较少出现的号码（仅供参考）",
+  "styleRandomDescription": "随机选择（仅供参考）",
+  "threePickExample": "示例号码",
+  "threePickExampleStar": "⭐ 示例号码",
+  "threePickCommonPattern": "常见模式",
+  "threePickRandomSurprise": "随机惊喜",
+  "threePickRandomSurpriseDice": "🎲 随机惊喜",
+  "threePickBalancedMicrocopy": "基于历史结果的均衡选择",
+  "threePickHotMicrocopy": "这些号码在过去结果中出现得更频繁",
+  "threePickRandomMicrocopy": "随机选择，仅供参考 🎲",
+  "insightBalancedOne": "根据历史数据，这显示出均衡分布，仅供参考",
+  "insightBalancedTwo": "历史记录显示分布较均匀",
+  "insightBalancedThree": "过去结果中可见均衡号码分布",
+  "insightHotOne": "近期结果显示类似模式",
+  "insightHotTwo": "过去结果中较常出现",
+  "insightHotThree": "根据过去结果，曾观察到类似模式",
+  "insightColdOne": "根据过去结果，观察到较少出现的号码 ❄️",
+  "insightColdTwo": "来自过去结果的较少出现号码",
+  "insightRandomOne": "有时随机也很有趣 🎲",
+  "insightRandomTwo": "随机模式，仅供参考",
+  "insightRandomThree": "随机选择，仅供娱乐",
+  "nextResultUpdateDays": "距离下次结果更新还有 {days} 天",
+  "@nextResultUpdateDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "nextResultUpdateHours": "距离下次结果更新还有 {hours} 小时",
+  "@nextResultUpdateHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "resultUpdateSoon": "结果即将更新！",
+  "referencePickLabel": "参考号码",
+  "referencePickWithStyle": "参考号码 · {style}",
+  "@referencePickWithStyle": {
+    "placeholders": {
+      "style": {}
+    }
+  },
+  "manualPickLabel": "👤 我的号码",
+  "trackingResult": "跟踪结果：{date}",
+  "@trackingResult": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "pickMainNumbers": "选择 {count} 个号码（{min}–{max}）",
+  "@pickMainNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "pickBonusNumbers": "选择 {count} 个{label}（{min}–{max}）",
+  "@pickBonusNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "label": {},
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "saveMyNumbers": "保存我的号码",
+  "pickMoreNumbers": "还需选择 {count} 个号码",
+  "@pickMoreNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pickMoreBonus": "还需选择 {count} 个{label}",
+  "@pickMoreBonus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "label": {}
+    }
+  },
+  "disclaimerTitle": "仅供娱乐 — 请理性参与。",
+  "disclaimerBody": "本应用仅基于历史数据提供号码选择。它不会预测结果、提高概率或保证任何结果。",
+  "settingsNotifications": "通知",
+  "settingsResults": "结果",
+  "settingsResultsSubtitle": "当你的已保存号码有可用历史结果时",
+  "settingsMyPicks": "我的号码",
+  "settingsMyPicksSubtitle": "当你保存的号码出现在近期结果中时",
+  "settingsDailyInsights": "每日洞察",
+  "settingsDailyInsightsSubtitle": "每天一条简短趋势观察",
+  "settingsWeeklySummary": "每周摘要",
+  "settingsWeeklySummarySubtitle": "每周日一份简短模式摘要",
+  "settingsMaxNotifications": "每天最多 2 条通知。",
+  "settingsLanguage": "语言",
+  "languageEnglish": "英语",
+  "languageChinese": "中文",
+  "languageFrench": "法语",
+  "settingsAbout": "关于",
+  "settingsHistoricalResultsOnly": "仅使用历史结果",
+  "settingsHistoricalResultsOnlyBody": "所有分析均基于历史结果。本应用不提供预测，也不会改善结果。",
+  "clearAllSavedPicksTitle": "清除所有已保存号码？",
+  "clearAll": "全部清除",
+  "pickDeleted": "号码已删除",
+  "yourStats": "你的统计",
+  "resultsChecked": "已检查 {count} 个结果",
+  "@resultsChecked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "top": "最佳",
+  "topWithTrophy": "🏆 最佳",
+  "totalHits": "总命中",
+  "similarityScore": "相似度分数",
+  "myPick": "👤 我的号码",
+  "noneYet": "暂无",
+  "mainCountLabel": "{count} 个主号",
+  "@mainCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "suppCountLabel": "{count} 个附加号",
+  "@suppCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mainSuppCountLabel": "{main}+{supp}",
+  "@mainSuppCountLabel": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "totalMainHits": "{main} 个主号",
+  "@totalMainHits": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      }
+    }
+  },
+  "totalMainSuppHits": "{main} 个主号 · {supp} 个附加号",
+  "@totalMainSuppHits": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "pending": "待定",
+  "pendingWithDate": "待定 · {date}",
+  "@pendingWithDate": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "copyPickText": "🎯 我的 {lotteryName} 号码组合\n{label}\n\n{main}{bonus}\n\n仅供娱乐生成 — NumberRun",
+  "@copyPickText": {
+    "placeholders": {
+      "lotteryName": {},
+      "label": {},
+      "main": {},
+      "bonus": {}
+    }
+  },
+  "copyPickBonusLine": "\n+ {label}: {numbers}",
+  "@copyPickBonusLine": {
+    "placeholders": {
+      "label": {},
+      "numbers": {}
+    }
+  },
+  "inlinePickCopyText": "{label}\n{lotteryName}: {main}{bonus}\n仅供娱乐生成 — NumberRun 🎯",
+  "@inlinePickCopyText": {
+    "placeholders": {
+      "label": {},
+      "lotteryName": {},
+      "main": {},
+      "bonus": {}
+    }
+  },
+  "inlinePickBonusInline": " + {numbers}",
+  "@inlinePickBonusInline": {
+    "placeholders": {
+      "numbers": {}
+    }
+  },
+  "savedWithCheck": "已保存 ✓",
+  "historyPastResultsCount": "{count} 条过去结果",
+  "@historyPastResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineModeSavedResults": "离线模式：显示已保存结果",
+  "offlineModeSavedResultsFrom": "离线模式：显示来自 {date} 的已保存结果",
+  "@offlineModeSavedResultsFrom": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "noHistoryData": "暂无历史数据。",
+  "noInternetNoSavedHistory": "没有网络连接，也没有已保存的彩票历史记录。",
+  "noInternetNoSavedResultHistory": "没有网络连接，也没有已保存的结果历史记录。",
+  "failedToLoadHistory": "加载历史记录失败。",
+  "recentPatternsTitle": "近期过去结果模式",
+  "recentPatternsSubtitle": "基于最近 {count} 条过去结果",
+  "@recentPatternsSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historicalComparisonOnly": "仅作历史比较 · 不保证结果",
+  "frequentNumbers": "较常出现的号码",
+  "frequentNumbersTooltip": "在过去结果中出现得更频繁",
+  "lessCommonNumbers": "较少出现的号码",
+  "lessCommonNumbersTooltip": "在过去结果中出现得较少",
+  "avgSum": "平均和值",
+  "oddEven": "奇/偶",
+  "lowHigh": "低/高",
+  "avgConsecPairs": "平均连续对数",
+  "notEnoughHistory": "历史结果不足，无法分析。",
+  "patternNotable": "显著模式",
+  "patternBalanced": "均衡",
+  "patternRandomLike": "类似随机",
+  "dailyInsightTitle": "今日洞察",
+  "savedPicksAnalysisTitle": "我的已保存号码分析",
+  "savedPicksAnalysisSubtitle": "与最近 20 条过去结果比较 · 仅作开奖后比较",
+  "topOverlap": "最高重合",
+  "numbersCount": "{count} 个号码",
+  "@numbersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "avgOverlap": "平均重合",
+  "perPastResult": "每条过去结果",
+  "oftenPicked": "常被选择",
+  "inRecentDraws": "出现在近期结果中",
+  "overlapLevelHigh": "重合等级：高",
+  "overlapLevelMedium": "重合等级：中",
+  "overlapLevelLow": "重合等级：低",
+  "historicalPatternNotEnough": "历史记录不足，无法进行模式分析（需要 52+ 条过去开奖）。",
+  "historicalPatternTitle": "历史模式比较",
+  "historicalPatternSubtitle": "基于过去 5 年的历史结果",
+  "trendComparison": "趋势比较",
+  "observedLessCommonComparison": "常见/低频比较",
+  "oddEvenStructure": "奇偶结构",
+  "lowHighStructure": "低高结构",
+  "sumRange": "和值范围",
+  "consecutivePairs": "连续对",
+  "consecutivePairCount": "{count} 个连续对",
+  "@consecutivePairCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "topSimilarPastResults": "前 10 个相似过去结果（仅供参考）",
+  "similarSharedNumbers": "重合 {count} 个号码",
+  "@similarSharedNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "similarStructuralSimilarity": "{percent}% 结构相似度",
+  "@similarStructuralSimilarity": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "observedMoreLessCommonCounts": "🔥 {hotCount} 个较常出现 · ❄️ {coldCount} 个较少出现",
+  "@observedMoreLessCommonCounts": {
+    "placeholders": {
+      "hotCount": {
+        "type": "int"
+      },
+      "coldCount": {
+        "type": "int"
+      }
+    }
+  },
+  "historicalPatternStrong": "与历史模式高度相似（仅供参考）",
+  "historicalPatternModerate": "与历史模式中度相似（仅供参考）",
+  "historicalPatternLimited": "与典型历史模式相似度有限（仅供参考）",
+  "drawResult": "开奖结果",
+  "supplementary": "附加号",
+  "yourNumbers": "你的号码",
+  "noMainMatched": "没有主号命中",
+  "checkOfficialResults": "请查看官方结果了解详情",
+  "noNumbersMatched": "没有号码命中",
+  "bonusMatched": "{label} 命中",
+  "@bonusMatched": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "matchedCount": "命中 {count} 个",
+  "@matchedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchedCountWithBonus": "命中 {count} 个 + {label}",
+  "@matchedCountWithBonus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "label": {}
+    }
+  },
+  "noMainWithSupp": "无主号 · {count} 个附加号",
+  "@noMainWithSupp": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchedWithSupp": "命中 {main} 个 + {supp} 个附加号",
+  "@matchedWithSupp": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "noMatch": "未命中",
+  "levelLightHit": "轻微命中",
+  "levelNice": "不错",
+  "levelSolid": "扎实",
+  "levelStrong": "强",
+  "levelGreat": "很好",
+  "unknown": "未知",
+  "belowTypicalRange": "低于典型范围",
+  "aboveTypicalRange": "高于典型范围",
+  "withinTypicalRange": "在典型范围内",
+  "drawAnalysisNotEnough": "开奖历史不足，无法分析。",
+  "drawAnalysisNoSavedPicks": "没有已保存号码或开奖记录可比较。",
+  "recentDrawsConcentrated": "近期结果显示少数号码活跃度较高 — 这一时期有明显集中。",
+  "periodMidRangeActive": "这一时期多个中段号码更活跃。",
+  "recentDrawsHigherRange": "近期结果偏向较高号码区间。",
+  "recentDrawsLowerRange": "近期结果偏向较低号码区间。",
+  "recentDrawsModerateSpread": "近期结果较均衡，号码分布适中。",
+  "recentDrawsNoStrongPattern": "近期结果较均衡，未检测到强模式。",
+  "weeklyNotableConcentration": "本周少数号码出现明显集中。",
+  "weeklyModerateSpread": "本周分布均衡，离散程度适中。",
+  "weeklyNoStrongTrend": "本周分布均衡，没有明显趋势。",
+  "savedPicksModerate": "你的已保存号码与近期结果有中等程度匹配。",
+  "savedNumbersAppeared": "你保存的多个号码出现在近期结果中。",
+  "savedPicksLimited": "你的已保存号码与近期开奖结果重合有限。",
+  "drawStrongHistoricalComparison": "本次开奖与过去 5 年的历史模式比较相似度较高。",
+  "drawModerateHistoricalComparison": "本次开奖与历史分布模式比较相似度中等。",
+  "drawLimitedHistoricalComparison": "本次开奖与典型历史模式比较相似度有限。",
+  "generatedForFunHistoricalPatterns": "基于历史模式生成，仅供娱乐。",
+  "suppShort": "附",
+  "mainAndBonusMatched": "{main} 个主号 + {bonusLabel} 命中",
+  "@mainAndBonusMatched": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "bonusLabel": {}
+    }
+  },
+  "mainMatched": "{main} 个主号命中",
+  "@mainMatched": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      }
+    }
+  },
+  "suppMatched": "{supp} 个附加号命中",
+  "@suppMatched": {
+    "placeholders": {
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "mainAndSuppMatched": "{main} 个主号 + {supp} 个附加号命中",
+  "@mainAndSuppMatched": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "shareNearMatch": "🔥 接近命中！",
+  "shareOnlyOneAway": "只差一个号码 👀",
+  "shareCanYouBeatThis": "你能超过这个吗？👀",
+  "shareNotBad": "🎯 还不错！",
+  "shareOfMainCount": "共 {count} 个",
+  "@shareOfMainCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shareTemplate": "模板",
+  "shareReferencePick": "⭐ 参考号码",
+  "sharePng": "分享 PNG",
+  "shareDefaultPick": "我的号码组合 🎯 — 由 NumberRun 生成",
+  "shareDefaultPicks": "我的号码组合 🎯 — 由 NumberRun 生成",
+  "shareNumberComparison": "🔥 NumberRun 号码比较",
+  "shareNumberOverlap": "🎯 NumberRun 号码重合",
+  "shareRandomResult": "😆 NumberRun 随机结果",
+  "shareTemplateFireLabel": "🔥 接近重合",
+  "shareTemplateElectricLabel": "🎯 号码重合",
+  "shareTemplateWarmLabel": "😂 随机结果",
+  "shareTemplateFireDescription": "金色深色风格卡片，适合接近命中和强命中记录。",
+  "shareTemplateElectricDescription": "简洁霓虹统计卡，适合较小命中和部分匹配。",
+  "shareTemplateWarmDescription": "轻松有趣的激励卡，适合待开奖、未命中或仅分享号码。",
+  "shareNotToday": "今天还不是",
+  "shareZeroOverlapped": "0 个重合",
+  "shareRandomResultPlain": "随机结果",
+  "shareResultIncoming": "结果即将更新！",
+  "shareWaitingForResults": "等待结果中 🤞",
+  "shareMyNumberPick": "我的号码组合",
+  "shareLetsSee": "看看会发生什么 👀",
+  "shareTheseAreMyNumbers": "这些是我的号码 ↑",
+  "shareFunnyFail": "😂 有趣未中",
+  "shareCardPreviewTitle": "分享卡片预览",
+  "shareCardPreviewSubtitle": "为 {lotteryName} 选择一种样式，或保留默认选项。",
+  "@shareCardPreviewSubtitle": {
+    "placeholders": {
+      "lotteryName": {}
+    }
+  },
+  "resultPanelNoOverlap": "上一条过去结果（{date}）没有重合",
+  "@resultPanelNoOverlap": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "resultPanelBonusAppeared": "{bonusLabel} 出现在上一条过去结果中（{date}）",
+  "@resultPanelBonusAppeared": {
+    "placeholders": {
+      "bonusLabel": {},
+      "date": {}
+    }
+  },
+  "resultPanelOverlap": "{count}{bonusSuffix} 个号码与上一条过去结果重合（{date}）",
+  "@resultPanelOverlap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "bonusSuffix": {},
+      "date": {}
+    }
+  },
+  "bonusSuffix": " + {bonusLabel}",
+  "@bonusSuffix": {
+    "placeholders": {
+      "bonusLabel": {}
+    }
+  },
+  "notificationResultReadyChannel": "结果已准备好",
+  "notificationResultReadyTitle": "结果已准备好 🎯",
+  "notificationResultsReadyTitle": "{count} 个结果已准备好 🎯",
+  "@notificationResultsReadyTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationSavedNumbersReady": "你保存的彩票号码可以查看了",
+  "notificationDailyInsightsChannel": "每日洞察",
+  "notificationDailyInsightTitle": "今日洞察 📊",
+  "notificationWeeklySummaryChannel": "每周摘要",
+  "notificationWeeklySummaryTitle": "每周摘要 📅",
+  "notificationResultsDescription": "当彩票开奖结果可用时通知",
+  "notificationDailyDescription": "每日开奖趋势观察",
+  "notificationWeeklyDescription": "每周开奖模式摘要",
+  "lotteryHistoryNoRemoteCsv": "未为 {lottery} 配置远程 CSV。",
+  "@lotteryHistoryNoRemoteCsv": {
+    "placeholders": {
+      "lottery": {}
+    }
+  },
+  "lotteryHistoryLoadFailed": "加载历史 CSV 失败（{statusCode}）。",
+  "@lotteryHistoryLoadFailed": {
+    "placeholders": {
+      "statusCode": {
+        "type": "int"
+      }
+    }
+  },
+  "lotteryHistoryCsvEmpty": "历史 CSV 为空。",
+  "lotteryHistoryNoValidRows": "CSV 中没有找到有效开奖行。",
+  "lotteryHistoryParseFailed": "解析历史 CSV 失败：{error}",
+  "@lotteryHistoryParseFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  }
+}

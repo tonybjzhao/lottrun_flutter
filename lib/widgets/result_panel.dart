@@ -94,15 +94,16 @@ class _ResultPanelState extends State<ResultPanel>
           )
         : '';
     return l10n.copyPickText(
-      widget.lottery.name,
+      l10n.lotteryName(widget.lottery),
       l10n.playStyleTagline(widget.pick.style),
       main,
       bonusLine,
     );
   }
 
-  String _bonusLabel(AppLocalizations l10n) =>
-      widget.lottery.bonusLabel ?? l10n.commonSupp;
+  String _bonusLabel(AppLocalizations l10n) => widget.lottery.bonusLabel == null
+      ? l10n.commonSupp
+      : l10n.lotteryBonusLabel(widget.lottery);
 
   Future<void> _copy(BuildContext context) async {
     HapticFeedback.lightImpact();
@@ -224,7 +225,7 @@ class _ResultPanelState extends State<ResultPanel>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${l10n.playStyleTagline(widget.pick.style)} · ${widget.lottery.name}',
+                            '${l10n.playStyleTagline(widget.pick.style)} · ${l10n.lotteryName(widget.lottery)}',
                             style: theme.textTheme.titleMedium?.copyWith(
                               color: theme.colorScheme.primary,
                               fontWeight: FontWeight.w800,

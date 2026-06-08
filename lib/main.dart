@@ -8,14 +8,16 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'app.dart';
 import 'firebase_options.dart';
 import 'services/analytics_service.dart';
+import 'services/locale_service.dart';
 import 'services/notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   unawaited(NotificationService.instance.init());
   AnalyticsService.init(_initFirebase());
+  await LocaleService.instance.load();
   await _initAds();
-  runApp(const LottFunApp());
+  runApp(LottFunApp(localeService: LocaleService.instance));
 }
 
 /// Initializes AdMob and registers test device IDs in debug builds
@@ -31,9 +33,7 @@ Future<void> _initAds() async {
     // Remove or leave empty before release — has no effect in release builds
     // since kDebugMode is false.
     await MobileAds.instance.updateRequestConfiguration(
-      RequestConfiguration(
-        testDeviceIds: ['c9807b9b342ebb9faedbeeb80e9905ed'],
-      ),
+      RequestConfiguration(testDeviceIds: ['c9807b9b342ebb9faedbeeb80e9905ed']),
     );
   }
 }

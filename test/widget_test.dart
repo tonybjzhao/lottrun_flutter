@@ -7,12 +7,13 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lottfun_flutter/app.dart';
+import 'package:lottfun_flutter/services/locale_service.dart';
 
 void main() {
   testWidgets('App smoke test — LottFun renders home screen', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const LottFunApp());
+    await tester.pumpWidget(LottFunApp(localeService: LocaleService.instance));
     await tester.pumpAndSettle();
     expect(find.text('LottFun'), findsNothing); // RichText, not plain Text
     expect(find.text('Generate 1 Pick'), findsOneWidget);

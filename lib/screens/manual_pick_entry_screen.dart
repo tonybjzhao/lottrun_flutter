@@ -90,7 +90,9 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
     if (mounted) Navigator.pop(context, true);
   }
 
-  String _bonusLabel() => _lottery.bonusLabel ?? context.l10n.commonSupp;
+  String _bonusLabel() => _lottery.bonusLabel == null
+      ? context.l10n.commonSupp
+      : context.l10n.lotteryBonusLabel(_lottery);
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +128,7 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
                         items: kSeedLotteries.map((l) {
                           return DropdownMenuItem(
                             value: l,
-                            child: Text(l.displayName),
+                            child: Text(l10n.lotteryDisplayName(l)),
                           );
                         }).toList(),
                         onChanged: _onLotteryChanged,

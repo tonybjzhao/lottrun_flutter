@@ -431,6 +431,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsMaxNotifications => 'Max 2 notifications per day total.';
 
   @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageChinese => 'Chinese';
+
+  @override
+  String get languageFrench => 'French';
+
+  @override
   String get settingsAbout => 'About';
 
   @override

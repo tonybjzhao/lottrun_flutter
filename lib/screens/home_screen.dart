@@ -534,7 +534,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   items: kSeedLotteries.map((l) {
                     return DropdownMenuItem(
                       value: l,
-                      child: Text(l.displayName),
+                      child: Text(l10n.lotteryDisplayName(l)),
                     );
                   }).toList(),
                   onChanged: (l) {
@@ -953,7 +953,12 @@ class _InlinePickCard extends StatelessWidget {
     final bonus = (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
         ? l10n.inlinePickBonusInline(pick.bonusNumbers!.join(' '))
         : '';
-    return l10n.inlinePickCopyText(label, lottery.name, main, bonus);
+    return l10n.inlinePickCopyText(
+      label,
+      l10n.lotteryName(lottery),
+      main,
+      bonus,
+    );
   }
 
   Future<void> _copy(BuildContext context) async {
@@ -1051,7 +1056,9 @@ class _InlinePickCard extends StatelessWidget {
                     BallRow(
                       mainNumbers: pick.mainNumbers,
                       bonusNumbers: pick.bonusNumbers ?? [],
-                      bonusLabel: lottery.bonusLabel,
+                      bonusLabel: lottery.bonusLabel == null
+                          ? null
+                          : context.l10n.lotteryBonusLabel(lottery),
                       ballSize: 38,
                       spacing: 6,
                     ),
