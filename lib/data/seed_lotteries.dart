@@ -27,7 +27,7 @@ final List<Lottery> kSeedLotteries = [
     mainCount: 7,
     mainMin: 1,
     mainMax: 47,
-    bonusCount: 3,
+    bonusCount: 2,  // Fixed: was 3, official rules are 2 supplementary
     bonusMin: 1,
     bonusMax: 47,
     // bonusLabel: null → supplementary style (Supp row)
@@ -114,10 +114,10 @@ final List<Lottery> kSeedLotteries = [
     name: _l10n.lotteryLottoMax,
     mainCount: 7,
     mainMin: 1,
-    mainMax: 52,
+    mainMax: 50,  // Fixed: was 52, official rules changed to 1-50 in May 2019
     bonusCount: 1,
     bonusMin: 1,
-    bonusMax: 52,
+    bonusMax: 50,  // Fixed: was 52
     // bonusLabel: null → same-pool bonus number, shown as supplementary.
   ),
   Lottery(
