@@ -243,225 +243,197 @@ class AppLocalizationsJa extends AppLocalizations {
   String get styleRandom => 'ランダム';
 
   @override
-  String get styleBalancedTagline => 'Balanced Pick';
+  String get styleBalancedTagline => 'バランス選択';
 
   @override
-  String get styleHotTagline => 'Example Pattern Pick';
+  String get styleHotTagline => 'パターン例';
 
   @override
-  String get styleColdTagline => 'Historical Number Example';
+  String get styleColdTagline => '過去の数字例';
 
   @override
-  String get styleRandomTagline => 'Random Pick';
+  String get styleRandomTagline => 'ランダム選択';
 
   @override
-  String get styleBalancedSubtitle => 'Even spread across all number ranges.';
+  String get styleBalancedSubtitle => 'すべての数字範囲に均等に分散。';
 
   @override
-  String get styleHotSubtitle =>
-      'These numbers were observed more often in past results.';
+  String get styleHotSubtitle => '過去の結果でより頻繁に観察された数字。';
 
   @override
-  String get styleColdSubtitle =>
-      'These numbers were observed less often in past results.';
+  String get styleColdSubtitle => '過去の結果であまり観察されなかった数字。';
 
   @override
-  String get styleRandomSubtitle =>
-      'Completely random selection. Just for fun.';
+  String get styleRandomSubtitle => '完全にランダムな選択。楽しみのため。';
 
   @override
-  String get styleBalancedDescription => '過去の抽選データに基づいた分散型';
+  String get styleBalancedDescription => '数字範囲全体に均等に分散';
 
   @override
-  String get styleHotDescription =>
-      'Based on recent frequency in past results (for reference only)';
+  String get styleHotDescription => '過去の結果の最近の頻度に基づく（参考用）';
 
   @override
-  String get styleColdDescription =>
-      'Based on less frequent historical numbers (for reference only)';
+  String get styleColdDescription => '頻度の低い過去の数字に基づく（参考用）';
 
   @override
-  String get styleRandomDescription => '完全にランダムな選択';
+  String get styleRandomDescription => 'ランダム選択（参考用）';
 
   @override
-  String get threePickExample => 'Example Pick';
+  String get threePickExample => '例';
 
   @override
-  String get threePickExampleStar => '⭐ Example Pick';
+  String get threePickExampleStar => '⭐ 例';
 
   @override
-  String get threePickCommonPattern => 'Common Pattern';
+  String get threePickCommonPattern => 'よくあるパターン';
 
   @override
-  String get threePickRandomSurprise => 'Random Surprise';
+  String get threePickRandomSurprise => 'ランダムサプライズ';
 
   @override
-  String get threePickRandomSurpriseDice => '🎲 Random Surprise';
+  String get threePickRandomSurpriseDice => '🎲 ランダムサプライズ';
 
   @override
-  String get threePickBalancedMicrocopy =>
-      'Balanced selection based on past results';
+  String get threePickBalancedMicrocopy => '過去の結果に基づくバランス選択';
 
   @override
-  String get threePickHotMicrocopy =>
-      'These numbers were observed more often in past results';
+  String get threePickHotMicrocopy => '過去の結果でより頻繁に観察された数字';
 
   @override
-  String get threePickRandomMicrocopy =>
-      'Random selection for reference only 🎲';
+  String get threePickRandomMicrocopy => '参考用のランダム選択 🎲';
 
   @override
-  String get insightBalancedOne =>
-      'Based on past data, this shows a balanced spread for reference';
+  String get insightBalancedOne => '過去のデータに基づくと、これは参考のためのバランスの取れた分散を示しています';
 
   @override
-  String get insightBalancedTwo => 'History points to an even distribution';
+  String get insightBalancedTwo => '過去は均等な分布を示しています';
 
   @override
-  String get insightBalancedThree =>
-      'Balanced number spread seen in past results';
+  String get insightBalancedThree => '過去の結果で見られたバランスの取れた数字分散';
 
   @override
-  String get insightHotOne => 'Recent results show similar patterns';
+  String get insightHotOne => '最近の結果は同様のパターンを示しています';
 
   @override
-  String get insightHotTwo => 'Frequently observed in past results';
+  String get insightHotTwo => '過去の結果で頻繁に観察されました';
 
   @override
-  String get insightHotThree =>
-      'Based on past results, a similar pattern was observed';
+  String get insightHotThree => '過去の結果に基づくと、同様のパターンが観察されました';
 
   @override
-  String get insightColdOne =>
-      'Based on past results, less common numbers were observed ❄️';
+  String get insightColdOne => '過去の結果に基づくと、あまり出ない数字が観察されました ❄️';
 
   @override
-  String get insightColdTwo => 'Less common numbers from past results';
+  String get insightColdTwo => '過去の結果からのあまり出ない数字';
 
   @override
-  String get insightRandomOne => 'Sometimes randomness is fun 🎲';
+  String get insightRandomOne => '時にはランダムも楽しいです 🎲';
 
   @override
-  String get insightRandomTwo => 'Random pattern for reference only';
+  String get insightRandomTwo => '参考用のランダムパターン';
 
   @override
-  String get insightRandomThree => 'Random selection for fun';
+  String get insightRandomThree => '楽しみのためのランダム選択';
 
   @override
   String nextResultUpdateDays(int days) {
-    return 'Next result update in ${days}d';
+    return '次の結果更新まで$days日';
   }
 
   @override
   String nextResultUpdateHours(int hours) {
-    return 'Next result update in ${hours}h';
+    return '次の結果更新まで$hours時間';
   }
 
   @override
-  String get resultUpdateSoon => 'Result update soon!';
+  String get resultUpdateSoon => 'まもなく結果更新！';
 
   @override
-  String get referencePickLabel => 'Reference Pick';
+  String get referencePickLabel => '参考選択';
 
   @override
   String referencePickWithStyle(Object style) {
-    return 'Reference Pick · $style';
+    return '参考選択 · $style';
   }
 
   @override
-  String get manualPickLabel => '👤 My Numbers';
+  String get manualPickLabel => '👤 自分の数字';
 
   @override
   String trackingResult(Object date) {
-    return 'Tracking result: $date';
+    return '結果追跡中: $date';
   }
 
   @override
   String pickMainNumbers(int count, int min, int max) {
-    return 'Pick $count numbers  ($min–$max)';
+    return '$count個の数字を選択  ($min–$max)';
   }
 
   @override
   String pickBonusNumbers(int count, Object label, int min, int max) {
-    return 'Pick $count $label  ($min–$max)';
+    return '$count個の$labelを選択  ($min–$max)';
   }
 
   @override
-  String get saveMyNumbers => 'Save My Numbers';
+  String get saveMyNumbers => '自分の数字を保存';
 
   @override
   String pickMoreNumbers(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'numbers',
-      one: 'number',
-    );
-    return 'Pick $count more $_temp0';
+    return 'あと$count個の数字を選択';
   }
 
   @override
   String pickMoreBonus(int count, Object label) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 's',
-      one: '',
-    );
-    return 'Pick $count more $label$_temp0';
+    return 'あと$count個の$labelを選択';
   }
 
   @override
-  String get disclaimerTitle => 'Just for fun — play responsibly.';
+  String get disclaimerTitle => '楽しみのため — 責任を持って遊びましょう。';
 
   @override
   String get disclaimerBody =>
-      'This app provides number selections based on historical data only. It does NOT predict results, improve odds, or guarantee outcomes.';
+      'このアプリは過去のデータのみに基づいた数字選択を提供します。結果を予測したり、当選確率を上げたり、結果を保証するものではありません。';
 
   @override
-  String get settingsNotifications => 'Notifications';
+  String get settingsNotifications => '通知';
 
   @override
-  String get settingsResults => 'Results';
+  String get settingsResults => '結果';
 
   @override
-  String get settingsResultsSubtitle =>
-      'When past results are available for your saved picks';
+  String get settingsResultsSubtitle => '保存した選択の過去の結果が利用可能なとき';
 
   @override
-  String get settingsMyPicks => 'My Picks';
+  String get settingsMyPicks => '自分の選択';
 
   @override
-  String get settingsMyPicksSubtitle =>
-      'When your saved numbers appear in recent results';
+  String get settingsMyPicksSubtitle => '保存した数字が最近の結果に現れたとき';
 
   @override
-  String get settingsDailyInsights => 'Daily Insights';
+  String get settingsDailyInsights => 'デイリーインサイト';
 
   @override
-  String get settingsDailyInsightsSubtitle =>
-      'One short trend observation per day';
+  String get settingsDailyInsightsSubtitle => '1日1回の短いトレンド観察';
 
   @override
-  String get settingsWeeklySummary => 'Weekly Summary';
+  String get settingsWeeklySummary => '週間サマリー';
 
   @override
-  String get settingsWeeklySummarySubtitle =>
-      'A brief weekly pattern summary every Sunday';
+  String get settingsWeeklySummarySubtitle => '毎週日曜日の簡単な週間パターンサマリー';
 
   @override
-  String get settingsNotificationTime => 'Notification time';
+  String get settingsNotificationTime => '通知時刻';
 
   @override
   String settingsNotificationTimeSubtitle(Object time) {
-    return 'Daily and weekly insights are scheduled for $time.';
+    return 'デイリーおよび週間インサイトは$timeに予定されています。';
   }
 
   @override
-  String get settingsMaxNotifications => 'Max 2 notifications per day total.';
+  String get settingsMaxNotifications => '1日最大2件の通知。';
 
   @override
-  String get settingsLanguage => 'Language';
+  String get settingsLanguage => '言語';
 
   @override
   String get languageEnglish => 'English';
@@ -482,96 +454,89 @@ class AppLocalizationsJa extends AppLocalizations {
   String get languageJapanese => '日本語';
 
   @override
-  String get settingsAnalysisStyle => 'Analysis Style';
+  String get settingsAnalysisStyle => '分析スタイル';
 
   @override
-  String get settingsAnalysisStyleSubtitle =>
-      'How historical trends are weighted';
+  String get settingsAnalysisStyleSubtitle => '過去のトレンドの重み付け方法';
 
   @override
-  String get analysisStyleRecentTrend => 'Recent Trend';
+  String get analysisStyleRecentTrend => '最近のトレンド';
 
   @override
   String get analysisStyleRecentTrendDescription =>
-      'Emphasizes recent patterns (0–12 weeks: 70%, 13–52 weeks: 20%, 1–5 years: 10%)';
+      '最近のパターンを重視（0〜12週: 70%、13〜52週: 20%、1〜5年: 10%）';
 
   @override
-  String get analysisStyleBalanced => 'Balanced';
+  String get analysisStyleBalanced => 'バランス型';
 
   @override
   String get analysisStyleBalancedDescription =>
-      'Equal consideration across time periods (0–12 weeks: 50%, 13–52 weeks: 30%, 1–5 years: 20%)';
+      '期間全体で均等に考慮（0〜12週: 50%、13〜52週: 30%、1〜5年: 20%）';
 
   @override
-  String get analysisStyleLongTermPattern => 'Long-Term Pattern';
+  String get analysisStyleLongTermPattern => '長期パターン';
 
   @override
   String get analysisStyleLongTermPatternDescription =>
-      'Emphasizes historical patterns (0–12 weeks: 30%, 13–52 weeks: 30%, 1–5 years: 40%)';
+      '過去のパターンを重視（0〜12週: 30%、13〜52週: 30%、1〜5年: 40%）';
 
   @override
   String get analysisStyleDisclaimer =>
-      'This only changes how historical trends are weighted. It does not improve the odds of winning.';
+      'これは過去のトレンドの重み付け方法を変更するだけです。当選確率を改善するものではありません。';
 
   @override
-  String get settingsAbout => 'About';
+  String get settingsAbout => 'アプリについて';
 
   @override
-  String get settingsHistoricalResultsOnly => 'Historical results only';
+  String get settingsHistoricalResultsOnly => '過去の結果のみ';
 
   @override
   String get settingsHistoricalResultsOnlyBody =>
-      'All analysis is based on historical results. This app does not provide predictions or improve outcomes.';
+      'すべての分析は過去の結果に基づいています。このアプリは予測を提供したり、結果を改善したりするものではありません。';
 
   @override
-  String get clearAllSavedPicksTitle => 'Clear all saved picks?';
+  String get clearAllSavedPicksTitle => '保存したすべての選択を削除しますか？';
 
   @override
-  String get clearAll => 'Clear all';
+  String get clearAll => 'すべて削除';
 
   @override
-  String get pickDeleted => 'Pick deleted';
+  String get pickDeleted => '選択を削除しました';
 
   @override
-  String get yourStats => 'Your Stats';
+  String get yourStats => 'あなたの統計';
 
   @override
   String resultsChecked(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'results',
-      one: 'result',
-    );
-    return '$count $_temp0 checked';
+    return '$count件の結果を確認';
   }
 
   @override
-  String get top => 'Top';
+  String get top => 'トップ';
 
   @override
-  String get topWithTrophy => '🏆 Top';
+  String get topWithTrophy => '🏆 トップ';
 
   @override
-  String get totalHits => 'Total Hits';
+  String get totalHits => '合計ヒット数';
 
   @override
-  String get similarityScore => 'Similarity Score';
+  String get similarityScore => '類似度スコア';
 
   @override
-  String get myPick => '👤 My Pick';
+  String get myPick => '👤 自分の選択';
 
   @override
-  String get noneYet => 'None yet';
+  String get noneYet => 'まだありません';
 
   @override
   String mainCountLabel(int count) {
-    return '$count main';
+    return '$count個本数字';
   }
 
   @override
   String suppCountLabel(int count) {
-    return '$count supp';
+    return '$count個追加';
   }
 
   @override
@@ -581,20 +546,20 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String totalMainHits(int main) {
-    return '$main main';
+    return '$main個本数字';
   }
 
   @override
   String totalMainSuppHits(int main, int supp) {
-    return '$main main · $supp supp';
+    return '$main個本数字 · $supp個追加';
   }
 
   @override
-  String get pending => 'Pending';
+  String get pending => '保留中';
 
   @override
   String pendingWithDate(Object date) {
-    return 'Pending · $date';
+    return '保留中 · $date';
   }
 
   @override
@@ -604,7 +569,7 @@ class AppLocalizationsJa extends AppLocalizations {
     Object main,
     Object bonus,
   ) {
-    return '🎯 My $lotteryName Number Set\n$label\n\n$main$bonus\n\nGenerated for fun — NumberRun';
+    return '🎯 $lotteryNameの数字セット\n$label\n\n$main$bonus\n\n楽しみのため生成 — NumberRun';
   }
 
   @override
@@ -619,7 +584,7 @@ class AppLocalizationsJa extends AppLocalizations {
     Object main,
     Object bonus,
   ) {
-    return '$label\n$lotteryName: $main$bonus\nGenerated for fun — NumberRun 🎯';
+    return '$label\n$lotteryName: $main$bonus\n楽しみのため生成 — NumberRun 🎯';
   }
 
   @override
@@ -628,332 +593,298 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get savedWithCheck => 'Saved ✓';
+  String get savedWithCheck => '保存済み ✓';
 
   @override
   String historyPastResultsCount(int count) {
-    return '$count past results';
+    return '$count件の過去の結果';
   }
 
   @override
-  String get offlineModeSavedResults => 'Offline mode: showing saved results';
+  String get offlineModeSavedResults => 'オフラインモード: 保存された結果を表示';
 
   @override
   String offlineModeSavedResultsFrom(Object date) {
-    return 'Offline mode: showing saved results from $date';
+    return 'オフラインモード: $dateからの保存された結果を表示';
   }
 
   @override
-  String get noHistoryData => 'No history data available yet.';
+  String get noHistoryData => '履歴データはまだありません。';
 
   @override
-  String get noInternetNoSavedHistory =>
-      'No internet connection and no saved lottery history yet.';
+  String get noInternetNoSavedHistory => 'インターネット接続がなく、保存された宝くじ履歴もありません。';
 
   @override
-  String get noInternetNoSavedResultHistory =>
-      'No internet connection and no saved result history yet.';
+  String get noInternetNoSavedResultHistory => 'インターネット接続がなく、保存された結果履歴もありません。';
 
   @override
-  String get failedToLoadHistory => 'Failed to load history.';
+  String get failedToLoadHistory => '履歴の読み込みに失敗しました。';
 
   @override
-  String get recentPatternsTitle => 'Recent Past Result Patterns';
+  String get recentPatternsTitle => '最近の過去の結果パターン';
 
   @override
   String recentPatternsSubtitle(int count) {
-    return 'Based on the last $count past results';
+    return '過去$count件の結果に基づく';
   }
 
   @override
-  String get historicalComparisonOnly =>
-      'Historical comparison only · no guarantee of outcomes';
+  String get historicalComparisonOnly => '過去との比較のみ · 結果を保証するものではありません';
 
   @override
-  String get frequentNumbers => 'Frequently observed numbers';
+  String get frequentNumbers => 'よく出る数字';
 
   @override
-  String get frequentNumbersTooltip => 'Observed more often in past results';
+  String get frequentNumbersTooltip => '過去の結果でより頻繁に観察';
 
   @override
-  String get lessCommonNumbers => 'Less common numbers';
+  String get lessCommonNumbers => 'あまり出ない数字';
 
   @override
-  String get lessCommonNumbersTooltip => 'Observed less often in past results';
+  String get lessCommonNumbersTooltip => '過去の結果であまり観察されない';
 
   @override
-  String get avgSum => 'Avg sum';
+  String get avgSum => '平均合計';
 
   @override
-  String get oddEven => 'Odd/Even';
+  String get oddEven => '奇数/偶数';
 
   @override
-  String get lowHigh => 'Low/High';
+  String get lowHigh => '低/高';
 
   @override
-  String get avgConsecPairs => 'Avg consec pairs';
+  String get avgConsecPairs => '平均連続ペア';
 
   @override
-  String get notEnoughHistory => 'Not enough past result history for analysis.';
+  String get notEnoughHistory => '分析するための十分な過去の結果履歴がありません。';
 
   @override
-  String get patternNotable => 'Notable pattern';
+  String get patternNotable => '注目すべきパターン';
 
   @override
-  String get patternBalanced => 'Balanced';
+  String get patternBalanced => 'バランス型';
 
   @override
-  String get patternRandomLike => 'Random-like';
+  String get patternRandomLike => 'ランダム的';
 
   @override
-  String get odd => 'odd';
+  String get odd => '奇数';
 
   @override
-  String get even => 'even';
+  String get even => '偶数';
 
   @override
-  String get low => 'low';
+  String get low => '低';
 
   @override
-  String get high => 'high';
+  String get high => '高';
 
   @override
-  String get dailyInsightTitle => 'Today\'s Insight';
+  String get dailyInsightTitle => '今日のインサイト';
 
   @override
-  String get savedPicksAnalysisTitle => 'My Saved Picks Analysis';
+  String get savedPicksAnalysisTitle => '保存した選択の分析';
 
   @override
-  String get savedPicksAnalysisSubtitle =>
-      'Compared with recent 20 past results · post-result comparison only';
+  String get savedPicksAnalysisSubtitle => '最近20件の過去の結果と比較 · 結果後の比較のみ';
 
   @override
-  String get topOverlap => 'Top overlap';
+  String get topOverlap => 'トップ一致';
 
   @override
   String numbersCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'numbers',
-      one: 'number',
-    );
-    return '$count $_temp0';
+    return '$count個の数字';
   }
 
   @override
-  String get avgOverlap => 'Avg overlap';
+  String get avgOverlap => '平均一致';
 
   @override
-  String get perPastResult => 'per past result';
+  String get perPastResult => '過去の結果ごと';
 
   @override
-  String get oftenPicked => 'Often picked';
+  String get oftenPicked => 'よく選ばれた';
 
   @override
-  String get inRecentDraws => 'In recent draws';
+  String get inRecentDraws => '最近の抽選で';
 
   @override
-  String get overlapLevelHigh => 'Overlap level: High';
+  String get overlapLevelHigh => '一致レベル: 高';
 
   @override
-  String get overlapLevelMedium => 'Overlap level: Medium';
+  String get overlapLevelMedium => '一致レベル: 中';
 
   @override
-  String get overlapLevelLow => 'Overlap level: Low';
+  String get overlapLevelLow => '一致レベル: 低';
 
   @override
   String get historicalPatternNotEnough =>
-      'Not enough history for pattern analysis (requires 52+ past draws).';
+      'パターン分析には十分な履歴がありません（52件以上の過去の抽選が必要）。';
 
   @override
-  String get historicalPatternTitle => 'Historical Pattern Comparison';
+  String get historicalPatternTitle => '過去のパターン比較';
 
   @override
-  String get historicalPatternSubtitle =>
-      'Based on past results from the last 5 years';
+  String get historicalPatternSubtitle => '過去5年間の過去の結果に基づく';
 
   @override
-  String get trendComparison => 'Trend comparison';
+  String get trendComparison => 'トレンド比較';
 
   @override
-  String get observedLessCommonComparison => 'Observed/less-common comparison';
+  String get observedLessCommonComparison => 'よく出る/あまり出ない比較';
 
   @override
-  String get oddEvenStructure => 'Odd/even structure';
+  String get oddEvenStructure => '奇数/偶数構造';
 
   @override
-  String get lowHighStructure => 'Low/high structure';
+  String get lowHighStructure => '低/高構造';
 
   @override
-  String get sumRange => 'Sum range';
+  String get sumRange => '合計範囲';
 
   @override
-  String get consecutivePairs => 'Consecutive pairs';
+  String get consecutivePairs => '連続ペア';
 
   @override
   String consecutivePairCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'pairs',
-      one: 'pair',
-    );
-    return '$count consec $_temp0';
+    return '$count個の連続ペア';
   }
 
   @override
-  String get topSimilarPastResults =>
-      'Top 10 similar past results (for reference only)';
+  String get topSimilarPastResults => 'トップ10の類似過去結果（参考用）';
 
   @override
   String similarSharedNumbers(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'numbers',
-      one: 'number',
-    );
-    return '$count $_temp0 overlapped';
+    return '$count個の数字が一致';
   }
 
   @override
   String similarStructuralSimilarity(Object percent) {
-    return '$percent% structural similarity';
+    return '$percent%の構造的類似性';
   }
 
   @override
   String observedMoreLessCommonCounts(int hotCount, int coldCount) {
-    return '🔥 $hotCount observed more often · ❄️ $coldCount less common';
+    return '🔥 $hotCount個よく出る · ❄️ $coldCount個あまり出ない';
   }
 
   @override
-  String get historicalPatternStrong =>
-      'Strong comparison with historical patterns (for reference only)';
+  String get historicalPatternStrong => '過去のパターンと強い比較（参考用）';
 
   @override
-  String get historicalPatternModerate =>
-      'Moderate comparison with historical patterns (for reference only)';
+  String get historicalPatternModerate => '過去のパターンと中程度の比較（参考用）';
 
   @override
-  String get historicalPatternLimited =>
-      'Limited comparison with historical patterns (for reference only)';
+  String get historicalPatternLimited => '過去のパターンと限定的な比較（参考用）';
 
   @override
-  String get drawResult => 'DRAW RESULT';
+  String get drawResult => '抽選結果';
 
   @override
-  String get supplementary => 'SUPPLEMENTARY';
+  String get supplementary => '追加数字';
 
   @override
-  String get yourNumbers => 'YOUR NUMBERS';
+  String get yourNumbers => 'あなたの数字';
 
   @override
-  String get noMainMatched => 'No main matched';
+  String get noMainMatched => '本数字の一致なし';
 
   @override
-  String get checkOfficialResults => 'Check official results for details';
+  String get checkOfficialResults => '詳細は公式結果を確認してください';
 
   @override
-  String get noNumbersMatched => 'No numbers matched';
+  String get noNumbersMatched => '数字の一致なし';
 
   @override
   String bonusMatched(Object label) {
-    return '$label matched';
+    return '$labelが一致';
   }
 
   @override
   String matchedCount(int count) {
-    return '$count matched';
+    return '$count個一致';
   }
 
   @override
   String matchedCountWithBonus(int count, Object label) {
-    return '$count matched + $label';
+    return '$count個一致 + $label';
   }
 
   @override
   String noMainWithSupp(int count) {
-    return 'No main · ${count}s';
+    return '本数字なし · $count個追加';
   }
 
   @override
   String matchedWithSupp(int main, int supp) {
-    return '$main matched + ${supp}s';
+    return '$main個一致 + $supp個追加';
   }
 
   @override
-  String get noMatch => 'No match';
+  String get noMatch => '一致なし';
 
   @override
-  String get levelLightHit => 'Light hit';
+  String get levelLightHit => '軽い一致';
 
   @override
-  String get levelNice => 'Nice';
+  String get levelNice => '良い';
 
   @override
-  String get levelSolid => 'Solid';
+  String get levelSolid => '確実';
 
   @override
-  String get levelStrong => 'Strong';
+  String get levelStrong => '強い';
 
   @override
-  String get levelGreat => 'Great';
+  String get levelGreat => '素晴らしい';
 
   @override
-  String get unknown => 'Unknown';
+  String get unknown => '不明';
 
   @override
-  String get belowTypicalRange => 'Below typical range';
+  String get belowTypicalRange => '通常範囲以下';
 
   @override
-  String get aboveTypicalRange => 'Above typical range';
+  String get aboveTypicalRange => '通常範囲以上';
 
   @override
-  String get withinTypicalRange => 'Within typical range';
+  String get withinTypicalRange => '通常範囲内';
 
   @override
-  String get drawAnalysisNotEnough => 'Not enough draw history for analysis.';
+  String get drawAnalysisNotEnough => '分析するための十分な抽選履歴がありません。';
 
   @override
-  String get drawAnalysisNoSavedPicks =>
-      'No saved picks or draw history to compare.';
+  String get drawAnalysisNoSavedPicks => '比較するための保存した選択または抽選履歴がありません。';
 
   @override
   String get recentDrawsConcentrated =>
-      'Recent draws show higher activity among a few numbers — a notable concentration in this period.';
+      '最近の抽選は少数の数字にアクティビティが集中しています — この期間の注目すべき集中。';
 
   @override
-  String get periodMidRangeActive =>
-      'This period shows higher activity among several mid-range numbers.';
+  String get periodMidRangeActive => 'この期間はいくつかの中間範囲の数字でアクティビティが高くなっています。';
 
   @override
-  String get recentDrawsHigherRange =>
-      'Recent draws have leaned toward higher-range numbers.';
+  String get recentDrawsHigherRange => '最近の抽選は高範囲の数字に傾いています。';
 
   @override
-  String get recentDrawsLowerRange =>
-      'Recent draws have leaned toward lower-range numbers.';
+  String get recentDrawsLowerRange => '最近の抽選は低範囲の数字に傾いています。';
 
   @override
   String get recentDrawsModerateSpread =>
-      'Recent draws are fairly balanced with a moderate spread across numbers.';
+      '最近の抽選は数字全体に中程度の分散があり、かなりバランスが取れています。';
 
   @override
   String get recentDrawsNoStrongPattern =>
-      'Recent draws are fairly balanced with no strong pattern detected.';
+      '最近の抽選はかなりバランスが取れており、強いパターンは検出されていません。';
 
   @override
-  String get weeklyNotableConcentration =>
-      'This week showed a notable concentration among a few numbers.';
+  String get weeklyNotableConcentration => '今週は少数の数字に注目すべき集中が見られました。';
 
   @override
-  String get weeklyModerateSpread =>
-      'This week showed a balanced distribution with moderate spread.';
+  String get weeklyModerateSpread => '今週は中程度の分散でバランスの取れた分布を示しました。';
 
   @override
-  String get weeklyNoStrongTrend =>
-      'This week showed a balanced distribution with no strong trend.';
+  String get weeklyNoStrongTrend => '今週は強いトレンドのないバランスの取れた分布を示しました。';
 
   @override
   String dailyInsightStrongDynamic(
@@ -961,7 +892,7 @@ class AppLocalizationsJa extends AppLocalizations {
     int drawCount,
     Object hotNumbers,
   ) {
-    return '$lotteryName: based on the latest $drawCount draws, the most active numbers are $hotNumbers.';
+    return '$lotteryName: 最新$drawCount回の抽選に基づくと、最もアクティブな数字は$hotNumbersです。';
   }
 
   @override
@@ -970,7 +901,7 @@ class AppLocalizationsJa extends AppLocalizations {
     int drawCount,
     Object hotNumbers,
   ) {
-    return '$lotteryName: the latest $drawCount draws show extra activity in the mid range. Active numbers: $hotNumbers.';
+    return '$lotteryName: 最新$drawCount回の抽選は中間範囲で余分なアクティビティを示しています。アクティブな数字: $hotNumbers。';
   }
 
   @override
@@ -979,7 +910,7 @@ class AppLocalizationsJa extends AppLocalizations {
     int drawCount,
     Object averageSum,
   ) {
-    return '$lotteryName: the latest $drawCount draws lean high, with an average main-number sum of $averageSum.';
+    return '$lotteryName: 最新$drawCount回の抽選は高めに傾いており、本数字の平均合計は$averageSumです。';
   }
 
   @override
@@ -988,7 +919,7 @@ class AppLocalizationsJa extends AppLocalizations {
     int drawCount,
     Object averageSum,
   ) {
-    return '$lotteryName: the latest $drawCount draws lean low, with an average main-number sum of $averageSum.';
+    return '$lotteryName: 最新$drawCount回の抽選は低めに傾いており、本数字の平均合計は$averageSumです。';
   }
 
   @override
@@ -998,7 +929,7 @@ class AppLocalizationsJa extends AppLocalizations {
     Object hotNumbers,
     Object oddEvenPattern,
   ) {
-    return '$lotteryName: the latest $drawCount draws look balanced. Active numbers: $hotNumbers; common structure: $oddEvenPattern.';
+    return '$lotteryName: 最新$drawCount回の抽選はバランスが取れています。アクティブな数字: $hotNumbers; 一般的な構造: $oddEvenPattern。';
   }
 
   @override
@@ -1007,7 +938,7 @@ class AppLocalizationsJa extends AppLocalizations {
     int drawCount,
     Object oddEvenPattern,
   ) {
-    return '$lotteryName: no strong pattern in the latest $drawCount draws. Common structure: $oddEvenPattern.';
+    return '$lotteryName: 最新$drawCount回の抽選に強いパターンはありません。一般的な構造: $oddEvenPattern。';
   }
 
   @override
@@ -1017,7 +948,7 @@ class AppLocalizationsJa extends AppLocalizations {
     Object hotNumbers,
     Object oddEvenPattern,
   ) {
-    return '$lotteryName: weekly summary from the latest $drawCount draws. Hot numbers: $hotNumbers; common structure: $oddEvenPattern.';
+    return '$lotteryName: 最新$drawCount回の抽選からの週間サマリー。よく出る数字: $hotNumbers; 一般的な構造: $oddEvenPattern。';
   }
 
   @override
@@ -1027,7 +958,7 @@ class AppLocalizationsJa extends AppLocalizations {
     Object hotNumbers,
     Object lowHighPattern,
   ) {
-    return '$lotteryName: weekly summary from the latest $drawCount draws. Hot numbers: $hotNumbers; range pattern: $lowHighPattern.';
+    return '$lotteryName: 最新$drawCount回の抽選からの週間サマリー。よく出る数字: $hotNumbers; 範囲パターン: $lowHighPattern。';
   }
 
   @override
@@ -1037,170 +968,165 @@ class AppLocalizationsJa extends AppLocalizations {
     Object oddEvenPattern,
     Object lowHighPattern,
   ) {
-    return '$lotteryName: weekly summary from the latest $drawCount draws shows no strong trend. Structure: $oddEvenPattern; range: $lowHighPattern.';
+    return '$lotteryName: 最新$drawCount回の抽選からの週間サマリーは強いトレンドを示していません。構造: $oddEvenPattern; 範囲: $lowHighPattern。';
   }
 
   @override
-  String get savedPicksModerate =>
-      'Your saved picks have matched recent draws moderately.';
+  String get savedPicksModerate => '保存した選択は最近の抽選と中程度に一致しています。';
 
   @override
-  String get savedNumbersAppeared =>
-      'Several numbers you saved appeared in recent results.';
+  String get savedNumbersAppeared => '保存したいくつかの数字が最近の結果に現れました。';
 
   @override
-  String get savedPicksLimited =>
-      'Your saved picks show limited overlap with recent draw results.';
+  String get savedPicksLimited => '保存した選択は最近の抽選結果と限定的な一致を示しています。';
 
   @override
   String get drawStrongHistoricalComparison =>
-      'This draw shows a strong comparison with historical patterns from the past 5 years.';
+      'この抽選は過去5年間の過去のパターンと強い比較を示しています。';
 
   @override
   String get drawModerateHistoricalComparison =>
-      'This draw shows a moderate comparison with historical distribution patterns.';
+      'この抽選は過去の分布パターンと中程度の比較を示しています。';
 
   @override
   String get drawLimitedHistoricalComparison =>
-      'This draw shows a limited comparison with typical historical patterns.';
+      'この抽選は典型的な過去のパターンと限定的な比較を示しています。';
 
   @override
-  String get generatedForFunHistoricalPatterns =>
-      'Generated for fun using historical patterns.';
+  String get generatedForFunHistoricalPatterns => '過去のパターンを使用して楽しみのために生成。';
 
   @override
-  String get suppShort => 'S';
+  String get suppShort => '追';
 
   @override
   String mainAndBonusMatched(int main, Object bonusLabel) {
-    return '$main main + $bonusLabel matched';
+    return '$main個本数字 + $bonusLabel一致';
   }
 
   @override
   String mainMatched(int main) {
-    return '$main main matched';
+    return '$main個本数字一致';
   }
 
   @override
   String suppMatched(int supp) {
-    return '$supp supp matched';
+    return '$supp個追加一致';
   }
 
   @override
   String mainAndSuppMatched(int main, int supp) {
-    return '$main main + $supp supp matched';
+    return '$main個本数字 + $supp個追加一致';
   }
 
   @override
-  String get shareNearMatch => '🔥 Near match!';
+  String get shareNearMatch => '🔥 惜しい！';
 
   @override
-  String get shareOnlyOneAway => 'Only one number away 👀';
+  String get shareOnlyOneAway => 'あと1つでした 👀';
 
   @override
-  String get shareCanYouBeatThis => 'Can you beat this? 👀';
+  String get shareCanYouBeatThis => 'これを超えられますか？ 👀';
 
   @override
-  String get shareNotBad => '🎯 Not bad!';
+  String get shareNotBad => '🎯 悪くない！';
 
   @override
   String shareOfMainCount(int count) {
-    return 'of $count';
+    return '$count個中';
   }
 
   @override
-  String get shareTemplate => 'Template';
+  String get shareTemplate => 'テンプレート';
 
   @override
-  String get shareReferencePick => '⭐ Reference Pick';
+  String get shareReferencePick => '⭐ 参考選択';
 
   @override
-  String get sharePng => 'Share PNG';
+  String get sharePng => 'PNG共有';
 
   @override
-  String get shareDefaultPick => 'My number pick 🎯 — Generated by NumberRun';
+  String get shareDefaultPick => '私の数字選択 🎯 — NumberRunで生成';
 
   @override
-  String get shareDefaultPicks => 'My number picks 🎯 — Generated by NumberRun';
+  String get shareDefaultPicks => '私の数字選択 🎯 — NumberRunで生成';
 
   @override
-  String get shareNumberComparison => '🔥 Number comparison from NumberRun';
+  String get shareNumberComparison => '🔥 NumberRunからの数字比較';
 
   @override
-  String get shareNumberOverlap => '🎯 Number overlap from NumberRun';
+  String get shareNumberOverlap => '🎯 NumberRunからの数字一致';
 
   @override
-  String get shareRandomResult => '😆 Random result from NumberRun';
+  String get shareRandomResult => '😆 NumberRunからのランダム結果';
 
   @override
-  String get shareTemplateFireLabel => '🔥 Almost Overlap';
+  String get shareTemplateFireLabel => '🔥 ほぼ一致';
 
   @override
-  String get shareTemplateElectricLabel => '🎯 Number Overlap';
+  String get shareTemplateElectricLabel => '🎯 数字一致';
 
   @override
-  String get shareTemplateWarmLabel => '😂 Random Result';
+  String get shareTemplateWarmLabel => '😂 ランダム結果';
 
   @override
-  String get shareTemplateFireDescription =>
-      'Dramatic gold-on-dark card for close calls and strong hit streaks.';
+  String get shareTemplateFireDescription => '惜しいケースと強いヒット連続のためのドラマチックな金色カード。';
 
   @override
   String get shareTemplateElectricDescription =>
-      'Clean neon stats card for smaller wins and partial matches.';
+      '小さな勝利と部分的な一致のためのクリーンなネオン統計カード。';
 
   @override
   String get shareTemplateWarmDescription =>
-      'Playful motivational card for pending draws, misses, or pick-only sharing.';
+      '保留中の抽選、外れ、または選択のみの共有のための楽しい励ましカード。';
 
   @override
-  String get shareNotToday => 'Not today';
+  String get shareNotToday => '今日はダメ';
 
   @override
-  String get shareZeroOverlapped => '0 overlapped';
+  String get shareZeroOverlapped => '0個一致';
 
   @override
-  String get shareRandomResultPlain => 'Random result';
+  String get shareRandomResultPlain => 'ランダム結果';
 
   @override
-  String get shareResultIncoming => 'Result update incoming!';
+  String get shareResultIncoming => '結果更新まもなく！';
 
   @override
-  String get shareWaitingForResults => 'Waiting for results 🤞';
+  String get shareWaitingForResults => '結果待ち 🤞';
 
   @override
-  String get shareMyNumberPick => 'My Number Pick';
+  String get shareMyNumberPick => '私の数字選択';
 
   @override
-  String get shareLetsSee => 'Let\'s see what happens 👀';
+  String get shareLetsSee => 'どうなるか見てみましょう 👀';
 
   @override
-  String get shareTheseAreMyNumbers => 'These are my numbers ↑';
+  String get shareTheseAreMyNumbers => 'これが私の数字です ↑';
 
   @override
-  String get shareFunnyFail => '😂 Funny fail';
+  String get shareFunnyFail => '😂 面白い失敗';
 
   @override
-  String get shareCardPreviewTitle => 'Share Card Preview';
+  String get shareCardPreviewTitle => '共有カードプレビュー';
 
   @override
   String shareCardPreviewSubtitle(Object lotteryName) {
-    return 'Pick a style or keep the default option for $lotteryName.';
+    return '$lotteryNameのスタイルを選択するか、デフォルトオプションのままにしてください。';
   }
 
   @override
   String resultPanelNoOverlap(Object date) {
-    return 'No overlap in last past result ($date)';
+    return '最後の過去の結果（$date）で一致なし';
   }
 
   @override
   String resultPanelBonusAppeared(Object bonusLabel, Object date) {
-    return '$bonusLabel appeared in last past result ($date)';
+    return '$bonusLabelが最後の過去の結果（$date）に現れました';
   }
 
   @override
   String resultPanelOverlap(int count, Object bonusSuffix, Object date) {
-    return '$count$bonusSuffix overlapped in last past result ($date)';
+    return '$count個$bonusSuffixが最後の過去の結果（$date）で一致';
   }
 
   @override
@@ -1209,127 +1135,123 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get notificationResultReadyChannel => 'Result Ready';
+  String get notificationResultReadyChannel => '結果準備完了';
 
   @override
-  String get notificationResultReadyTitle => 'Result Ready 🎯';
+  String get notificationResultReadyTitle => '結果準備完了 🎯';
 
   @override
   String notificationResultsReadyTitle(int count) {
-    return '$count Results Ready 🎯';
+    return '$count件の結果準備完了 🎯';
   }
 
   @override
-  String get notificationSavedNumbersReady =>
-      'Your saved lottery numbers are ready to check';
+  String get notificationSavedNumbersReady => '保存した宝くじ数字の確認準備ができました';
 
   @override
-  String get notificationDailyInsightsChannel => 'Daily Insights';
+  String get notificationDailyInsightsChannel => 'デイリーインサイト';
 
   @override
-  String get notificationDailyInsightTitle => 'Today\'s Insight 📊';
+  String get notificationDailyInsightTitle => '今日のインサイト 📊';
 
   @override
-  String get notificationWeeklySummaryChannel => 'Weekly Summary';
+  String get notificationWeeklySummaryChannel => '週間サマリー';
 
   @override
-  String get notificationWeeklySummaryTitle => 'Weekly Summary 📅';
+  String get notificationWeeklySummaryTitle => '週間サマリー 📅';
 
   @override
-  String get notificationResultsDescription =>
-      'Notifies when lottery draw results are available';
+  String get notificationResultsDescription => '宝くじ抽選結果が利用可能なときに通知';
 
   @override
-  String get notificationDailyDescription => 'Daily draw trend observations';
+  String get notificationDailyDescription => '毎日の抽選トレンド観察';
 
   @override
-  String get notificationWeeklyDescription => 'Weekly draw pattern summary';
+  String get notificationWeeklyDescription => '週間抽選パターンサマリー';
 
   @override
   String lotteryHistoryNoRemoteCsv(Object lottery) {
-    return 'No remote CSV configured for $lottery.';
+    return '$lotteryのリモートCSVが設定されていません。';
   }
 
   @override
   String lotteryHistoryLoadFailed(int statusCode) {
-    return 'Failed to load history CSV ($statusCode).';
+    return '履歴CSVの読み込みに失敗しました（$statusCode）。';
   }
 
   @override
-  String get lotteryHistoryCsvEmpty => 'History CSV is empty.';
+  String get lotteryHistoryCsvEmpty => '履歴CSVが空です。';
 
   @override
-  String get lotteryHistoryNoValidRows => 'No valid draw rows found in CSV.';
+  String get lotteryHistoryNoValidRows => 'CSVに有効な抽選行が見つかりません。';
 
   @override
   String lotteryHistoryParseFailed(Object error) {
-    return 'Failed to parse history CSV: $error';
+    return '履歴CSVの解析に失敗しました: $error';
   }
 
   @override
-  String get completeMyNumbers => 'Complete My Numbers';
+  String get completeMyNumbers => '自分の数字を補完';
 
   @override
-  String get completeMyNumbersTitle => 'Lock Your Lucky Numbers';
+  String get completeMyNumbersTitle => 'ラッキーナンバーをロック';
 
   @override
-  String get completeMyNumbersSubtitle =>
-      'Select numbers you want to keep, and we\'ll generate the rest based on your chosen strategy.';
+  String get completeMyNumbersSubtitle => '保持したい数字を選択すると、選択した戦略に基づいて残りを生成します。';
 
   @override
-  String get selectYourNumbers => 'Your Numbers';
+  String get selectYourNumbers => 'あなたの数字';
 
   @override
   String tapToLockNumbers(int locked, int total) {
-    return 'Tap to lock numbers ($locked/$total)';
+    return 'タップして数字をロック（$locked/$total）';
   }
 
   @override
-  String get bonusNumbers => 'Bonus Numbers';
+  String get bonusNumbers => 'ボーナス数字';
 
   @override
   String tapToLockBonusNumbers(int locked, int total) {
-    return 'Tap to lock bonus ($locked/$total)';
+    return 'タップしてボーナスをロック（$locked/$total）';
   }
 
   @override
-  String get generationStrategy => 'Generation Strategy';
+  String get generationStrategy => '生成戦略';
 
   @override
-  String get generateAllNumbers => 'Generate Numbers';
+  String get generateAllNumbers => '数字を生成';
 
   @override
-  String get completeRemainingNumbers => 'Complete My Numbers';
+  String get completeRemainingNumbers => '自分の数字を補完';
 
   @override
-  String get yourCompletedNumbers => 'Your Completed Numbers';
+  String get yourCompletedNumbers => 'あなたの完成した数字';
 
   @override
-  String get locked => 'Your picks';
+  String get locked => 'あなたの選択';
 
   @override
-  String get generated => 'Generated';
+  String get generated => '生成済み';
 
   @override
   String maxNumbersSelected(int max) {
-    return 'Maximum $max numbers allowed';
+    return '最大$max個の数字まで';
   }
 
   @override
-  String get reset => 'Reset';
+  String get reset => 'リセット';
 
   @override
-  String get regenerate => 'Try Again';
+  String get regenerate => 'もう一度試す';
 
   @override
   String get completeMyNumbersDisclaimer =>
-      'This feature is for entertainment and statistical reference only. Generated numbers are based on historical data and do not increase your chances of winning.';
+      'この機能は娯楽および統計的参考のみを目的としています。生成された数字は過去のデータに基づいており、当選確率を上げるものではありません。';
 
   @override
-  String get numberAlreadySelected =>
-      'This number is already selected in the other section';
+  String get numberAlreadySelected => 'この数字は既に他のセクションで選択されています';
 
   @override
   String get duplicateNumbersError =>
-      'Cannot generate: duplicate numbers found. Please ensure no number appears in both main and supplementary sections.';
+      '生成できません: 重複した数字が見つかりました。本数字と追加数字のセクションに同じ数字が含まれていないことを確認してください。';
 }

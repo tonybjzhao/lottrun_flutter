@@ -99,8 +99,727 @@
   "styleObservedPattern": "観察型",
   "styleLessCommon": "低頻度型",
   "styleRandom": "ランダム",
-  "styleBalancedDescription": "過去の抽選データに基づいた分散型",
-  "styleObservedPatternDescription": "過去の抽選で頻繁に出た数字",
-  "styleLessCommonDescription": "過去の抽選であまり出なかった数字",
-  "styleRandomDescription": "完全にランダムな選択"
+  "styleBalancedTagline": "バランス選択",
+  "styleHotTagline": "パターン例",
+  "styleColdTagline": "過去の数字例",
+  "styleRandomTagline": "ランダム選択",
+  "styleBalancedSubtitle": "すべての数字範囲に均等に分散。",
+  "styleHotSubtitle": "過去の結果でより頻繁に観察された数字。",
+  "styleColdSubtitle": "過去の結果であまり観察されなかった数字。",
+  "styleRandomSubtitle": "完全にランダムな選択。楽しみのため。",
+  "styleBalancedDescription": "数字範囲全体に均等に分散",
+  "styleHotDescription": "過去の結果の最近の頻度に基づく（参考用）",
+  "styleColdDescription": "頻度の低い過去の数字に基づく（参考用）",
+  "styleRandomDescription": "ランダム選択（参考用）",
+  "threePickExample": "例",
+  "threePickExampleStar": "⭐ 例",
+  "threePickCommonPattern": "よくあるパターン",
+  "threePickRandomSurprise": "ランダムサプライズ",
+  "threePickRandomSurpriseDice": "🎲 ランダムサプライズ",
+  "threePickBalancedMicrocopy": "過去の結果に基づくバランス選択",
+  "threePickHotMicrocopy": "過去の結果でより頻繁に観察された数字",
+  "threePickRandomMicrocopy": "参考用のランダム選択 🎲",
+  "insightBalancedOne": "過去のデータに基づくと、これは参考のためのバランスの取れた分散を示しています",
+  "insightBalancedTwo": "過去は均等な分布を示しています",
+  "insightBalancedThree": "過去の結果で見られたバランスの取れた数字分散",
+  "insightHotOne": "最近の結果は同様のパターンを示しています",
+  "insightHotTwo": "過去の結果で頻繁に観察されました",
+  "insightHotThree": "過去の結果に基づくと、同様のパターンが観察されました",
+  "insightColdOne": "過去の結果に基づくと、あまり出ない数字が観察されました ❄️",
+  "insightColdTwo": "過去の結果からのあまり出ない数字",
+  "insightRandomOne": "時にはランダムも楽しいです 🎲",
+  "insightRandomTwo": "参考用のランダムパターン",
+  "insightRandomThree": "楽しみのためのランダム選択",
+  "nextResultUpdateDays": "次の結果更新まで{days}日",
+  "@nextResultUpdateDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "nextResultUpdateHours": "次の結果更新まで{hours}時間",
+  "@nextResultUpdateHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "resultUpdateSoon": "まもなく結果更新！",
+  "referencePickLabel": "参考選択",
+  "referencePickWithStyle": "参考選択 · {style}",
+  "@referencePickWithStyle": {
+    "placeholders": {
+      "style": {}
+    }
+  },
+  "manualPickLabel": "👤 自分の数字",
+  "trackingResult": "結果追跡中: {date}",
+  "@trackingResult": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "pickMainNumbers": "{count}個の数字を選択  ({min}–{max})",
+  "@pickMainNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "pickBonusNumbers": "{count}個の{label}を選択  ({min}–{max})",
+  "@pickBonusNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "label": {},
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "saveMyNumbers": "自分の数字を保存",
+  "pickMoreNumbers": "あと{count}個の数字を選択",
+  "@pickMoreNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pickMoreBonus": "あと{count}個の{label}を選択",
+  "@pickMoreBonus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "label": {}
+    }
+  },
+  "disclaimerTitle": "楽しみのため — 責任を持って遊びましょう。",
+  "disclaimerBody": "このアプリは過去のデータのみに基づいた数字選択を提供します。結果を予測したり、当選確率を上げたり、結果を保証するものではありません。",
+  "settingsNotifications": "通知",
+  "settingsResults": "結果",
+  "settingsResultsSubtitle": "保存した選択の過去の結果が利用可能なとき",
+  "settingsMyPicks": "自分の選択",
+  "settingsMyPicksSubtitle": "保存した数字が最近の結果に現れたとき",
+  "settingsDailyInsights": "デイリーインサイト",
+  "settingsDailyInsightsSubtitle": "1日1回の短いトレンド観察",
+  "settingsWeeklySummary": "週間サマリー",
+  "settingsWeeklySummarySubtitle": "毎週日曜日の簡単な週間パターンサマリー",
+  "settingsNotificationTime": "通知時刻",
+  "settingsNotificationTimeSubtitle": "デイリーおよび週間インサイトは{time}に予定されています。",
+  "@settingsNotificationTimeSubtitle": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "settingsMaxNotifications": "1日最大2件の通知。",
+  "settingsLanguage": "言語",
+  "languageEnglish": "English",
+  "languageChinese": "中文",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "settingsAnalysisStyle": "分析スタイル",
+  "settingsAnalysisStyleSubtitle": "過去のトレンドの重み付け方法",
+  "analysisStyleRecentTrend": "最近のトレンド",
+  "analysisStyleRecentTrendDescription": "最近のパターンを重視（0〜12週: 70%、13〜52週: 20%、1〜5年: 10%）",
+  "analysisStyleBalanced": "バランス型",
+  "analysisStyleBalancedDescription": "期間全体で均等に考慮（0〜12週: 50%、13〜52週: 30%、1〜5年: 20%）",
+  "analysisStyleLongTermPattern": "長期パターン",
+  "analysisStyleLongTermPatternDescription": "過去のパターンを重視（0〜12週: 30%、13〜52週: 30%、1〜5年: 40%）",
+  "analysisStyleDisclaimer": "これは過去のトレンドの重み付け方法を変更するだけです。当選確率を改善するものではありません。",
+  "settingsAbout": "アプリについて",
+  "settingsHistoricalResultsOnly": "過去の結果のみ",
+  "settingsHistoricalResultsOnlyBody": "すべての分析は過去の結果に基づいています。このアプリは予測を提供したり、結果を改善したりするものではありません。",
+  "clearAllSavedPicksTitle": "保存したすべての選択を削除しますか？",
+  "clearAll": "すべて削除",
+  "pickDeleted": "選択を削除しました",
+  "yourStats": "あなたの統計",
+  "resultsChecked": "{count}件の結果を確認",
+  "@resultsChecked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "top": "トップ",
+  "topWithTrophy": "🏆 トップ",
+  "totalHits": "合計ヒット数",
+  "similarityScore": "類似度スコア",
+  "myPick": "👤 自分の選択",
+  "noneYet": "まだありません",
+  "mainCountLabel": "{count}個本数字",
+  "@mainCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "suppCountLabel": "{count}個追加",
+  "@suppCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mainSuppCountLabel": "{main}+{supp}",
+  "@mainSuppCountLabel": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "totalMainHits": "{main}個本数字",
+  "@totalMainHits": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      }
+    }
+  },
+  "totalMainSuppHits": "{main}個本数字 · {supp}個追加",
+  "@totalMainSuppHits": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "pending": "保留中",
+  "pendingWithDate": "保留中 · {date}",
+  "@pendingWithDate": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "copyPickText": "🎯 {lotteryName}の数字セット\n{label}\n\n{main}{bonus}\n\n楽しみのため生成 — NumberRun",
+  "@copyPickText": {
+    "placeholders": {
+      "lotteryName": {},
+      "label": {},
+      "main": {},
+      "bonus": {}
+    }
+  },
+  "copyPickBonusLine": "\n+ {label}: {numbers}",
+  "@copyPickBonusLine": {
+    "placeholders": {
+      "label": {},
+      "numbers": {}
+    }
+  },
+  "inlinePickCopyText": "{label}\n{lotteryName}: {main}{bonus}\n楽しみのため生成 — NumberRun 🎯",
+  "@inlinePickCopyText": {
+    "placeholders": {
+      "label": {},
+      "lotteryName": {},
+      "main": {},
+      "bonus": {}
+    }
+  },
+  "inlinePickBonusInline": " + {numbers}",
+  "@inlinePickBonusInline": {
+    "placeholders": {
+      "numbers": {}
+    }
+  },
+  "savedWithCheck": "保存済み ✓",
+  "historyPastResultsCount": "{count}件の過去の結果",
+  "@historyPastResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineModeSavedResults": "オフラインモード: 保存された結果を表示",
+  "offlineModeSavedResultsFrom": "オフラインモード: {date}からの保存された結果を表示",
+  "@offlineModeSavedResultsFrom": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "noHistoryData": "履歴データはまだありません。",
+  "noInternetNoSavedHistory": "インターネット接続がなく、保存された宝くじ履歴もありません。",
+  "noInternetNoSavedResultHistory": "インターネット接続がなく、保存された結果履歴もありません。",
+  "failedToLoadHistory": "履歴の読み込みに失敗しました。",
+  "recentPatternsTitle": "最近の過去の結果パターン",
+  "recentPatternsSubtitle": "過去{count}件の結果に基づく",
+  "@recentPatternsSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historicalComparisonOnly": "過去との比較のみ · 結果を保証するものではありません",
+  "frequentNumbers": "よく出る数字",
+  "frequentNumbersTooltip": "過去の結果でより頻繁に観察",
+  "lessCommonNumbers": "あまり出ない数字",
+  "lessCommonNumbersTooltip": "過去の結果であまり観察されない",
+  "avgSum": "平均合計",
+  "oddEven": "奇数/偶数",
+  "lowHigh": "低/高",
+  "avgConsecPairs": "平均連続ペア",
+  "notEnoughHistory": "分析するための十分な過去の結果履歴がありません。",
+  "patternNotable": "注目すべきパターン",
+  "patternBalanced": "バランス型",
+  "patternRandomLike": "ランダム的",
+  "odd": "奇数",
+  "even": "偶数",
+  "low": "低",
+  "high": "高",
+  "dailyInsightTitle": "今日のインサイト",
+  "savedPicksAnalysisTitle": "保存した選択の分析",
+  "savedPicksAnalysisSubtitle": "最近20件の過去の結果と比較 · 結果後の比較のみ",
+  "topOverlap": "トップ一致",
+  "numbersCount": "{count}個の数字",
+  "@numbersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "avgOverlap": "平均一致",
+  "perPastResult": "過去の結果ごと",
+  "oftenPicked": "よく選ばれた",
+  "inRecentDraws": "最近の抽選で",
+  "overlapLevelHigh": "一致レベル: 高",
+  "overlapLevelMedium": "一致レベル: 中",
+  "overlapLevelLow": "一致レベル: 低",
+  "historicalPatternNotEnough": "パターン分析には十分な履歴がありません（52件以上の過去の抽選が必要）。",
+  "historicalPatternTitle": "過去のパターン比較",
+  "historicalPatternSubtitle": "過去5年間の過去の結果に基づく",
+  "trendComparison": "トレンド比較",
+  "observedLessCommonComparison": "よく出る/あまり出ない比較",
+  "oddEvenStructure": "奇数/偶数構造",
+  "lowHighStructure": "低/高構造",
+  "sumRange": "合計範囲",
+  "consecutivePairs": "連続ペア",
+  "consecutivePairCount": "{count}個の連続ペア",
+  "@consecutivePairCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "topSimilarPastResults": "トップ10の類似過去結果（参考用）",
+  "similarSharedNumbers": "{count}個の数字が一致",
+  "@similarSharedNumbers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "similarStructuralSimilarity": "{percent}%の構造的類似性",
+  "@similarStructuralSimilarity": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "observedMoreLessCommonCounts": "🔥 {hotCount}個よく出る · ❄️ {coldCount}個あまり出ない",
+  "@observedMoreLessCommonCounts": {
+    "placeholders": {
+      "hotCount": {
+        "type": "int"
+      },
+      "coldCount": {
+        "type": "int"
+      }
+    }
+  },
+  "historicalPatternStrong": "過去のパターンと強い比較（参考用）",
+  "historicalPatternModerate": "過去のパターンと中程度の比較（参考用）",
+  "historicalPatternLimited": "過去のパターンと限定的な比較（参考用）",
+  "drawResult": "抽選結果",
+  "supplementary": "追加数字",
+  "yourNumbers": "あなたの数字",
+  "noMainMatched": "本数字の一致なし",
+  "checkOfficialResults": "詳細は公式結果を確認してください",
+  "noNumbersMatched": "数字の一致なし",
+  "bonusMatched": "{label}が一致",
+  "@bonusMatched": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "matchedCount": "{count}個一致",
+  "@matchedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchedCountWithBonus": "{count}個一致 + {label}",
+  "@matchedCountWithBonus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "label": {}
+    }
+  },
+  "noMainWithSupp": "本数字なし · {count}個追加",
+  "@noMainWithSupp": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchedWithSupp": "{main}個一致 + {supp}個追加",
+  "@matchedWithSupp": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "noMatch": "一致なし",
+  "levelLightHit": "軽い一致",
+  "levelNice": "良い",
+  "levelSolid": "確実",
+  "levelStrong": "強い",
+  "levelGreat": "素晴らしい",
+  "unknown": "不明",
+  "belowTypicalRange": "通常範囲以下",
+  "aboveTypicalRange": "通常範囲以上",
+  "withinTypicalRange": "通常範囲内",
+  "drawAnalysisNotEnough": "分析するための十分な抽選履歴がありません。",
+  "drawAnalysisNoSavedPicks": "比較するための保存した選択または抽選履歴がありません。",
+  "recentDrawsConcentrated": "最近の抽選は少数の数字にアクティビティが集中しています — この期間の注目すべき集中。",
+  "periodMidRangeActive": "この期間はいくつかの中間範囲の数字でアクティビティが高くなっています。",
+  "recentDrawsHigherRange": "最近の抽選は高範囲の数字に傾いています。",
+  "recentDrawsLowerRange": "最近の抽選は低範囲の数字に傾いています。",
+  "recentDrawsModerateSpread": "最近の抽選は数字全体に中程度の分散があり、かなりバランスが取れています。",
+  "recentDrawsNoStrongPattern": "最近の抽選はかなりバランスが取れており、強いパターンは検出されていません。",
+  "weeklyNotableConcentration": "今週は少数の数字に注目すべき集中が見られました。",
+  "weeklyModerateSpread": "今週は中程度の分散でバランスの取れた分布を示しました。",
+  "weeklyNoStrongTrend": "今週は強いトレンドのないバランスの取れた分布を示しました。",
+  "dailyInsightStrongDynamic": "{lotteryName}: 最新{drawCount}回の抽選に基づくと、最もアクティブな数字は{hotNumbers}です。",
+  "@dailyInsightStrongDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "hotNumbers": {}
+    }
+  },
+  "dailyInsightMidRangeDynamic": "{lotteryName}: 最新{drawCount}回の抽選は中間範囲で余分なアクティビティを示しています。アクティブな数字: {hotNumbers}。",
+  "@dailyInsightMidRangeDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "hotNumbers": {}
+    }
+  },
+  "dailyInsightHigherRangeDynamic": "{lotteryName}: 最新{drawCount}回の抽選は高めに傾いており、本数字の平均合計は{averageSum}です。",
+  "@dailyInsightHigherRangeDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "averageSum": {}
+    }
+  },
+  "dailyInsightLowerRangeDynamic": "{lotteryName}: 最新{drawCount}回の抽選は低めに傾いており、本数字の平均合計は{averageSum}です。",
+  "@dailyInsightLowerRangeDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "averageSum": {}
+    }
+  },
+  "dailyInsightBalancedDynamic": "{lotteryName}: 最新{drawCount}回の抽選はバランスが取れています。アクティブな数字: {hotNumbers}; 一般的な構造: {oddEvenPattern}。",
+  "@dailyInsightBalancedDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "hotNumbers": {},
+      "oddEvenPattern": {}
+    }
+  },
+  "dailyInsightNoTrendDynamic": "{lotteryName}: 最新{drawCount}回の抽選に強いパターンはありません。一般的な構造: {oddEvenPattern}。",
+  "@dailyInsightNoTrendDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "oddEvenPattern": {}
+    }
+  },
+  "weeklySummaryStrongDynamic": "{lotteryName}: 最新{drawCount}回の抽選からの週間サマリー。よく出る数字: {hotNumbers}; 一般的な構造: {oddEvenPattern}。",
+  "@weeklySummaryStrongDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "hotNumbers": {},
+      "oddEvenPattern": {}
+    }
+  },
+  "weeklySummaryBalancedDynamic": "{lotteryName}: 最新{drawCount}回の抽選からの週間サマリー。よく出る数字: {hotNumbers}; 範囲パターン: {lowHighPattern}。",
+  "@weeklySummaryBalancedDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "hotNumbers": {},
+      "lowHighPattern": {}
+    }
+  },
+  "weeklySummaryNoTrendDynamic": "{lotteryName}: 最新{drawCount}回の抽選からの週間サマリーは強いトレンドを示していません。構造: {oddEvenPattern}; 範囲: {lowHighPattern}。",
+  "@weeklySummaryNoTrendDynamic": {
+    "placeholders": {
+      "lotteryName": {},
+      "drawCount": {
+        "type": "int"
+      },
+      "oddEvenPattern": {},
+      "lowHighPattern": {}
+    }
+  },
+  "savedPicksModerate": "保存した選択は最近の抽選と中程度に一致しています。",
+  "savedNumbersAppeared": "保存したいくつかの数字が最近の結果に現れました。",
+  "savedPicksLimited": "保存した選択は最近の抽選結果と限定的な一致を示しています。",
+  "drawStrongHistoricalComparison": "この抽選は過去5年間の過去のパターンと強い比較を示しています。",
+  "drawModerateHistoricalComparison": "この抽選は過去の分布パターンと中程度の比較を示しています。",
+  "drawLimitedHistoricalComparison": "この抽選は典型的な過去のパターンと限定的な比較を示しています。",
+  "generatedForFunHistoricalPatterns": "過去のパターンを使用して楽しみのために生成。",
+  "suppShort": "追",
+  "mainAndBonusMatched": "{main}個本数字 + {bonusLabel}一致",
+  "@mainAndBonusMatched": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "bonusLabel": {}
+    }
+  },
+  "mainMatched": "{main}個本数字一致",
+  "@mainMatched": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      }
+    }
+  },
+  "suppMatched": "{supp}個追加一致",
+  "@suppMatched": {
+    "placeholders": {
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "mainAndSuppMatched": "{main}個本数字 + {supp}個追加一致",
+  "@mainAndSuppMatched": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "supp": {
+        "type": "int"
+      }
+    }
+  },
+  "shareNearMatch": "🔥 惜しい！",
+  "shareOnlyOneAway": "あと1つでした 👀",
+  "shareCanYouBeatThis": "これを超えられますか？ 👀",
+  "shareNotBad": "🎯 悪くない！",
+  "shareOfMainCount": "{count}個中",
+  "@shareOfMainCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shareTemplate": "テンプレート",
+  "shareReferencePick": "⭐ 参考選択",
+  "sharePng": "PNG共有",
+  "shareDefaultPick": "私の数字選択 🎯 — NumberRunで生成",
+  "shareDefaultPicks": "私の数字選択 🎯 — NumberRunで生成",
+  "shareNumberComparison": "🔥 NumberRunからの数字比較",
+  "shareNumberOverlap": "🎯 NumberRunからの数字一致",
+  "shareRandomResult": "😆 NumberRunからのランダム結果",
+  "shareTemplateFireLabel": "🔥 ほぼ一致",
+  "shareTemplateElectricLabel": "🎯 数字一致",
+  "shareTemplateWarmLabel": "😂 ランダム結果",
+  "shareTemplateFireDescription": "惜しいケースと強いヒット連続のためのドラマチックな金色カード。",
+  "shareTemplateElectricDescription": "小さな勝利と部分的な一致のためのクリーンなネオン統計カード。",
+  "shareTemplateWarmDescription": "保留中の抽選、外れ、または選択のみの共有のための楽しい励ましカード。",
+  "shareNotToday": "今日はダメ",
+  "shareZeroOverlapped": "0個一致",
+  "shareRandomResultPlain": "ランダム結果",
+  "shareResultIncoming": "結果更新まもなく！",
+  "shareWaitingForResults": "結果待ち 🤞",
+  "shareMyNumberPick": "私の数字選択",
+  "shareLetsSee": "どうなるか見てみましょう 👀",
+  "shareTheseAreMyNumbers": "これが私の数字です ↑",
+  "shareFunnyFail": "😂 面白い失敗",
+  "shareCardPreviewTitle": "共有カードプレビュー",
+  "shareCardPreviewSubtitle": "{lotteryName}のスタイルを選択するか、デフォルトオプションのままにしてください。",
+  "@shareCardPreviewSubtitle": {
+    "placeholders": {
+      "lotteryName": {}
+    }
+  },
+  "resultPanelNoOverlap": "最後の過去の結果（{date}）で一致なし",
+  "@resultPanelNoOverlap": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "resultPanelBonusAppeared": "{bonusLabel}が最後の過去の結果（{date}）に現れました",
+  "@resultPanelBonusAppeared": {
+    "placeholders": {
+      "bonusLabel": {},
+      "date": {}
+    }
+  },
+  "resultPanelOverlap": "{count}個{bonusSuffix}が最後の過去の結果（{date}）で一致",
+  "@resultPanelOverlap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "bonusSuffix": {},
+      "date": {}
+    }
+  },
+  "bonusSuffix": " + {bonusLabel}",
+  "@bonusSuffix": {
+    "placeholders": {
+      "bonusLabel": {}
+    }
+  },
+  "notificationResultReadyChannel": "結果準備完了",
+  "notificationResultReadyTitle": "結果準備完了 🎯",
+  "notificationResultsReadyTitle": "{count}件の結果準備完了 🎯",
+  "@notificationResultsReadyTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationSavedNumbersReady": "保存した宝くじ数字の確認準備ができました",
+  "notificationDailyInsightsChannel": "デイリーインサイト",
+  "notificationDailyInsightTitle": "今日のインサイト 📊",
+  "notificationWeeklySummaryChannel": "週間サマリー",
+  "notificationWeeklySummaryTitle": "週間サマリー 📅",
+  "notificationResultsDescription": "宝くじ抽選結果が利用可能なときに通知",
+  "notificationDailyDescription": "毎日の抽選トレンド観察",
+  "notificationWeeklyDescription": "週間抽選パターンサマリー",
+  "lotteryHistoryNoRemoteCsv": "{lottery}のリモートCSVが設定されていません。",
+  "@lotteryHistoryNoRemoteCsv": {
+    "placeholders": {
+      "lottery": {}
+    }
+  },
+  "lotteryHistoryLoadFailed": "履歴CSVの読み込みに失敗しました（{statusCode}）。",
+  "@lotteryHistoryLoadFailed": {
+    "placeholders": {
+      "statusCode": {
+        "type": "int"
+      }
+    }
+  },
+  "lotteryHistoryCsvEmpty": "履歴CSVが空です。",
+  "lotteryHistoryNoValidRows": "CSVに有効な抽選行が見つかりません。",
+  "lotteryHistoryParseFailed": "履歴CSVの解析に失敗しました: {error}",
+  "@lotteryHistoryParseFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "completeMyNumbers": "自分の数字を補完",
+  "completeMyNumbersTitle": "ラッキーナンバーをロック",
+  "completeMyNumbersSubtitle": "保持したい数字を選択すると、選択した戦略に基づいて残りを生成します。",
+  "selectYourNumbers": "あなたの数字",
+  "tapToLockNumbers": "タップして数字をロック（{locked}/{total}）",
+  "@tapToLockNumbers": {
+    "placeholders": {
+      "locked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "bonusNumbers": "ボーナス数字",
+  "tapToLockBonusNumbers": "タップしてボーナスをロック（{locked}/{total}）",
+  "@tapToLockBonusNumbers": {
+    "placeholders": {
+      "locked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "generationStrategy": "生成戦略",
+  "generateAllNumbers": "数字を生成",
+  "completeRemainingNumbers": "自分の数字を補完",
+  "yourCompletedNumbers": "あなたの完成した数字",
+  "locked": "あなたの選択",
+  "generated": "生成済み",
+  "maxNumbersSelected": "最大{max}個の数字まで",
+  "@maxNumbersSelected": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "reset": "リセット",
+  "regenerate": "もう一度試す",
+  "completeMyNumbersDisclaimer": "この機能は娯楽および統計的参考のみを目的としています。生成された数字は過去のデータに基づいており、当選確率を上げるものではありません。",
+  "numberAlreadySelected": "この数字は既に他のセクションで選択されています",
+  "duplicateNumbersError": "生成できません: 重複した数字が見つかりました。本数字と追加数字のセクションに同じ数字が含まれていないことを確認してください。"
 }
