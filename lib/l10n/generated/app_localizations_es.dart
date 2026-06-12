@@ -1418,4 +1418,12 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get completeMyNumbersDisclaimer =>
       'Esta función es solo para entretenimiento y referencia estadística. Los números generados se basan en datos históricos y no aumentan tus posibilidades de ganar.';
+
+  @override
+  String get numberAlreadySelected =>
+      'Este número ya está seleccionado en la otra sección';
+
+  @override
+  String get duplicateNumbersError =>
+      'No se puede generar: se encontraron números duplicados. Asegúrese de que ningún número aparezca en las secciones principales y suplementarias.';
 }

@@ -726,5 +726,7 @@
   },
   "reset": "Zurücksetzen",
   "regenerate": "Erneut Versuchen",
-  "completeMyNumbersDisclaimer": "Diese Funktion dient nur zu Unterhaltungs- und statistischen Referenzzwecken. Generierte Zahlen basieren auf historischen Daten und erhöhen nicht Ihre Gewinnchancen."
+  "completeMyNumbersDisclaimer": "Diese Funktion dient nur zu Unterhaltungs- und statistischen Referenzzwecken. Generierte Zahlen basieren auf historischen Daten und erhöhen nicht Ihre Gewinnchancen.",
+  "numberAlreadySelected": "Diese Nummer ist bereits im anderen Abschnitt ausgewählt",
+  "duplicateNumbersError": "Kann nicht generieren: Doppelte Zahlen gefunden. Stellen Sie sicher, dass keine Zahl sowohl im Haupt- als auch im Zusatzabschnitt vorkommt."
 }

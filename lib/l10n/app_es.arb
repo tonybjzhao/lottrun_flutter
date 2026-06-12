@@ -726,5 +726,7 @@
   },
   "reset": "Reiniciar",
   "regenerate": "Intentar de Nuevo",
-  "completeMyNumbersDisclaimer": "Esta función es solo para entretenimiento y referencia estadística. Los números generados se basan en datos históricos y no aumentan tus posibilidades de ganar."
+  "completeMyNumbersDisclaimer": "Esta función es solo para entretenimiento y referencia estadística. Los números generados se basan en datos históricos y no aumentan tus posibilidades de ganar.",
+  "numberAlreadySelected": "Este número ya está seleccionado en la otra sección",
+  "duplicateNumbersError": "No se puede generar: se encontraron números duplicados. Asegúrese de que ningún número aparezca en las secciones principales y suplementarias."
 }

@@ -1314,4 +1314,12 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get completeMyNumbersDisclaimer =>
       'This feature is for entertainment and statistical reference only. Generated numbers are based on historical data and do not increase your chances of winning.';
+
+  @override
+  String get numberAlreadySelected =>
+      'This number is already selected in the other section';
+
+  @override
+  String get duplicateNumbersError =>
+      'Cannot generate: duplicate numbers found. Please ensure no number appears in both main and supplementary sections.';
 }

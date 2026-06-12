@@ -1371,4 +1371,12 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get completeMyNumbersDisclaimer =>
       'Diese Funktion dient nur zu Unterhaltungs- und statistischen Referenzzwecken. Generierte Zahlen basieren auf historischen Daten und erhöhen nicht Ihre Gewinnchancen.';
+
+  @override
+  String get numberAlreadySelected =>
+      'Diese Nummer ist bereits im anderen Abschnitt ausgewählt';
+
+  @override
+  String get duplicateNumbersError =>
+      'Kann nicht generieren: Doppelte Zahlen gefunden. Stellen Sie sicher, dass keine Zahl sowohl im Haupt- als auch im Zusatzabschnitt vorkommt.';
 }

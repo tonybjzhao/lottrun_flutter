@@ -816,5 +816,7 @@
   },
   "reset": "Reset",
   "regenerate": "Try Again",
-  "completeMyNumbersDisclaimer": "This feature is for entertainment and statistical reference only. Generated numbers are based on historical data and do not increase your chances of winning."
+  "completeMyNumbersDisclaimer": "This feature is for entertainment and statistical reference only. Generated numbers are based on historical data and do not increase your chances of winning.",
+  "numberAlreadySelected": "This number is already selected in the other section",
+  "duplicateNumbersError": "Cannot generate: duplicate numbers found. Please ensure no number appears in both main and supplementary sections."
 }

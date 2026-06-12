@@ -1300,4 +1300,12 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get completeMyNumbersDisclaimer =>
       'Cette fonctionnalité est à des fins de divertissement et de référence statistique uniquement. Les numéros générés sont basés sur des données historiques et n’augmentent pas vos chances de gagner.';
+
+  @override
+  String get numberAlreadySelected =>
+      'Ce numéro est déjà sélectionné dans l’autre section';
+
+  @override
+  String get duplicateNumbersError =>
+      'Impossible de générer : numéros en double détectés. Assurez-vous qu’aucun numéro n’apparaît dans les sections principales et supplémentaires.';
 }

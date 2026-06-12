@@ -1223,4 +1223,10 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get completeMyNumbersDisclaimer =>
       '此功能仅供娱乐和统计参考。生成的号码基于历史数据，不会增加中奖机会。';
+
+  @override
+  String get numberAlreadySelected => '此号码已在另一区域中选择';
+
+  @override
+  String get duplicateNumbersError => '无法生成：发现重复号码。请确保没有号码同时出现在主号码和补充号码中。';
 }

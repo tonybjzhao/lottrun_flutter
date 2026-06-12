@@ -181,6 +181,8 @@ class _CompleteMyNumbersScreenState extends State<CompleteMyNumbersScreen> {
     required bool isBonus,
   }) {
     final theme = Theme.of(context);
+    final otherSet = isBonus ? _lockedMainNumbers : _lockedBonusNumbers;
+    final hasSharedPool = !widget.lottery.hasSeparateBonusPool;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,9 +209,11 @@ class _CompleteMyNumbersScreenState extends State<CompleteMyNumbersScreen> {
             (index) {
               final number = min + index;
               final isLocked = lockedNumbers.contains(number);
+              final isDisabled = hasSharedPool && otherSet.contains(number);
               return _buildNumberButton(
                 number: number,
                 isLocked: isLocked,
+                isDisabled: isDisabled,
                 isBonus: isBonus,
                 onTap: () => _toggleNumber(number, isBonus, maxSelection),
               );
@@ -223,6 +227,7 @@ class _CompleteMyNumbersScreenState extends State<CompleteMyNumbersScreen> {
   Widget _buildNumberButton({
     required int number,
     required bool isLocked,
+    required bool isDisabled,
     required bool isBonus,
     required VoidCallback onTap,
   }) {
@@ -230,39 +235,43 @@ class _CompleteMyNumbersScreenState extends State<CompleteMyNumbersScreen> {
     final size = 48.0;
 
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: isLocked
-              ? theme.colorScheme.primary
-              : theme.colorScheme.surfaceContainerHighest,
-          border: Border.all(
+      onTap: isDisabled ? null : onTap,
+      child: Opacity(
+        opacity: isDisabled ? 0.3 : 1.0,
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
             color: isLocked
                 ? theme.colorScheme.primary
-                : theme.colorScheme.outline.withOpacity(0.3),
-            width: isLocked ? 2 : 1,
-          ),
-          boxShadow: isLocked
-              ? [
-                  BoxShadow(
-                    color: theme.colorScheme.primary.withOpacity(0.3),
-                    blurRadius: 8,
-                    spreadRadius: 1,
-                  ),
-                ]
-              : null,
-        ),
-        child: Center(
-          child: Text(
-            '$number',
-            style: theme.textTheme.titleMedium?.copyWith(
+                : theme.colorScheme.surfaceContainerHighest,
+            border: Border.all(
               color: isLocked
-                  ? theme.colorScheme.onPrimary
-                  : theme.colorScheme.onSurface,
-              fontWeight: isLocked ? FontWeight.bold : FontWeight.normal,
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.outline.withOpacity(0.3),
+              width: isLocked ? 2 : 1,
+            ),
+            boxShadow: isLocked
+                ? [
+                    BoxShadow(
+                      color: theme.colorScheme.primary.withOpacity(0.3),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                    ),
+                  ]
+                : null,
+          ),
+          child: Center(
+            child: Text(
+              '$number',
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: isLocked
+                    ? theme.colorScheme.onPrimary
+                    : theme.colorScheme.onSurface,
+                fontWeight: isLocked ? FontWeight.bold : FontWeight.normal,
+                decoration: isDisabled ? TextDecoration.lineThrough : null,
+              ),
             ),
           ),
         ),
@@ -479,23 +488,41 @@ class _CompleteMyNumbersScreenState extends State<CompleteMyNumbersScreen> {
   void _toggleNumber(int number, bool isBonus, int maxSelection) {
     setState(() {
       final targetSet = isBonus ? _lockedBonusNumbers : _lockedMainNumbers;
+      final otherSet = isBonus ? _lockedMainNumbers : _lockedBonusNumbers;
 
       if (targetSet.contains(number)) {
+        // Unlocking a number
         targetSet.remove(number);
-      } else if (targetSet.length < maxSelection) {
-        targetSet.add(number);
       } else {
-        // Show feedback that max is reached
-        HapticFeedback.lightImpact();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              context.l10n.maxNumbersSelected(maxSelection),
+        // Check if we've reached max selection
+        if (targetSet.length >= maxSelection) {
+          HapticFeedback.lightImpact();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                context.l10n.maxNumbersSelected(maxSelection),
+              ),
+              duration: const Duration(seconds: 2),
             ),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-        return;
+          );
+          return;
+        }
+
+        // Check for duplicate in shared pool (only for games without separate bonus pool)
+        if (!widget.lottery.hasSeparateBonusPool && otherSet.contains(number)) {
+          HapticFeedback.lightImpact();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                context.l10n.numberAlreadySelected,
+              ),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+          return;
+        }
+
+        targetSet.add(number);
       }
 
       _generatedPick = null;
@@ -515,6 +542,23 @@ class _CompleteMyNumbersScreenState extends State<CompleteMyNumbersScreen> {
   }
 
   Future<void> _generateNumbers() async {
+    // Validate no duplicates for shared pool games
+    if (!widget.lottery.hasSeparateBonusPool) {
+      final duplicates = _lockedMainNumbers.intersection(_lockedBonusNumbers);
+      if (duplicates.isNotEmpty) {
+        HapticFeedback.lightImpact();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              context.l10n.duplicateNumbersError,
+            ),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+        return;
+      }
+    }
+
     setState(() => _isGenerating = true);
 
     await Future.delayed(const Duration(milliseconds: 500));

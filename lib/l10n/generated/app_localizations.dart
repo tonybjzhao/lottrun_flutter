@@ -2223,6 +2223,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This feature is for entertainment and statistical reference only. Generated numbers are based on historical data and do not increase your chances of winning.'**
   String get completeMyNumbersDisclaimer;
+
+  /// No description provided for @numberAlreadySelected.
+  ///
+  /// In en, this message translates to:
+  /// **'This number is already selected in the other section'**
+  String get numberAlreadySelected;
+
+  /// No description provided for @duplicateNumbersError.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot generate: duplicate numbers found. Please ensure no number appears in both main and supplementary sections.'**
+  String get duplicateNumbersError;
 }
 
 class _AppLocalizationsDelegate
