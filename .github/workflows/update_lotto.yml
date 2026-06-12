@@ -50,15 +50,21 @@ jobs:
       - name: Update US lottery CSVs
         run: python tools/sync_us_lottery_history.py --recent-draws 3
 
+      - name: Update UK/Canada lottery CSVs
+        run: python tools/sync_uk_canada_lottery_history.py --limit 120
+
+      - name: Update Germany lottery CSVs
+        run: python tools/sync_de_lottery_history.py --limit 120
+
       - name: Commit updated CSVs
         run: |
-          if [ -z "$(git status --porcelain -- docs/*.csv lib/data/seed_us_*.dart)" ]; then
+          if [ -z "$(git status --porcelain -- docs/*.csv lib/data/seed_*.dart)" ]; then
             echo "No CSV changes to commit."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/*.csv lib/data/seed_us_*.dart
+          git add docs/*.csv lib/data/seed_*.dart
           git commit -m "Update lottery CSVs [skip ci]"
           git push
