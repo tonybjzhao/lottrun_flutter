@@ -7,6 +7,8 @@ import '../models/lottery.dart';
 import '../services/generator_service.dart';
 import '../services/lottery_service.dart';
 import '../services/analytics_service.dart';
+import '../services/local_storage_service.dart';
+import '../services/draw_date_service.dart';
 import '../widgets/lotto_ball.dart';
 import '../widgets/style_chip_group.dart';
 import '../widgets/disclaimer_card.dart';
@@ -30,6 +32,7 @@ class _CompleteMyNumbersScreenState extends State<CompleteMyNumbersScreen> {
   PlayStyle _selectedStyle = PlayStyle.balanced;
   GeneratedPick? _generatedPick;
   bool _isGenerating = false;
+  bool _isSaved = false;
 
   @override
   Widget build(BuildContext context) {
@@ -367,15 +370,34 @@ class _CompleteMyNumbersScreenState extends State<CompleteMyNumbersScreen> {
                   label: Text(l10n.reset),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               Expanded(
-                child: FilledButton.icon(
+                child: OutlinedButton.icon(
                   onPressed: _generateNumbers,
                   icon: const Icon(Icons.casino),
                   label: Text(l10n.regenerate),
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 12),
+
+          // Save Button
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: _isSaved ? null : _savePick,
+              icon: Icon(_isSaved ? Icons.check : Icons.bookmark_add),
+              label: Text(_isSaved ? l10n.commonSaved : l10n.commonSave),
+              style: FilledButton.styleFrom(
+                backgroundColor: _isSaved
+                    ? theme.colorScheme.surfaceContainerHighest
+                    : theme.colorScheme.primary,
+                foregroundColor: _isSaved
+                    ? theme.colorScheme.onSurface.withOpacity(0.6)
+                    : theme.colorScheme.onPrimary,
+              ),
+            ),
           ),
           ],
         ),
@@ -477,6 +499,7 @@ class _CompleteMyNumbersScreenState extends State<CompleteMyNumbersScreen> {
       }
 
       _generatedPick = null;
+      _isSaved = false;
       HapticFeedback.selectionClick();
     });
   }
@@ -524,6 +547,7 @@ class _CompleteMyNumbersScreenState extends State<CompleteMyNumbersScreen> {
     setState(() {
       _generatedPick = pick;
       _isGenerating = false;
+      _isSaved = false; // Reset saved state when regenerating
     });
   }
 
@@ -532,7 +556,43 @@ class _CompleteMyNumbersScreenState extends State<CompleteMyNumbersScreen> {
       _lockedMainNumbers.clear();
       _lockedBonusNumbers.clear();
       _generatedPick = null;
+      _isSaved = false;
     });
     HapticFeedback.lightImpact();
+  }
+
+  Future<void> _savePick() async {
+    if (_generatedPick == null) return;
+
+    HapticFeedback.lightImpact();
+
+    final pickToSave = GeneratedPick(
+      id: _generatedPick!.id,
+      lotteryId: _generatedPick!.lotteryId,
+      style: _generatedPick!.style,
+      mainNumbers: _generatedPick!.mainNumbers,
+      bonusNumbers: _generatedPick!.bonusNumbers,
+      createdAt: _generatedPick!.createdAt,
+      drawDate: nextDrawDate(widget.lottery.id),
+      drawLabel: nextDrawLabel(widget.lottery.id),
+      pickLabel: context.l10n.completeMyNumbers,
+      source: PickSource.manual,
+    );
+
+    await Future.wait([
+      LocalStorageService.instance.saveLastPick(pickToSave),
+      LocalStorageService.instance.savePickToHistory(pickToSave),
+    ]);
+
+    if (!mounted) return;
+
+    setState(() => _isSaved = true);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(context.l10n.pickSaved),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 }
