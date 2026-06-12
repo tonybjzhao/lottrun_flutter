@@ -1,0 +1,106 @@
+{
+  "@@locale": "ja",
+  "appTitle": "LottFun",
+  "brandTitle": "NumberRun",
+  "brandSubtitle": "過去の記録からの数字セット",
+  "commonCancel": "キャンセル",
+  "commonRetry": "再試行",
+  "commonShare": "共有",
+  "commonCopy": "コピー",
+  "commonSave": "保存",
+  "commonSaved": "保存済み",
+  "commonLoad": "読み込み",
+  "commonDelete": "削除",
+  "commonBonus": "ボーナス",
+  "commonSupp": "追加",
+  "commonView": "表示",
+  "commonLoading": "読み込み中...",
+  "commonGenerating": "生成中…",
+  "commonPreparing": "準備中...",
+  "countryUnitedStates": "アメリカ",
+  "countryAustralia": "オーストラリア",
+  "countryUnitedKingdom": "イギリス",
+  "countryCanada": "カナダ",
+  "countryGermany": "ドイツ",
+  "countryJapan": "日本",
+  "countryOther": "その他",
+  "lotteryPowerball": "Powerball",
+  "lotteryOzLotto": "Oz Lotto",
+  "lotterySaturdayLotto": "Saturday Lotto",
+  "lotteryMegaMillions": "Mega Millions",
+  "lotteryUkLotto": "UK Lotto",
+  "lotteryEuroMillions": "EuroMillions",
+  "lotteryLottoMax": "Lotto Max",
+  "lotteryLotto649": "Lotto 6/49",
+  "lotteryLotto6aus49": "Lotto 6aus49",
+  "lotteryEuroJackpot": "EuroJackpot",
+  "lotteryLoto6": "ロト6",
+  "lotteryLoto7": "ロト7",
+  "bonusPowerball": "Powerball",
+  "bonusMegaBall": "Mega Ball",
+  "bonusLuckyStars": "Lucky Stars",
+  "bonusSuperzahl": "Superzahl",
+  "bonusEuroNumbers": "Euro Numbers",
+  "screenHistoryTitle": "履歴",
+  "screenSettingsTitle": "設定",
+  "screenSavedPicksTitle": "保存した選択",
+  "screenAddMyNumbersTitle": "自分の数字を追加",
+  "numberSelectionLabel": "数字の選択",
+  "lotteryLabel": "宝くじ",
+  "homeCardTitle": "数字の選択",
+  "homeCardSubtitle": "スタイルを選択するか、3つの数字セットを生成",
+  "generateOnePick": "1つ生成",
+  "generateThreeNumberSets": "🎲 3つの数字セットを生成",
+  "generateThreeNumberSetsDescription": "3つの数字セットはバランス型+観察型+ランダム型を組み合わせています（参考用）。",
+  "pastOverlapReferenceNote": "✨ いくつかの選択は過去の結果と複数の数字が重なりました（参考用）",
+  "generateEmptyPrompt": "過去の記録から数字セットを生成 🎲",
+  "numberSetReady": "✨ 数字セットが準備できました",
+  "historicalSimilarityReference": "📊 過去との類似度（参考）: {score} / 100",
+  "@historicalSimilarityReference": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "dayStreak": "🔥 {count}日連続",
+  "@dayStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "countdownWithHourglass": "⏳ {text}",
+  "@countdownWithHourglass": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "saveAll": "すべて保存",
+  "savedToSavedPicks": "保存した選択に保存しました",
+  "pickSaved": "選択を保存しました",
+  "alreadySaved": "既に保存済み",
+  "allThreePicksSaved": "3つすべて保存しました",
+  "copiedToClipboard": "クリップボードにコピーしました。",
+  "pickCopiedToClipboard": "{label}をクリップボードにコピーしました。",
+  "@pickCopiedToClipboard": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "savedPicksTooltip": "保存した選択",
+  "historyTooltip": "履歴",
+  "settingsTooltip": "設定",
+  "addMyNumbersTooltip": "自分の数字を追加",
+  "deleteTooltip": "削除",
+  "collapseTooltip": "折りたたむ",
+  "styleBalanced": "バランス型",
+  "styleObservedPattern": "観察型",
+  "styleLessCommon": "低頻度型",
+  "styleRandom": "ランダム",
+  "styleBalancedDescription": "過去の抽選データに基づいた分散型",
+  "styleObservedPatternDescription": "過去の抽選で頻繁に出た数字",
+  "styleLessCommonDescription": "過去の抽選であまり出なかった数字",
+  "styleRandomDescription": "完全にランダムな選択"
+}

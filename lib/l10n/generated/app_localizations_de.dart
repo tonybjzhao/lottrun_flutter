@@ -75,6 +75,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get countryGermany => 'Deutschland';
 
   @override
+  String get countryJapan => 'Japan';
+
+  @override
   String get countryOther => 'Andere';
 
   @override
@@ -106,6 +109,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get lotteryEuroJackpot => 'EuroJackpot';
+
+  @override
+  String get lotteryLoto6 => 'Loto 6';
+
+  @override
+  String get lotteryLoto7 => 'Loto 7';
 
   @override
   String get bonusPowerball => 'Powerball';
@@ -474,6 +483,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get languageGerman => 'Deutsch';
+
+  @override
+  String get languageJapanese => '日本語';
 
   @override
   String get settingsAnalysisStyle => 'Analysestil';

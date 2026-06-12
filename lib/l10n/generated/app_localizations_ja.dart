@@ -4,9 +4,9 @@ import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
 
-/// The translations for English (`en`).
-class AppLocalizationsEn extends AppLocalizations {
-  AppLocalizationsEn([String locale = 'en']) : super(locale);
+/// The translations for Japanese (`ja`).
+class AppLocalizationsJa extends AppLocalizations {
+  AppLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
   String get appTitle => 'LottFun';
@@ -15,70 +15,70 @@ class AppLocalizationsEn extends AppLocalizations {
   String get brandTitle => 'NumberRun';
 
   @override
-  String get brandSubtitle => 'Number sets from past records';
+  String get brandSubtitle => '過去の記録からの数字セット';
 
   @override
-  String get commonCancel => 'Cancel';
+  String get commonCancel => 'キャンセル';
 
   @override
-  String get commonRetry => 'Retry';
+  String get commonRetry => '再試行';
 
   @override
-  String get commonShare => 'Share';
+  String get commonShare => '共有';
 
   @override
-  String get commonCopy => 'Copy';
+  String get commonCopy => 'コピー';
 
   @override
-  String get commonSave => 'Save';
+  String get commonSave => '保存';
 
   @override
-  String get commonSaved => 'Saved';
+  String get commonSaved => '保存済み';
 
   @override
-  String get commonLoad => 'Load';
+  String get commonLoad => '読み込み';
 
   @override
-  String get commonDelete => 'Delete';
+  String get commonDelete => '削除';
 
   @override
-  String get commonBonus => 'Bonus';
+  String get commonBonus => 'ボーナス';
 
   @override
-  String get commonSupp => 'Supp';
+  String get commonSupp => '追加';
 
   @override
-  String get commonView => 'View';
+  String get commonView => '表示';
 
   @override
-  String get commonLoading => 'Loading...';
+  String get commonLoading => '読み込み中...';
 
   @override
-  String get commonGenerating => 'Generating…';
+  String get commonGenerating => '生成中…';
 
   @override
-  String get commonPreparing => 'Preparing...';
+  String get commonPreparing => '準備中...';
 
   @override
-  String get countryUnitedStates => 'United States';
+  String get countryUnitedStates => 'アメリカ';
 
   @override
-  String get countryAustralia => 'Australia';
+  String get countryAustralia => 'オーストラリア';
 
   @override
-  String get countryUnitedKingdom => 'United Kingdom';
+  String get countryUnitedKingdom => 'イギリス';
 
   @override
-  String get countryCanada => 'Canada';
+  String get countryCanada => 'カナダ';
 
   @override
-  String get countryGermany => 'Germany';
+  String get countryGermany => 'ドイツ';
 
   @override
-  String get countryJapan => 'Japan';
+  String get countryJapan => '日本';
 
   @override
-  String get countryOther => 'Other';
+  String get countryOther => 'その他';
 
   @override
   String get lotteryPowerball => 'Powerball';
@@ -111,10 +111,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lotteryEuroJackpot => 'EuroJackpot';
 
   @override
-  String get lotteryLoto6 => 'Loto 6';
+  String get lotteryLoto6 => 'ロト6';
 
   @override
-  String get lotteryLoto7 => 'Loto 7';
+  String get lotteryLoto7 => 'ロト7';
 
   @override
   String get bonusPowerball => 'Powerball';
@@ -132,58 +132,56 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bonusEuroNumbers => 'Euro Numbers';
 
   @override
-  String get screenHistoryTitle => 'History';
+  String get screenHistoryTitle => '履歴';
 
   @override
-  String get screenSettingsTitle => 'Settings';
+  String get screenSettingsTitle => '設定';
 
   @override
-  String get screenSavedPicksTitle => 'Saved Picks';
+  String get screenSavedPicksTitle => '保存した選択';
 
   @override
-  String get screenAddMyNumbersTitle => 'Add My Numbers';
+  String get screenAddMyNumbersTitle => '自分の数字を追加';
 
   @override
-  String get numberSelectionLabel => 'Number selection';
+  String get numberSelectionLabel => '数字の選択';
 
   @override
-  String get lotteryLabel => 'Lottery';
+  String get lotteryLabel => '宝くじ';
 
   @override
-  String get homeCardTitle => 'Number Picks';
+  String get homeCardTitle => '数字の選択';
 
   @override
-  String get homeCardSubtitle => 'Choose one style, or generate 3 number sets';
+  String get homeCardSubtitle => 'スタイルを選択するか、3つの数字セットを生成';
 
   @override
-  String get generateOnePick => 'Generate 1 Pick';
+  String get generateOnePick => '1つ生成';
 
   @override
-  String get generateThreeNumberSets => '🎲 Generate 3 Number Sets';
+  String get generateThreeNumberSets => '🎲 3つの数字セットを生成';
 
   @override
   String get generateThreeNumberSetsDescription =>
-      '3 Number Sets combine Balanced + Observed + Random styles for reference only.';
+      '3つの数字セットはバランス型+観察型+ランダム型を組み合わせています（参考用）。';
 
   @override
-  String get pastOverlapReferenceNote =>
-      '✨ Some selections overlapped multiple numbers in past results (for reference only)';
+  String get pastOverlapReferenceNote => '✨ いくつかの選択は過去の結果と複数の数字が重なりました（参考用）';
 
   @override
-  String get generateEmptyPrompt =>
-      'Generate a number set from past records 🎲';
+  String get generateEmptyPrompt => '過去の記録から数字セットを生成 🎲';
 
   @override
-  String get numberSetReady => '✨ Your number set is ready';
+  String get numberSetReady => '✨ 数字セットが準備できました';
 
   @override
   String historicalSimilarityReference(int score) {
-    return '📊 Historical similarity (reference only): $score / 100';
+    return '📊 過去との類似度（参考）: $score / 100';
   }
 
   @override
   String dayStreak(int count) {
-    return '🔥 $count-day streak';
+    return '🔥 $count日連続';
   }
 
   @override
@@ -192,57 +190,57 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get saveAll => 'Save All';
+  String get saveAll => 'すべて保存';
 
   @override
-  String get savedToSavedPicks => 'Saved to Saved Picks';
+  String get savedToSavedPicks => '保存した選択に保存しました';
 
   @override
-  String get pickSaved => 'Pick saved';
+  String get pickSaved => '選択を保存しました';
 
   @override
-  String get alreadySaved => 'Already saved';
+  String get alreadySaved => '既に保存済み';
 
   @override
-  String get allThreePicksSaved => 'All 3 picks saved';
+  String get allThreePicksSaved => '3つすべて保存しました';
 
   @override
-  String get copiedToClipboard => 'Copied to clipboard.';
+  String get copiedToClipboard => 'クリップボードにコピーしました。';
 
   @override
   String pickCopiedToClipboard(Object label) {
-    return '$label copied to clipboard.';
+    return '$labelをクリップボードにコピーしました。';
   }
 
   @override
-  String get savedPicksTooltip => 'Saved Picks';
+  String get savedPicksTooltip => '保存した選択';
 
   @override
-  String get historyTooltip => 'History';
+  String get historyTooltip => '履歴';
 
   @override
-  String get settingsTooltip => 'Settings';
+  String get settingsTooltip => '設定';
 
   @override
-  String get addMyNumbersTooltip => 'Add My Numbers';
+  String get addMyNumbersTooltip => '自分の数字を追加';
 
   @override
-  String get deleteTooltip => 'Delete';
+  String get deleteTooltip => '削除';
 
   @override
-  String get collapseTooltip => 'Collapse';
+  String get collapseTooltip => '折りたたむ';
 
   @override
-  String get styleBalanced => 'Balanced';
+  String get styleBalanced => 'バランス型';
 
   @override
-  String get styleObservedPattern => 'Observed Pattern';
+  String get styleObservedPattern => '観察型';
 
   @override
-  String get styleLessCommon => 'Less common';
+  String get styleLessCommon => '低頻度型';
 
   @override
-  String get styleRandom => 'Random';
+  String get styleRandom => 'ランダム';
 
   @override
   String get styleBalancedTagline => 'Balanced Pick';
@@ -272,7 +270,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Completely random selection. Just for fun.';
 
   @override
-  String get styleBalancedDescription => 'Even spread across the number range';
+  String get styleBalancedDescription => '過去の抽選データに基づいた分散型';
 
   @override
   String get styleHotDescription =>
@@ -283,7 +281,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Based on less frequent historical numbers (for reference only)';
 
   @override
-  String get styleRandomDescription => 'Random selection (for reference only)';
+  String get styleRandomDescription => '完全にランダムな選択';
 
   @override
   String get threePickExample => 'Example Pick';

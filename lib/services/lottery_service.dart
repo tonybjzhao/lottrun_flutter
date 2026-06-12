@@ -8,6 +8,8 @@ import '../data/seed_us_powerball.dart';
 import '../data/seed_canada_lotteries.dart';
 import '../data/seed_de_lotto_6aus49.dart';
 import '../data/seed_de_eurojackpot.dart';
+import '../data/seed_jp_loto6.dart';
+import '../data/seed_jp_loto7.dart';
 import '../models/lottery.dart';
 import '../models/lottery_draw.dart';
 
@@ -51,6 +53,10 @@ class LotteryService {
         return kDeLotto6aus49Draws;
       case 'de_eurojackpot':
         return kDeEuroJackpotDraws;
+      case 'jp_loto6':
+        return kJpLoto6Draws;
+      case 'jp_loto7':
+        return kJpLoto7Draws;
       default:
         return [];
     }

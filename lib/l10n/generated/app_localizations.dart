@@ -9,6 +9,7 @@ import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
 import 'app_localizations_es.dart';
 import 'app_localizations_fr.dart';
+import 'app_localizations_ja.dart';
 import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
@@ -101,6 +102,7 @@ abstract class AppLocalizations {
     Locale('en'),
     Locale('es'),
     Locale('fr'),
+    Locale('ja'),
     Locale('zh'),
   ];
 
@@ -236,6 +238,12 @@ abstract class AppLocalizations {
   /// **'Germany'**
   String get countryGermany;
 
+  /// No description provided for @countryJapan.
+  ///
+  /// In en, this message translates to:
+  /// **'Japan'**
+  String get countryJapan;
+
   /// No description provided for @countryOther.
   ///
   /// In en, this message translates to:
@@ -301,6 +309,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'EuroJackpot'**
   String get lotteryEuroJackpot;
+
+  /// No description provided for @lotteryLoto6.
+  ///
+  /// In en, this message translates to:
+  /// **'Loto 6'**
+  String get lotteryLoto6;
+
+  /// No description provided for @lotteryLoto7.
+  ///
+  /// In en, this message translates to:
+  /// **'Loto 7'**
+  String get lotteryLoto7;
 
   /// No description provided for @bonusPowerball.
   ///
@@ -913,6 +933,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Deutsch'**
   String get languageGerman;
+
+  /// No description provided for @languageJapanese.
+  ///
+  /// In en, this message translates to:
+  /// **'日本語'**
+  String get languageJapanese;
 
   /// No description provided for @settingsAnalysisStyle.
   ///
@@ -2247,8 +2273,14 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['de', 'en', 'es', 'fr', 'zh'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'de',
+    'en',
+    'es',
+    'fr',
+    'ja',
+    'zh',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -2265,6 +2297,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsEs();
     case 'fr':
       return AppLocalizationsFr();
+    case 'ja':
+      return AppLocalizationsJa();
     case 'zh':
       return AppLocalizationsZh();
   }

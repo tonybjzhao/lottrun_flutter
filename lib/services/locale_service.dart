@@ -7,7 +7,7 @@ class LocaleService extends ChangeNotifier {
   static final instance = LocaleService._();
 
   static const _prefKey = 'selected_locale';
-  static const supportedLanguageCodes = ['en', 'zh', 'fr', 'es', 'de'];
+  static const supportedLanguageCodes = ['en', 'zh', 'fr', 'es', 'de', 'ja'];
 
   Locale? _locale;
 

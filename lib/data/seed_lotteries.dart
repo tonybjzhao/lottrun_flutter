@@ -163,4 +163,32 @@ final List<Lottery> kSeedLotteries = [
     hasSeparateBonusPool: true,
     bonusLabel: _l10n.bonusEuroNumbers,
   ),
+
+  // ── Japan ─────────────────────────────────────────────────────────────────
+  Lottery(
+    id: 'jp_loto6',
+    countryCode: 'JP',
+    countryName: _l10n.countryJapan,
+    name: _l10n.lotteryLoto6,
+    mainCount: 6,
+    mainMin: 1,
+    mainMax: 43,
+    bonusCount: 1,
+    bonusMin: 1,
+    bonusMax: 43,
+    // bonusLabel: null → same-pool bonus number, shown as supplementary.
+  ),
+  Lottery(
+    id: 'jp_loto7',
+    countryCode: 'JP',
+    countryName: _l10n.countryJapan,
+    name: _l10n.lotteryLoto7,
+    mainCount: 7,
+    mainMin: 1,
+    mainMax: 37,
+    bonusCount: 2,
+    bonusMin: 1,
+    bonusMax: 37,
+    // bonusLabel: null → same-pool bonus numbers, shown as supplementary.
+  ),
 ];
