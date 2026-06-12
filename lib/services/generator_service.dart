@@ -21,12 +21,19 @@ class GeneratorService {
     final sorted = [...history]
       ..sort((a, b) => b.drawDate.compareTo(a.drawDate));
 
+    // For shared pool lotteries, main generation must exclude locked bonus numbers
+    final mainExclude = lottery.hasSeparateBonusPool
+        ? <int>[]
+        : lockedBonusNumbers;
+
     final main = _generateMain(
       lottery,
       style,
       sorted,
       lockedNumbers: lockedMainNumbers,
+      excludeNumbers: mainExclude,
     );
+
     final bonus = lottery.hasBonus
         ? _generateBonus(
             lottery,
@@ -36,6 +43,27 @@ class GeneratorService {
             lockedNumbers: lockedBonusNumbers,
           )
         : null;
+
+    // CRITICAL VALIDATION: For shared pool lotteries, ensure no duplicates
+    if (!lottery.hasSeparateBonusPool && bonus != null) {
+      final mainSet = main.toSet();
+      final bonusSet = bonus.toSet();
+      final duplicates = mainSet.intersection(bonusSet);
+
+      assert(
+        duplicates.isEmpty,
+        'BUG: Duplicate numbers found in shared pool lottery ${lottery.id}: '
+        'Main=$main, Bonus=$bonus, Duplicates=$duplicates',
+      );
+
+      if (duplicates.isNotEmpty) {
+        throw StateError(
+          'Generated duplicate numbers for shared pool lottery ${lottery.id}: '
+          'numbers $duplicates appear in both main and bonus pools',
+        );
+      }
+    }
+
     return GeneratedPick(
       lotteryId: lottery.id,
       style: style,
@@ -52,6 +80,7 @@ class GeneratorService {
     PlayStyle style,
     List<LotteryDraw> history, {
     List<int> lockedNumbers = const [],
+    List<int> excludeNumbers = const [],
   }) {
     // Validate locked numbers
     final validLocked = lockedNumbers
@@ -68,13 +97,17 @@ class GeneratorService {
     // Generate only the remaining numbers needed
     final remainingCount = lottery.mainCount - validLocked.length;
     final allMain = history.map((d) => d.mainNumbers).toList();
+
+    // For shared pool: exclude both locked main AND locked bonus numbers
+    final allExclude = [...validLocked, ...excludeNumbers];
+
     final generated = _generatePartial(
       lottery.mainMin,
       lottery.mainMax,
       remainingCount,
       style,
       allMain,
-      exclude: validLocked,
+      exclude: allExclude,
     );
 
     // Combine locked and generated, then sort
