@@ -1,3 +1,15 @@
+#!/usr/bin/env python3
+"""
+Sync Japan lottery (Loto 6 & Loto 7) historical data from Lottolyzer.
+
+Data source: https://en.lottolyzer.com/history/japan/
+- Loto 6: ~1,750 draws available (35 pages × 50 draws)
+- Loto 7: ~700 draws available (14 pages × 50 draws)
+
+Usage:
+    python tools/sync_jp_lottery_history.py --limit 1000
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -25,59 +37,43 @@ HEADERS = {
 class GameConfig:
     lottery_id: str
     name: str
-    archive_url: str
+    base_url: str
     output_csv: str
     dart_file: str
     dart_symbol: str
     main_count: int
     bonus_count: int
-    year_start: int
 
 
 GAMES = [
     GameConfig(
         lottery_id="jp_loto6",
         name="Japan Loto 6",
-        archive_url="https://www.lotto.net/japan-loto-6/results/{year}",
+        base_url="https://en.lottolyzer.com/history/japan/lotto-6/page/{page}/per-page/50/number-view",
         output_csv="docs/jp_loto6.csv",
         dart_file="lib/data/seed_jp_loto6.dart",
         dart_symbol="kJpLoto6Draws",
         main_count=6,
         bonus_count=1,
-        year_start=2000,
     ),
     GameConfig(
         lottery_id="jp_loto7",
         name="Japan Loto 7",
-        archive_url="https://www.lotto.net/japan-loto-7/results/{year}",
+        base_url="https://en.lottolyzer.com/history/japan/lotto-7/page/{page}/per-page/50/number-view",
         output_csv="docs/jp_loto7.csv",
         dart_file="lib/data/seed_jp_loto7.dart",
         dart_symbol="kJpLoto7Draws",
         main_count=7,
         bonus_count=2,
-        year_start=2013,
     ),
 ]
-
-# Date pattern for English date format: "Friday March 7th 2025"
-DATE_RE = re.compile(
-    r"\b(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s+"
-    r"(January|February|March|April|May|June|July|August|September|October|November|December)\s+"
-    r"(\d{1,2})(?:st|nd|rd|th)?\s+(\d{4})\b"
-)
-
-MONTHS = {
-    "January": 1, "February": 2, "March": 3, "April": 4,
-    "May": 5, "June": 6, "July": 7, "August": 8,
-    "September": 9, "October": 10, "November": 11, "December": 12,
-}
 
 
 def fetch_html(url: str, retries: int = 3) -> str:
     """Fetch HTML with retries."""
     for attempt in range(retries):
         try:
-            response = requests.get(url, headers=HEADERS, timeout=20)
+            response = requests.get(url, headers=HEADERS, timeout=30)
             response.raise_for_status()
             return response.text
         except Exception as e:
@@ -87,83 +83,145 @@ def fetch_html(url: str, retries: int = 3) -> str:
     return ""
 
 
-def parse_archive_page(html: str, game: GameConfig) -> list[dict]:
-    """Parse lotto.net archive page and extract draw results."""
+def parse_lottolyzer_page(html: str, game: GameConfig) -> list[dict]:
+    """Parse Lottolyzer results page and extract draws."""
     soup = BeautifulSoup(html, "html.parser")
-    text = soup.get_text("\n", strip=True)
+    draws = []
 
-    # Find all date matches
-    date_matches = list(DATE_RE.finditer(text))
-    if not date_matches:
-        return []
+    # Find all text elements that say "Draw XXXX"
+    draw_pattern = re.compile(r"^Draw \d+$")
+    draw_elements = soup.find_all(string=draw_pattern)
 
-    rows: list[dict] = []
+    for elem in draw_elements:
+        try:
+            draw_text = elem.strip()
 
-    # Extract numbers - look for number patterns near dates
-    # lotto.net typically shows: "1 2 3 4 5 6 Bonus: 7"
-    lines = text.split("\n")
+            # Navigate up the DOM to find the container that has both date and numbers
+            parent = elem.parent
+            container = None
 
-    for i, line in enumerate(lines):
-        # Look for date in line
-        date_match = DATE_RE.search(line)
-        if not date_match:
-            continue
+            # Go up max 10 levels to find a div containing numbers
+            for _ in range(10):
+                if not parent or parent.name != "div":
+                    parent = parent.parent if parent else None
+                    continue
 
-        month_name, day, year = date_match.groups()
-        draw_date = f"{year}-{MONTHS[month_name]:02d}-{int(day):02d}"
+                # Check if this parent has a numbers div
+                nums_div = parent.find("div", class_="numbers")
+                if nums_div:
+                    container = parent
+                    break
 
-        # Look for numbers in nearby lines (within next 5 lines)
-        for j in range(i, min(i + 5, len(lines))):
-            # Find sequences of numbers
-            numbers = re.findall(r'\b(\d{1,2})\b', lines[j])
-            numbers = [int(n) for n in numbers if 1 <= int(n) <= 50]  # Filter valid range
+                parent = parent.parent
 
-            if len(numbers) >= game.main_count + game.bonus_count:
+            if not container:
+                continue
+
+            # Find date
+            date_div = container.find("div", class_="date")
+            if not date_div:
+                continue
+
+            date_text = date_div.get_text(strip=True)
+            draw_date = parse_date(date_text)
+            if not draw_date:
+                continue
+
+            # Extract numbers from ball images
+            ball_imgs = nums_div.find_all("img", class_="ball")
+            numbers = []
+
+            for img in ball_imgs:
+                alt_text = img.get("alt", "")
+                if alt_text and alt_text.isdigit():
+                    num = int(alt_text)
+                    # Filter valid numbers for this game
+                    if game.lottery_id == "jp_loto6":
+                        if 1 <= num <= 43:
+                            numbers.append(num)
+                    else:  # jp_loto7
+                        if 1 <= num <= 37:
+                            numbers.append(num)
+
+            # We need main_count + bonus_count numbers
+            required_total = game.main_count + game.bonus_count
+
+            if len(numbers) >= required_total:
                 main_numbers = numbers[:game.main_count]
                 bonus_numbers = numbers[game.main_count:game.main_count + game.bonus_count]
 
-                row = {
+                draw = {
                     "game_id": game.lottery_id,
                     "country_code": "JP",
                     "draw_date": draw_date,
-                    "draw_number": "",  # Will be set later
+                    "draw_number": "",  # Will be assigned later
                     "main": main_numbers,
                     "bonus": bonus_numbers,
                 }
-                rows.append(row)
-                break
+                draws.append(draw)
 
-    return rows
+        except (ValueError, IndexError, AttributeError):
+            # Skip invalid draws
+            continue
+
+    return draws
+
+
+def parse_date(date_str: str) -> str | None:
+    """Parse date string to YYYY-MM-DD format."""
+    date_str = date_str.strip()
+
+    # Try multiple date formats
+    formats = [
+        "%d %b %Y",       # 11 Jun 2026 (Lottolyzer format)
+        "%d %B %Y",       # 11 June 2026
+        "%b %d, %Y",      # Jun 12, 2026
+        "%B %d, %Y",      # June 12, 2026
+        "%Y-%m-%d",       # 2026-06-12
+        "%d/%m/%Y",       # 12/06/2026
+        "%m/%d/%Y",       # 06/12/2026
+        "%d.%m.%Y",       # 12.06.2026
+    ]
+
+    for fmt in formats:
+        try:
+            dt = datetime.strptime(date_str, fmt)
+            return dt.strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+
+    return None
 
 
 def fetch_all_draws(game: GameConfig, limit: int) -> list[dict]:
-    """Fetch draws across multiple years."""
-    current_year = datetime.now().year
+    """Fetch draws across multiple pages."""
     all_draws: list[dict] = []
+    page = 1
+    max_pages = 50  # Safety limit
 
     print(f"\n📥 Fetching {game.name}...")
 
-    for year in range(current_year, game.year_start - 1, -1):
-        if len(all_draws) >= limit:
-            break
-
-        url = game.archive_url.format(year=year)
-        print(f"  🔍 {year}: {url}")
+    while len(all_draws) < limit and page <= max_pages:
+        url = game.base_url.format(page=page)
+        print(f"  🔍 Page {page}: {url}")
 
         try:
             html = fetch_html(url)
-            draws = parse_archive_page(html, game)
+            draws = parse_lottolyzer_page(html, game)
 
-            if draws:
-                all_draws.extend(draws)
-                print(f"  ✓ Found {len(draws)} draws from {year}")
-            else:
-                print(f"  ⚠ No draws found for {year}")
+            if not draws:
+                print(f"  ⚠ No draws found on page {page}, stopping")
+                break
+
+            all_draws.extend(draws)
+            print(f"  ✓ Found {len(draws)} draws (total: {len(all_draws)})")
+
+            page += 1
+            time.sleep(1.5)  # Be polite to the server
+
         except Exception as e:
-            print(f"  ✗ Error fetching {year}: {e}")
-            continue
-
-        time.sleep(1)  # Be polite to the server
+            print(f"  ✗ Error fetching page {page}: {e}")
+            break
 
     # Sort by date (newest first) and limit
     all_draws.sort(key=lambda x: x["draw_date"], reverse=True)
@@ -215,17 +273,25 @@ def generate_dart_file(draws: list[dict], dart_path: Path, dart_symbol: str) -> 
     lines = [
         "import '../models/lottery_draw.dart';",
         "",
+        f"const String {dart_symbol}UpdatedAt = '{datetime.now().strftime('%Y-%m-%d')}';",
+        "",
+        f"/// {len(draws)} real Japan lottery draws from Lottolyzer",
         f"final List<LotteryDraw> {dart_symbol} = [",
     ]
 
     for draw in draws:
+        date_parts = draw["draw_date"].split("-")
+        year, month, day = int(date_parts[0]), int(date_parts[1]), int(date_parts[2])
+
         main_str = ", ".join(str(n) for n in draw["main"])
         bonus_str = ", ".join(str(n) for n in draw["bonus"])
 
+        lottery_id = draw["game_id"]
+
         lines.append(
-            f'  LotteryDraw(date: "{draw["draw_date"]}", '
-            f'drawNumber: "{draw["draw_number"]}", '
-            f'main: [{main_str}], bonus: [{bonus_str}]),'
+            f'  LotteryDraw(lotteryId: \'{lottery_id}\', '
+            f'drawDate: DateTime({year}, {month}, {day}), '
+            f'mainNumbers: [{main_str}], bonusNumbers: [{bonus_str}]),'
         )
 
     lines.append("];")
@@ -235,13 +301,15 @@ def generate_dart_file(draws: list[dict], dart_path: Path, dart_symbol: str) -> 
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Sync Japan lottery history")
-    parser.add_argument("--limit", type=int, default=500, help="Max draws per game")
+    parser = argparse.ArgumentParser(description="Sync Japan lottery history from Lottolyzer")
+    parser.add_argument("--limit", type=int, default=1000, help="Max draws per game")
     args = parser.parse_args()
 
     print("=" * 80)
-    print("JAPAN LOTTERY DATA SYNC")
+    print("JAPAN LOTTERY DATA SYNC - LOTTOLYZER SOURCE")
     print("=" * 80)
+
+    results = []
 
     for game in GAMES:
         try:
@@ -250,6 +318,13 @@ def main() -> None:
 
             if not draws:
                 print(f"\n❌ {game.name}: No draws found!")
+                results.append({
+                    "game": game.name,
+                    "records": 0,
+                    "earliest": "N/A",
+                    "latest": "N/A",
+                    "status": "FAILED"
+                })
                 continue
 
             # Write CSV
@@ -263,18 +338,38 @@ def main() -> None:
             print(f"✅ Dart: {dart_path}")
 
             # Summary
-            if draws:
-                latest = draws[0]["draw_date"]
-                oldest = draws[-1]["draw_date"]
-                print(f"📅 Date range: {oldest} to {latest}")
+            latest = draws[0]["draw_date"]
+            earliest = draws[-1]["draw_date"]
+            print(f"📅 Date range: {earliest} to {latest}")
+
+            results.append({
+                "game": game.name,
+                "records": len(draws),
+                "earliest": earliest,
+                "latest": latest,
+                "status": "SUCCESS"
+            })
 
         except Exception as e:
             print(f"\n❌ {game.name} failed: {e}")
             import traceback
             traceback.print_exc()
+            results.append({
+                "game": game.name,
+                "records": 0,
+                "earliest": "N/A",
+                "latest": "N/A",
+                "status": "ERROR"
+            })
 
+    # Final summary table
     print("\n" + "=" * 80)
-    print("SYNC COMPLETE")
+    print("SYNC COMPLETE - SUMMARY")
+    print("=" * 80)
+    print(f"{'Game':<20} {'Records':<10} {'Earliest Draw':<15} {'Latest Draw':<15} {'Status':<10}")
+    print("-" * 80)
+    for r in results:
+        print(f"{r['game']:<20} {r['records']:<10} {r['earliest']:<15} {r['latest']:<15} {r['status']:<10}")
     print("=" * 80)
 
 
