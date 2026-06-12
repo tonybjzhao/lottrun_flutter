@@ -1312,4 +1312,63 @@ class AppLocalizationsDe extends AppLocalizations {
   String lotteryHistoryParseFailed(Object error) {
     return 'Parsen der Verlaufs-CSV fehlgeschlagen: $error';
   }
+
+  @override
+  String get completeMyNumbers => 'Meine Zahlen Vervollständigen';
+
+  @override
+  String get completeMyNumbersTitle => 'Sperren Sie Ihre Glückszahlen';
+
+  @override
+  String get completeMyNumbersSubtitle =>
+      'Wählen Sie die Zahlen aus, die Sie behalten möchten, und wir generieren den Rest basierend auf Ihrer gewählten Strategie.';
+
+  @override
+  String get selectYourNumbers => 'Ihre Zahlen';
+
+  @override
+  String tapToLockNumbers(int locked, int total) {
+    return 'Tippen zum Sperren ($locked/$total)';
+  }
+
+  @override
+  String get bonusNumbers => 'Bonuszahlen';
+
+  @override
+  String tapToLockBonusNumbers(int locked, int total) {
+    return 'Tippen zum Sperren Bonus ($locked/$total)';
+  }
+
+  @override
+  String get generationStrategy => 'Generierungsstrategie';
+
+  @override
+  String get generateAllNumbers => 'Zahlen Generieren';
+
+  @override
+  String get completeRemainingNumbers => 'Meine Zahlen Vervollständigen';
+
+  @override
+  String get yourCompletedNumbers => 'Ihre Vollständigen Zahlen';
+
+  @override
+  String get locked => 'Ihre Auswahl';
+
+  @override
+  String get generated => 'Generiert';
+
+  @override
+  String maxNumbersSelected(int max) {
+    return 'Maximal $max Zahlen erlaubt';
+  }
+
+  @override
+  String get reset => 'Zurücksetzen';
+
+  @override
+  String get regenerate => 'Erneut Versuchen';
+
+  @override
+  String get completeMyNumbersDisclaimer =>
+      'Diese Funktion dient nur zu Unterhaltungs- und statistischen Referenzzwecken. Generierte Zahlen basieren auf historischen Daten und erhöhen nicht Ihre Gewinnchancen.';
 }

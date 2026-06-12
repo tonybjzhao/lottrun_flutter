@@ -14,14 +14,27 @@ class GeneratorService {
     required Lottery lottery,
     required PlayStyle style,
     required List<LotteryDraw> history,
+    List<int> lockedMainNumbers = const [],
+    List<int> lockedBonusNumbers = const [],
   }) {
     // Sort newest-first so recency weights are applied correctly.
     final sorted = [...history]
       ..sort((a, b) => b.drawDate.compareTo(a.drawDate));
 
-    final main = _generateMain(lottery, style, sorted);
+    final main = _generateMain(
+      lottery,
+      style,
+      sorted,
+      lockedNumbers: lockedMainNumbers,
+    );
     final bonus = lottery.hasBonus
-        ? _generateBonus(lottery, style, sorted, exclude: main)
+        ? _generateBonus(
+            lottery,
+            style,
+            sorted,
+            exclude: main,
+            lockedNumbers: lockedBonusNumbers,
+          )
         : null;
     return GeneratedPick(
       lotteryId: lottery.id,
@@ -37,34 +50,57 @@ class GeneratorService {
   List<int> _generateMain(
     Lottery lottery,
     PlayStyle style,
-    List<LotteryDraw> history, // newest-first
-  ) {
+    List<LotteryDraw> history, {
+    List<int> lockedNumbers = const [],
+  }) {
+    // Validate locked numbers
+    final validLocked = lockedNumbers
+        .where((n) => n >= lottery.mainMin && n <= lottery.mainMax)
+        .toSet()
+        .toList()
+      ..sort();
+
+    // If we already have enough locked numbers, just return them
+    if (validLocked.length >= lottery.mainCount) {
+      return validLocked.take(lottery.mainCount).toList();
+    }
+
+    // Generate only the remaining numbers needed
+    final remainingCount = lottery.mainCount - validLocked.length;
     final allMain = history.map((d) => d.mainNumbers).toList();
+    final generated = _generatePartial(
+      lottery.mainMin,
+      lottery.mainMax,
+      remainingCount,
+      style,
+      allMain,
+      exclude: validLocked,
+    );
+
+    // Combine locked and generated, then sort
+    return [...validLocked, ...generated]..sort();
+  }
+
+  /// Generate partial numbers for a given style, excluding locked numbers.
+  List<int> _generatePartial(
+    int min,
+    int max,
+    int count,
+    PlayStyle style,
+    List<List<int>> history, {
+    List<int> exclude = const [],
+  }) {
     switch (style) {
       case PlayStyle.random:
-        return _pickRandom(lottery.mainMin, lottery.mainMax, lottery.mainCount);
+        return _pickRandom(min, max, count, exclude: exclude);
       case PlayStyle.hot:
-        return _pickByScore(
-          lottery.mainMin,
-          lottery.mainMax,
-          lottery.mainCount,
-          allMain,
-          favourHigh: true,
-        );
+        return _pickByScore(min, max, count, history,
+            favourHigh: true, exclude: exclude);
       case PlayStyle.cold:
-        return _pickByScore(
-          lottery.mainMin,
-          lottery.mainMax,
-          lottery.mainCount,
-          allMain,
-          favourHigh: false,
-        );
+        return _pickByScore(min, max, count, history,
+            favourHigh: false, exclude: exclude);
       case PlayStyle.balanced:
-        return _pickBalanced(
-          lottery.mainMin,
-          lottery.mainMax,
-          lottery.mainCount,
-        );
+        return _pickBalanced(min, max, count, exclude: exclude);
     }
   }
 
@@ -75,46 +111,43 @@ class GeneratorService {
     PlayStyle style,
     List<LotteryDraw> history, {
     required List<int> exclude,
+    List<int> lockedNumbers = const [],
   }) {
+    final count = lottery.bonusCount!;
+    final min = lottery.bonusMin!;
+    final max = lottery.bonusMax!;
+
+    // Validate locked bonus numbers
+    final validLocked = lockedNumbers
+        .where((n) => n >= min && n <= max)
+        .toSet()
+        .toList()
+      ..sort();
+
+    // If we already have enough locked bonus numbers, return them
+    if (validLocked.length >= count) {
+      return validLocked.take(count).toList();
+    }
+
     final allBonus = history
         .where((d) => d.bonusNumbers != null)
         .map((d) => d.bonusNumbers!)
         .toList();
-    final count = lottery.bonusCount!;
-    final min = lottery.bonusMin!;
-    final max = lottery.bonusMax!;
     final excludedNumbers = lottery.hasSeparateBonusPool
-        ? const <int>[]
-        : exclude;
+        ? validLocked
+        : [...exclude, ...validLocked];
+    final remainingCount = count - validLocked.length;
 
-    switch (style) {
-      case PlayStyle.random:
-        return _pickRandom(min, max, count, exclude: excludedNumbers);
-      case PlayStyle.hot:
-        return allBonus.isEmpty
-            ? _pickRandom(min, max, count, exclude: excludedNumbers)
-            : _pickByScore(
-                min,
-                max,
-                count,
-                allBonus,
-                favourHigh: true,
-                exclude: excludedNumbers,
-              );
-      case PlayStyle.cold:
-        return allBonus.isEmpty
-            ? _pickRandom(min, max, count, exclude: excludedNumbers)
-            : _pickByScore(
-                min,
-                max,
-                count,
-                allBonus,
-                favourHigh: false,
-                exclude: excludedNumbers,
-              );
-      case PlayStyle.balanced:
-        return _pickRandom(min, max, count, exclude: excludedNumbers);
-    }
+    final generated = _generatePartial(
+      min,
+      max,
+      remainingCount,
+      style,
+      allBonus,
+      exclude: excludedNumbers,
+    );
+
+    return [...validLocked, ...generated]..sort();
   }
 
   // ── Recency-weighted scoring ──────────────────────────────────────────────
@@ -223,7 +256,12 @@ class GeneratorService {
     return result..sort();
   }
 
-  List<int> _pickBalanced(int min, int max, int count) {
+  List<int> _pickBalanced(
+    int min,
+    int max,
+    int count, {
+    List<int> exclude = const [],
+  }) {
     final range = max - min + 1;
     final bucketSize = range / count;
     final result = <int>[];
@@ -235,10 +273,10 @@ class GeneratorService {
           : min + ((i + 1) * bucketSize).round() - 1;
       final candidates = [
         for (var n = bucketMin; n <= bucketMax; n++)
-          if (!result.contains(n)) n,
+          if (!result.contains(n) && !exclude.contains(n)) n,
       ];
       if (candidates.isEmpty) {
-        result.addAll(_pickRandom(min, max, 1, exclude: result));
+        result.addAll(_pickRandom(min, max, 1, exclude: [...result, ...exclude]));
       } else {
         result.add(candidates[_rng.nextInt(candidates.length)]);
       }

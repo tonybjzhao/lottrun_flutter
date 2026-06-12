@@ -1165,4 +1165,62 @@ class AppLocalizationsZh extends AppLocalizations {
   String lotteryHistoryParseFailed(Object error) {
     return '解析历史 CSV 失败：$error';
   }
+
+  @override
+  String get completeMyNumbers => '完成我的号码';
+
+  @override
+  String get completeMyNumbersTitle => '锁定你的幸运号码';
+
+  @override
+  String get completeMyNumbersSubtitle => '选择你想保留的号码，我们会根据你选择的策略生成其余号码。';
+
+  @override
+  String get selectYourNumbers => '你的号码';
+
+  @override
+  String tapToLockNumbers(int locked, int total) {
+    return '点击锁定号码（$locked/$total）';
+  }
+
+  @override
+  String get bonusNumbers => '特别号码';
+
+  @override
+  String tapToLockBonusNumbers(int locked, int total) {
+    return '点击锁定特别号码（$locked/$total）';
+  }
+
+  @override
+  String get generationStrategy => '生成策略';
+
+  @override
+  String get generateAllNumbers => '生成号码';
+
+  @override
+  String get completeRemainingNumbers => '完成我的号码';
+
+  @override
+  String get yourCompletedNumbers => '你的完整号码';
+
+  @override
+  String get locked => '你选的';
+
+  @override
+  String get generated => '已生成';
+
+  @override
+  String maxNumbersSelected(int max) {
+    return '最多允许 $max 个号码';
+  }
+
+  @override
+  String get reset => '重置';
+
+  @override
+  String get regenerate => '重新生成';
+
+  @override
+  String get completeMyNumbersDisclaimer =>
+      '此功能仅供娱乐和统计参考。生成的号码基于历史数据，不会增加中奖机会。';
 }

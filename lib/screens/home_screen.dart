@@ -22,6 +22,7 @@ import '../widgets/style_chip_group.dart';
 import 'history_screen.dart';
 import 'saved_picks_screen.dart';
 import 'settings_screen.dart';
+import 'complete_my_numbers_screen.dart';
 
 // ── Home screen ───────────────────────────────────────────────────────────────
 
@@ -699,6 +700,36 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       fontSize: 12,
                       color: theme.colorScheme.primary.withAlpha(160),
                       fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Complete My Numbers button
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CompleteMyNumbersScreen(
+                            lottery: _selectedLottery,
+                          ),
+                        ),
+                      ),
+                      icon: const Icon(Icons.edit_outlined, size: 18),
+                      label: Text(
+                        l10n.completeMyNumbers,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     ),
                   ),
                 ],

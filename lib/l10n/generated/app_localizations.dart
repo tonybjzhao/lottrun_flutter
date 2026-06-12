@@ -2121,6 +2121,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to parse history CSV: {error}'**
   String lotteryHistoryParseFailed(Object error);
+
+  /// No description provided for @completeMyNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete My Numbers'**
+  String get completeMyNumbers;
+
+  /// No description provided for @completeMyNumbersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock Your Lucky Numbers'**
+  String get completeMyNumbersTitle;
+
+  /// No description provided for @completeMyNumbersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select numbers you want to keep, and we\'ll generate the rest based on your chosen strategy.'**
+  String get completeMyNumbersSubtitle;
+
+  /// No description provided for @selectYourNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Numbers'**
+  String get selectYourNumbers;
+
+  /// No description provided for @tapToLockNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to lock numbers ({locked}/{total})'**
+  String tapToLockNumbers(int locked, int total);
+
+  /// No description provided for @bonusNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Bonus Numbers'**
+  String get bonusNumbers;
+
+  /// No description provided for @tapToLockBonusNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to lock bonus ({locked}/{total})'**
+  String tapToLockBonusNumbers(int locked, int total);
+
+  /// No description provided for @generationStrategy.
+  ///
+  /// In en, this message translates to:
+  /// **'Generation Strategy'**
+  String get generationStrategy;
+
+  /// No description provided for @generateAllNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Numbers'**
+  String get generateAllNumbers;
+
+  /// No description provided for @completeRemainingNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete My Numbers'**
+  String get completeRemainingNumbers;
+
+  /// No description provided for @yourCompletedNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Completed Numbers'**
+  String get yourCompletedNumbers;
+
+  /// No description provided for @locked.
+  ///
+  /// In en, this message translates to:
+  /// **'Your picks'**
+  String get locked;
+
+  /// No description provided for @generated.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated'**
+  String get generated;
+
+  /// No description provided for @maxNumbersSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum {max} numbers allowed'**
+  String maxNumbersSelected(int max);
+
+  /// No description provided for @reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
+
+  /// No description provided for @regenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get regenerate;
+
+  /// No description provided for @completeMyNumbersDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'This feature is for entertainment and statistical reference only. Generated numbers are based on historical data and do not increase your chances of winning.'**
+  String get completeMyNumbersDisclaimer;
 }
 
 class _AppLocalizationsDelegate

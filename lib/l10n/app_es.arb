@@ -682,5 +682,49 @@
     "placeholders": {
       "error": {}
     }
-  }
+  },
+  "completeMyNumbers": "Completar Mis Números",
+  "completeMyNumbersTitle": "Bloquea Tus Números de la Suerte",
+  "completeMyNumbersSubtitle": "Selecciona los números que quieres mantener y generaremos el resto según tu estrategia elegida.",
+  "selectYourNumbers": "Tus Números",
+  "tapToLockNumbers": "Toca para bloquear números ({locked}/{total})",
+  "@tapToLockNumbers": {
+    "placeholders": {
+      "locked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "bonusNumbers": "Números Bonus",
+  "tapToLockBonusNumbers": "Toca para bloquear bonus ({locked}/{total})",
+  "@tapToLockBonusNumbers": {
+    "placeholders": {
+      "locked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "generationStrategy": "Estrategia de Generación",
+  "generateAllNumbers": "Generar Números",
+  "completeRemainingNumbers": "Completar Mis Números",
+  "yourCompletedNumbers": "Tus Números Completos",
+  "locked": "Tus elecciones",
+  "generated": "Generado",
+  "maxNumbersSelected": "Máximo {max} números permitidos",
+  "@maxNumbersSelected": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "reset": "Reiniciar",
+  "regenerate": "Intentar de Nuevo",
+  "completeMyNumbersDisclaimer": "Esta función es solo para entretenimiento y referencia estadística. Los números generados se basan en datos históricos y no aumentan tus posibilidades de ganar."
 }

@@ -682,5 +682,49 @@
     "placeholders": {
       "error": {}
     }
-  }
+  },
+  "completeMyNumbers": "Meine Zahlen Vervollständigen",
+  "completeMyNumbersTitle": "Sperren Sie Ihre Glückszahlen",
+  "completeMyNumbersSubtitle": "Wählen Sie die Zahlen aus, die Sie behalten möchten, und wir generieren den Rest basierend auf Ihrer gewählten Strategie.",
+  "selectYourNumbers": "Ihre Zahlen",
+  "tapToLockNumbers": "Tippen zum Sperren ({locked}/{total})",
+  "@tapToLockNumbers": {
+    "placeholders": {
+      "locked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "bonusNumbers": "Bonuszahlen",
+  "tapToLockBonusNumbers": "Tippen zum Sperren Bonus ({locked}/{total})",
+  "@tapToLockBonusNumbers": {
+    "placeholders": {
+      "locked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "generationStrategy": "Generierungsstrategie",
+  "generateAllNumbers": "Zahlen Generieren",
+  "completeRemainingNumbers": "Meine Zahlen Vervollständigen",
+  "yourCompletedNumbers": "Ihre Vollständigen Zahlen",
+  "locked": "Ihre Auswahl",
+  "generated": "Generiert",
+  "maxNumbersSelected": "Maximal {max} Zahlen erlaubt",
+  "@maxNumbersSelected": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "reset": "Zurücksetzen",
+  "regenerate": "Erneut Versuchen",
+  "completeMyNumbersDisclaimer": "Diese Funktion dient nur zu Unterhaltungs- und statistischen Referenzzwecken. Generierte Zahlen basieren auf historischen Daten und erhöhen nicht Ihre Gewinnchancen."
 }

@@ -772,5 +772,49 @@
     "placeholders": {
       "error": {}
     }
-  }
+  },
+  "completeMyNumbers": "Complete My Numbers",
+  "completeMyNumbersTitle": "Lock Your Lucky Numbers",
+  "completeMyNumbersSubtitle": "Select numbers you want to keep, and we'll generate the rest based on your chosen strategy.",
+  "selectYourNumbers": "Your Numbers",
+  "tapToLockNumbers": "Tap to lock numbers ({locked}/{total})",
+  "@tapToLockNumbers": {
+    "placeholders": {
+      "locked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "bonusNumbers": "Bonus Numbers",
+  "tapToLockBonusNumbers": "Tap to lock bonus ({locked}/{total})",
+  "@tapToLockBonusNumbers": {
+    "placeholders": {
+      "locked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "generationStrategy": "Generation Strategy",
+  "generateAllNumbers": "Generate Numbers",
+  "completeRemainingNumbers": "Complete My Numbers",
+  "yourCompletedNumbers": "Your Completed Numbers",
+  "locked": "Your picks",
+  "generated": "Generated",
+  "maxNumbersSelected": "Maximum {max} numbers allowed",
+  "@maxNumbersSelected": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "reset": "Reset",
+  "regenerate": "Try Again",
+  "completeMyNumbersDisclaimer": "This feature is for entertainment and statistical reference only. Generated numbers are based on historical data and do not increase your chances of winning."
 }

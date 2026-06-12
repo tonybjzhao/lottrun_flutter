@@ -1359,4 +1359,63 @@ class AppLocalizationsEs extends AppLocalizations {
   String lotteryHistoryParseFailed(Object error) {
     return 'Error al analizar CSV del historial: $error';
   }
+
+  @override
+  String get completeMyNumbers => 'Completar Mis Números';
+
+  @override
+  String get completeMyNumbersTitle => 'Bloquea Tus Números de la Suerte';
+
+  @override
+  String get completeMyNumbersSubtitle =>
+      'Selecciona los números que quieres mantener y generaremos el resto según tu estrategia elegida.';
+
+  @override
+  String get selectYourNumbers => 'Tus Números';
+
+  @override
+  String tapToLockNumbers(int locked, int total) {
+    return 'Toca para bloquear números ($locked/$total)';
+  }
+
+  @override
+  String get bonusNumbers => 'Números Bonus';
+
+  @override
+  String tapToLockBonusNumbers(int locked, int total) {
+    return 'Toca para bloquear bonus ($locked/$total)';
+  }
+
+  @override
+  String get generationStrategy => 'Estrategia de Generación';
+
+  @override
+  String get generateAllNumbers => 'Generar Números';
+
+  @override
+  String get completeRemainingNumbers => 'Completar Mis Números';
+
+  @override
+  String get yourCompletedNumbers => 'Tus Números Completos';
+
+  @override
+  String get locked => 'Tus elecciones';
+
+  @override
+  String get generated => 'Generado';
+
+  @override
+  String maxNumbersSelected(int max) {
+    return 'Máximo $max números permitidos';
+  }
+
+  @override
+  String get reset => 'Reiniciar';
+
+  @override
+  String get regenerate => 'Intentar de Nuevo';
+
+  @override
+  String get completeMyNumbersDisclaimer =>
+      'Esta función es solo para entretenimiento y referencia estadística. Los números generados se basan en datos históricos y no aumentan tus posibilidades de ganar.';
 }

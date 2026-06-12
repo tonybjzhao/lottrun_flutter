@@ -682,5 +682,49 @@
     "placeholders": {
       "error": {}
     }
-  }
+  },
+  "completeMyNumbers": "Compléter mes numéros",
+  "completeMyNumbersTitle": "Verrouiller vos numéros porte-bonheur",
+  "completeMyNumbersSubtitle": "Sélectionnez les numéros que vous souhaitez conserver et nous générerons le reste selon votre stratégie.",
+  "selectYourNumbers": "Vos numéros",
+  "tapToLockNumbers": "Appuyez pour verrouiller ({locked}/{total})",
+  "@tapToLockNumbers": {
+    "placeholders": {
+      "locked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "bonusNumbers": "Numéros bonus",
+  "tapToLockBonusNumbers": "Appuyez pour verrouiller bonus ({locked}/{total})",
+  "@tapToLockBonusNumbers": {
+    "placeholders": {
+      "locked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "generationStrategy": "Stratégie de génération",
+  "generateAllNumbers": "Générer des numéros",
+  "completeRemainingNumbers": "Compléter mes numéros",
+  "yourCompletedNumbers": "Vos numéros complets",
+  "locked": "Vos choix",
+  "generated": "Généré",
+  "maxNumbersSelected": "Maximum {max} numéros autorisés",
+  "@maxNumbersSelected": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "reset": "Réinitialiser",
+  "regenerate": "Réessayer",
+  "completeMyNumbersDisclaimer": "Cette fonctionnalité est à des fins de divertissement et de référence statistique uniquement. Les numéros générés sont basés sur des données historiques et n’augmentent pas vos chances de gagner."
 }
