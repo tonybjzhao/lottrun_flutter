@@ -981,9 +981,12 @@ class _InlinePickCard extends StatelessWidget {
 
   String _buildCopyText(AppLocalizations l10n) {
     final main = pick.mainNumbers.join('  ');
-    final bonus = (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty)
-        ? l10n.inlinePickBonusInline(pick.bonusNumbers!.join(' '))
-        : '';
+    // Hide supplementary numbers in user picks
+    final showBonus = pick.bonusNumbers != null &&
+        pick.bonusNumbers!.isNotEmpty &&
+        !lottery.bonusIsSupplementary;
+    final bonus =
+        showBonus ? l10n.inlinePickBonusInline(pick.bonusNumbers!.join(' ')) : '';
     return l10n.inlinePickCopyText(
       label,
       l10n.lotteryName(lottery),
@@ -1084,9 +1087,11 @@ class _InlinePickCard extends StatelessWidget {
                     const SizedBox(height: 12),
 
                     // ── Ball row ─────────────────────────────────────────
+                    // Hide supplementary numbers in user picks
                     BallRow(
                       mainNumbers: pick.mainNumbers,
-                      bonusNumbers: pick.bonusNumbers ?? [],
+                      bonusNumbers:
+                          lottery.bonusIsSupplementary ? [] : (pick.bonusNumbers ?? []),
                       bonusLabel: lottery.bonusLabel == null
                           ? null
                           : context.l10n.lotteryBonusLabel(lottery),

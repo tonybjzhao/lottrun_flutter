@@ -34,7 +34,10 @@ class GeneratorService {
       excludeNumbers: mainExclude,
     );
 
-    final bonus = lottery.hasBonus
+    // Supplementary lotteries (Saturday Lotto, Oz Lotto, etc.) only have
+    // supplementary numbers in historical draws for prize matching.
+    // User-generated picks should NOT include supplementary numbers.
+    final bonus = lottery.hasBonus && !lottery.bonusIsSupplementary
         ? _generateBonus(
             lottery,
             style,

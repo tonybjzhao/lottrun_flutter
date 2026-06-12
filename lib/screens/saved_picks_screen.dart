@@ -638,9 +638,11 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
     final bonusLabel = _lottery == null
         ? l10n.commonBonus
         : l10n.lotteryBonusLabel(_lottery!);
-    final bonus =
-        (widget.pick.bonusNumbers != null &&
-            widget.pick.bonusNumbers!.isNotEmpty)
+    // Hide supplementary numbers in user picks (Saturday Lotto, Oz Lotto, etc.)
+    final showBonus = widget.pick.bonusNumbers != null &&
+        widget.pick.bonusNumbers!.isNotEmpty &&
+        (_lottery == null || !_lottery!.bonusIsSupplementary);
+    final bonus = showBonus
         ? l10n.copyPickBonusLine(
             bonusLabel,
             widget.pick.bonusNumbers!.join(' '),
@@ -839,9 +841,13 @@ class _PickItemState extends State<_PickItem> with TickerProviderStateMixin {
                     )
                   else ...[
                     // Pending / legacy: show normal ball row
+                    // Hide supplementary numbers in user picks (Saturday Lotto, Oz Lotto)
                     BallRow(
                       mainNumbers: widget.pick.mainNumbers,
-                      bonusNumbers: bonusNums,
+                      bonusNumbers: _lottery != null &&
+                              _lottery!.bonusIsSupplementary
+                          ? []
+                          : bonusNums,
                       bonusLabel: _lottery == null
                           ? null
                           : l10n.lotteryBonusLabel(_lottery!),

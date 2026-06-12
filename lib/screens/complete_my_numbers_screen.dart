@@ -84,7 +84,9 @@ class _CompleteMyNumbersScreenState extends State<CompleteMyNumbersScreen> {
           const SizedBox(height: 24),
 
           // Bonus Numbers Section (if applicable)
-          if (widget.lottery.hasBonus) ...[
+          // Note: Supplementary lotteries (Saturday Lotto, Oz Lotto) don't
+          // allow users to pick supplementary numbers - only main numbers.
+          if (widget.lottery.hasBonus && !widget.lottery.bonusIsSupplementary) ...[
             _buildNumberSection(
               title: widget.lottery.bonusLabel ?? l10n.bonusNumbers,
               subtitle: l10n.tapToLockBonusNumbers(
@@ -340,8 +342,10 @@ class _CompleteMyNumbersScreenState extends State<CompleteMyNumbersScreen> {
             isBonus: false,
           ),
 
-          // Bonus Numbers
-          if (pick.bonusNumbers != null && pick.bonusNumbers!.isNotEmpty) ...[
+          // Bonus Numbers (hide for supplementary lotteries)
+          if (pick.bonusNumbers != null &&
+              pick.bonusNumbers!.isNotEmpty &&
+              !widget.lottery.bonusIsSupplementary) ...[
             const SizedBox(height: 12),
             Divider(color: theme.colorScheme.outline.withOpacity(0.2)),
             const SizedBox(height: 12),

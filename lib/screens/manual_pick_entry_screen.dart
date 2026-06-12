@@ -40,6 +40,7 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
   bool get _isComplete =>
       _selectedMain.length == _lottery.mainCount &&
       (!_lottery.hasBonus ||
+          _lottery.bonusIsSupplementary ||
           _selectedBonus.length == (_lottery.bonusCount ?? 0));
 
   void _toggleMain(int n) {
@@ -181,7 +182,8 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
                   ),
 
                   // ── Bonus numbers ─────────────────────────────────
-                  if (_lottery.hasBonus) ...[
+                  // Hide for supplementary lotteries (Saturday Lotto, Oz Lotto)
+                  if (_lottery.hasBonus && !_lottery.bonusIsSupplementary) ...[
                     const SizedBox(height: 20),
                     _SectionHeader(
                       label: l10n.pickBonusNumbers(
@@ -249,7 +251,7 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
   String _progressText(AppLocalizations l10n) {
     final mainLeft = _lottery.mainCount - _selectedMain.length;
     if (mainLeft > 0) return l10n.pickMoreNumbers(mainLeft);
-    if (_lottery.hasBonus) {
+    if (_lottery.hasBonus && !_lottery.bonusIsSupplementary) {
       final bonusLeft = (_lottery.bonusCount ?? 1) - _selectedBonus.length;
       if (bonusLeft > 0) {
         return l10n.pickMoreBonus(bonusLeft, _bonusLabel().toLowerCase());
