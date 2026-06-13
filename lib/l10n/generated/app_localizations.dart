@@ -244,6 +244,12 @@ abstract class AppLocalizations {
   /// **'Japan'**
   String get countryJapan;
 
+  /// No description provided for @countryFrance.
+  ///
+  /// In en, this message translates to:
+  /// **'France'**
+  String get countryFrance;
+
   /// No description provided for @countryOther.
   ///
   /// In en, this message translates to:
@@ -322,6 +328,18 @@ abstract class AppLocalizations {
   /// **'Loto 7'**
   String get lotteryLoto7;
 
+  /// No description provided for @lotteryFranceLoto.
+  ///
+  /// In en, this message translates to:
+  /// **'France Loto'**
+  String get lotteryFranceLoto;
+
+  /// No description provided for @lotteryFranceEuroMillions.
+  ///
+  /// In en, this message translates to:
+  /// **'EuroMillions'**
+  String get lotteryFranceEuroMillions;
+
   /// No description provided for @bonusPowerball.
   ///
   /// In en, this message translates to:
@@ -351,6 +369,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Euro Numbers'**
   String get bonusEuroNumbers;
+
+  /// No description provided for @bonusChanceNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Chance Number'**
+  String get bonusChanceNumber;
 
   /// No description provided for @screenHistoryTitle.
   ///

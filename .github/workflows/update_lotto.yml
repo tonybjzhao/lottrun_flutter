@@ -59,6 +59,9 @@ jobs:
       - name: Update Japan lottery CSVs
         run: python tools/sync_jp_lottery_history.py --limit 500
 
+      - name: Update France lottery CSVs
+        run: python tools/sync_fr_lottery_history.py --limit 500
+
       - name: Commit updated CSVs
         run: |
           if [ -z "$(git status --porcelain -- docs/*.csv lib/data/seed_*.dart)" ]; then

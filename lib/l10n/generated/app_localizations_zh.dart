@@ -78,6 +78,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get countryJapan => '日本';
 
   @override
+  String get countryFrance => 'France';
+
+  @override
   String get countryOther => '其他';
 
   @override
@@ -117,6 +120,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get lotteryLoto7 => 'ロト7';
 
   @override
+  String get lotteryFranceLoto => 'France Loto';
+
+  @override
+  String get lotteryFranceEuroMillions => 'EuroMillions';
+
+  @override
   String get bonusPowerball => 'Powerball';
 
   @override
@@ -130,6 +139,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get bonusEuroNumbers => 'Euro Numbers';
+
+  @override
+  String get bonusChanceNumber => 'Chance Number';
 
   @override
   String get screenHistoryTitle => '历史记录';

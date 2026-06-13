@@ -38,6 +38,10 @@ class LotteryHistoryCsvService {
         'https://tonybjzhao.github.io/lottrun_flutter/de_lotto_6aus49.csv',
     'de_eurojackpot':
         'https://tonybjzhao.github.io/lottrun_flutter/de_eurojackpot.csv',
+    'fr_loto':
+        'https://tonybjzhao.github.io/lottrun_flutter/fr_loto.csv',
+    'fr_euromillions':
+        'https://tonybjzhao.github.io/lottrun_flutter/fr_euromillions.csv',
   };
 
   static const Map<String, String> _cacheKeys = {
@@ -52,6 +56,8 @@ class LotteryHistoryCsvService {
     'ca_lotto_649': 'cache_ca_lotto_649_csv',
     'de_lotto_6aus49': 'cache_de_lotto_6aus49_csv',
     'de_eurojackpot': 'cache_de_eurojackpot_csv',
+    'fr_loto': 'cache_fr_loto_csv',
+    'fr_euromillions': 'cache_fr_euromillions_csv',
   };
 
   Future<LotteryHistoryResult> fetchDraws(Lottery lottery) async {

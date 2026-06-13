@@ -191,4 +191,34 @@ final List<Lottery> kSeedLotteries = [
     bonusMax: 37,
     // bonusLabel: null → same-pool bonus numbers, shown as supplementary.
   ),
+
+  // ── France ────────────────────────────────────────────────────────────────
+  Lottery(
+    id: 'fr_loto',
+    countryCode: 'FR',
+    countryName: _l10n.countryFrance,
+    name: _l10n.lotteryFranceLoto,
+    mainCount: 5,
+    mainMin: 1,
+    mainMax: 49,
+    bonusCount: 1,
+    bonusMin: 1,
+    bonusMax: 10,
+    hasSeparateBonusPool: true,
+    bonusLabel: _l10n.bonusChanceNumber,
+  ),
+  Lottery(
+    id: 'fr_euromillions',
+    countryCode: 'FR',
+    countryName: _l10n.countryFrance,
+    name: _l10n.lotteryFranceEuroMillions,
+    mainCount: 5,
+    mainMin: 1,
+    mainMax: 50,
+    bonusCount: 2,
+    bonusMin: 1,
+    bonusMax: 12,
+    hasSeparateBonusPool: true,
+    bonusLabel: _l10n.bonusLuckyStars,
+  ),
 ];
