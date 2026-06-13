@@ -93,6 +93,7 @@ final List<Lottery> kSeedLotteries = [
   ),
   Lottery(
     id: 'uk_euromillions',
+    sharedDatasetId: 'euromillions',
     countryCode: 'GB',
     countryName: _l10n.countryUnitedKingdom,
     name: _l10n.lotteryEuroMillions,
@@ -151,6 +152,7 @@ final List<Lottery> kSeedLotteries = [
   ),
   Lottery(
     id: 'de_eurojackpot',
+    sharedDatasetId: 'eurojackpot',
     countryCode: 'DE',
     countryName: _l10n.countryGermany,
     name: _l10n.lotteryEuroJackpot,
@@ -209,6 +211,7 @@ final List<Lottery> kSeedLotteries = [
   ),
   Lottery(
     id: 'fr_euromillions',
+    sharedDatasetId: 'euromillions',
     countryCode: 'FR',
     countryName: _l10n.countryFrance,
     name: _l10n.lotteryFranceEuroMillions,

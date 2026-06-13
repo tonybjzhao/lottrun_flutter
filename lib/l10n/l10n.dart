@@ -69,6 +69,7 @@ extension PlayStyleL10n on AppLocalizations {
     'CA' => countryCanada,
     'DE' => countryGermany,
     'JP' => countryJapan,
+    'FR' => countryFrance,
     _ => countryOther,
   };
 
@@ -85,6 +86,8 @@ extension PlayStyleL10n on AppLocalizations {
     'de_eurojackpot' => lotteryEuroJackpot,
     'jp_loto6' => lotteryLoto6,
     'jp_loto7' => lotteryLoto7,
+    'fr_loto' => lotteryFranceLoto,
+    'fr_euromillions' => lotteryFranceEuroMillions,
     _ => lottery.name,
   };
 

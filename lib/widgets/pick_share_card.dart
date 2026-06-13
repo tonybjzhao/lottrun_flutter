@@ -1040,6 +1040,9 @@ String _flagEmoji(String countryCode) => switch (countryCode) {
   'US' => '🇺🇸',
   'GB' => '🇬🇧',
   'CA' => '🇨🇦',
+  'DE' => '🇩🇪',
+  'JP' => '🇯🇵',
+  'FR' => '🇫🇷',
   _ => '🌍',
 };
 

@@ -78,7 +78,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get countryJapan => '日本';
 
   @override
-  String get countryFrance => 'France';
+  String get countryFrance => '法国';
 
   @override
   String get countryOther => '其他';
