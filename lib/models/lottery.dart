@@ -16,6 +16,11 @@ class Lottery {
   /// null = supplementary style (shown on second row, labeled "Supp").
   final String? bonusLabel;
 
+  /// Shared dataset ID for multi-country lotteries (e.g. 'euromillions', 'eurojackpot').
+  /// When set, this lottery uses a shared historical dataset instead of country-specific data.
+  /// Example: Both 'uk_euromillions' and 'fr_euromillions' use sharedDatasetId: 'euromillions'
+  final String? sharedDatasetId;
+
   const Lottery({
     required this.id,
     required this.countryCode,
@@ -30,6 +35,7 @@ class Lottery {
     this.hasSeparateBonusPool = false,
     this.drawRoundsPerTicket = 1,
     this.bonusLabel,
+    this.sharedDatasetId,
   });
 
   bool get hasBonus => bonusCount != null && bonusCount! > 0;

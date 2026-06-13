@@ -124,6 +124,9 @@ class GeneratedPick {
     if (lotteryId.startsWith('au_')) return 'AU';
     if (lotteryId.startsWith('uk_')) return 'GB';
     if (lotteryId.startsWith('ca_')) return 'CA';
+    if (lotteryId.startsWith('de_')) return 'DE';
+    if (lotteryId.startsWith('jp_')) return 'JP';
+    if (lotteryId.startsWith('fr_')) return 'FR';
     return 'OTHER';
   }
 

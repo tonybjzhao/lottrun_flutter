@@ -23,6 +23,8 @@ String _countryFlag(String code) => switch (code) {
   'GB' => '🇬🇧',
   'CA' => '🇨🇦',
   'DE' => '🇩🇪',
+  'JP' => '🇯🇵',
+  'FR' => '🇫🇷',
   _ => '🌍',
 };
 
@@ -32,10 +34,12 @@ String _countryName(BuildContext context, String code) => switch (code) {
   'GB' => context.l10n.countryUnitedKingdom,
   'CA' => context.l10n.countryCanada,
   'DE' => context.l10n.countryGermany,
+  'JP' => context.l10n.countryJapan,
+  'FR' => context.l10n.countryFrance,
   _ => context.l10n.countryOther,
 };
 
-const _countryOrder = ['US', 'AU', 'OTHER'];
+const _countryOrder = ['US', 'AU', 'GB', 'CA', 'DE', 'JP', 'FR', 'OTHER'];
 
 // ── Stats model ───────────────────────────────────────────────────────────────
 
