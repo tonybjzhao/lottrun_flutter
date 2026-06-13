@@ -73,6 +73,34 @@ class _ManualPickEntryScreenState extends State<ManualPickEntryScreen> {
     final bonusSorted = _selectedBonus.isEmpty
         ? null
         : (_selectedBonus.toList()..sort());
+
+    // DEFENSIVE VALIDATION: Check for duplicates in shared pool lotteries
+    if (!_lottery.hasSeparateBonusPool &&
+        bonusSorted != null &&
+        bonusSorted.isNotEmpty) {
+      final mainSet = mainSorted.toSet();
+      final bonusSet = bonusSorted.toSet();
+      final duplicates = mainSet.intersection(bonusSet);
+
+      if (duplicates.isNotEmpty) {
+        setState(() => _saving = false);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Cannot save: Numbers ${duplicates.toList()} appear in both '
+                'main and ${_lottery.bonusLabel ?? "supplementary"} pools. '
+                'This is not allowed for ${_lottery.name}.',
+              ),
+              duration: const Duration(seconds: 4),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
+        return;
+      }
+    }
+
     final now = DateTime.now();
 
     final pick = GeneratedPick(

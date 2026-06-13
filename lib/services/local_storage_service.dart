@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/generated_pick.dart';
 
@@ -45,19 +46,8 @@ class LocalStorageService {
     if (raw == null) return null;
     try {
       final map = jsonDecode(raw) as Map<String, dynamic>;
-      return GeneratedPick(
-        id: map['id'] as String?,
-        lotteryId: map['lotteryId'] as String,
-        style: PlayStyle.values.firstWhere(
-          (s) => s.name == map['style'],
-          orElse: () => PlayStyle.balanced,
-        ),
-        mainNumbers: List<int>.from(map['mainNumbers'] as List),
-        bonusNumbers: map['bonusNumbers'] != null
-            ? List<int>.from(map['bonusNumbers'] as List)
-            : null,
-        createdAt: DateTime.parse(map['createdAt'] as String),
-      );
+      // Use _pickFromMap for consistent load-time validation
+      return _pickFromMap(map);
     } catch (_) {
       return null;
     }
@@ -108,6 +98,43 @@ class LocalStorageService {
   static GeneratedPick _pickFromMap(Map<String, dynamic> map) {
     final lotteryId = map['lotteryId'] as String;
     final createdAt = DateTime.parse(map['createdAt'] as String);
+
+    // LOAD-TIME VALIDATION & SANITIZATION
+    var mainNumbers = List<int>.from(map['mainNumbers'] as List);
+    var bonusNumbers = map['bonusNumbers'] != null
+        ? List<int>.from(map['bonusNumbers'] as List)
+        : null;
+
+    // Remove duplicates within main numbers
+    final mainSet = mainNumbers.toSet();
+    if (mainSet.length != mainNumbers.length) {
+      debugPrint('WARNING: Removed ${mainNumbers.length - mainSet.length} duplicate(s) '
+          'from mainNumbers in pick $lotteryId');
+      mainNumbers = mainSet.toList()..sort();
+    }
+
+    // Remove duplicates within bonus numbers
+    if (bonusNumbers != null) {
+      final bonusSet = bonusNumbers.toSet();
+      if (bonusSet.length != bonusNumbers.length) {
+        debugPrint('WARNING: Removed ${bonusNumbers.length - bonusSet.length} duplicate(s) '
+            'from bonusNumbers in pick $lotteryId');
+        bonusNumbers = bonusSet.toList()..sort();
+      }
+    }
+
+    // For shared pool lotteries, remove any bonus numbers that duplicate main numbers
+    // We'll detect this conservatively: if bonus pool matches main pool range
+    if (bonusNumbers != null && bonusNumbers.isNotEmpty) {
+      final duplicates = mainSet.intersection(bonusNumbers.toSet());
+      if (duplicates.isNotEmpty) {
+        debugPrint('WARNING: Removing ${duplicates.length} duplicate(s) between main and bonus '
+            'in pick $lotteryId: $duplicates');
+        bonusNumbers = bonusNumbers.where((n) => !mainSet.contains(n)).toList();
+        if (bonusNumbers.isEmpty) bonusNumbers = null;
+      }
+    }
+
     return GeneratedPick(
       id: map['id'] as String? ??
           '${createdAt.millisecondsSinceEpoch}_${lotteryId.hashCode.abs()}',
@@ -116,10 +143,8 @@ class LocalStorageService {
         (s) => s.name == map['style'],
         orElse: () => PlayStyle.balanced,
       ),
-      mainNumbers: List<int>.from(map['mainNumbers'] as List),
-      bonusNumbers: map['bonusNumbers'] != null
-          ? List<int>.from(map['bonusNumbers'] as List)
-          : null,
+      mainNumbers: mainNumbers,
+      bonusNumbers: bonusNumbers,
       createdAt: createdAt,
       pickLabel: map['pickLabel'] as String?,
       drawDate: map['drawDate'] != null

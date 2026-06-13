@@ -107,9 +107,17 @@ class GeneratedPick {
     this.drawLabel,
     this.source = PickSource.generated,
     this.hasNotifiedResultReady = false,
-  }) : id =
-           id ??
-           '${createdAt.millisecondsSinceEpoch}_${lotteryId.hashCode.abs()}';
+  })  : assert(
+          mainNumbers.toSet().length == mainNumbers.length,
+          'VALIDATION ERROR: Duplicate numbers in mainNumbers: $mainNumbers',
+        ),
+        assert(
+          bonusNumbers == null ||
+              bonusNumbers.toSet().length == bonusNumbers.length,
+          'VALIDATION ERROR: Duplicate numbers in bonusNumbers: $bonusNumbers',
+        ),
+        id = id ??
+            '${createdAt.millisecondsSinceEpoch}_${lotteryId.hashCode.abs()}';
 
   String get countryCode {
     if (lotteryId.startsWith('us_')) return 'US';
