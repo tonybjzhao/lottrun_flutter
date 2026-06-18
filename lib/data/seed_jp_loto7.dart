@@ -1,6 +1,6 @@
 import '../models/lottery_draw.dart';
 
-const String kJpLoto7DrawsUpdatedAt = '2026-06-17';
+const String kJpLoto7DrawsUpdatedAt = '2026-06-18';
 
 /// 500 real Japan lottery draws from Lottolyzer
 final List<LotteryDraw> kJpLoto7Draws = [
