@@ -38,8 +38,9 @@ class LotteryHistoryCsvService {
         'https://tonybjzhao.github.io/lottrun_flutter/de_lotto_6aus49.csv',
     'de_eurojackpot':
         'https://tonybjzhao.github.io/lottrun_flutter/de_eurojackpot.csv',
-    'fr_loto':
-        'https://tonybjzhao.github.io/lottrun_flutter/fr_loto.csv',
+    'jp_loto6': 'https://tonybjzhao.github.io/lottrun_flutter/jp_loto6.csv',
+    'jp_loto7': 'https://tonybjzhao.github.io/lottrun_flutter/jp_loto7.csv',
+    'fr_loto': 'https://tonybjzhao.github.io/lottrun_flutter/fr_loto.csv',
     'fr_euromillions':
         'https://tonybjzhao.github.io/lottrun_flutter/fr_euromillions.csv',
   };
@@ -56,6 +57,8 @@ class LotteryHistoryCsvService {
     'ca_lotto_649': 'cache_ca_lotto_649_csv',
     'de_lotto_6aus49': 'cache_de_lotto_6aus49_csv',
     'de_eurojackpot': 'cache_de_eurojackpot_csv',
+    'jp_loto6': 'cache_jp_loto6_csv',
+    'jp_loto7': 'cache_jp_loto7_csv',
     'fr_loto': 'cache_fr_loto_csv',
     'fr_euromillions': 'cache_fr_euromillions_csv',
   };
@@ -87,7 +90,7 @@ class LotteryHistoryCsvService {
       }
 
       final csvString = utf8.decode(response.bodyBytes);
-      final draws = _parseDraws(csvString, lottery);
+      final draws = _mergeWithSeedDraws(_parseDraws(csvString, lottery));
 
       if (cacheKey != null) {
         await prefs.setString(cacheKey, csvString);
@@ -107,7 +110,7 @@ class LotteryHistoryCsvService {
       final cachedCsv = prefs.getString(cacheKey);
       if (cachedCsv != null && cachedCsv.trim().isNotEmpty) {
         try {
-          final draws = _parseDraws(cachedCsv, lottery);
+          final draws = _mergeWithSeedDraws(_parseDraws(cachedCsv, lottery));
           final loadedAtText = prefs.getString(updatedAtKey!);
           return LotteryHistoryResult(
             draws: draws,
@@ -147,10 +150,26 @@ class LotteryHistoryCsvService {
 
     try {
       final header = rows.first.map((cell) => cell.toString().trim()).toList();
-      final roundIndex = header.indexWhere(
-        (cell) => cell.toLowerCase() == 'round',
+      final normalizedHeader = header
+          .map((cell) => cell.toLowerCase())
+          .toList();
+      final dateIndex = normalizedHeader.indexWhere(
+        (cell) => cell == 'draw_date' || cell == 'date',
       );
-      final firstMainIndex = roundIndex >= 0 ? roundIndex + 1 : 3;
+      final roundIndex = header.indexWhere((cell) {
+        final normalized = cell.toLowerCase();
+        return normalized == 'round' || normalized == 'draw_number';
+      });
+      final mainIndices = _numberColumnIndices(
+        normalizedHeader,
+        'main_',
+        lottery.mainCount,
+      );
+      final bonusIndices = _bonusColumnIndices(
+        normalizedHeader,
+        lottery.bonusCount ?? 0,
+      );
+      final fallbackFirstMainIndex = roundIndex >= 0 ? roundIndex + 1 : 3;
       final seen = <String>{};
       final draws =
           rows
@@ -160,7 +179,10 @@ class LotteryHistoryCsvService {
                 (row) => _rowToDraw(
                   row,
                   lottery,
-                  firstMainIndex: firstMainIndex,
+                  dateIndex: dateIndex >= 0 ? dateIndex : 1,
+                  mainIndices: mainIndices,
+                  bonusIndices: bonusIndices,
+                  fallbackFirstMainIndex: fallbackFirstMainIndex,
                   roundIndex: roundIndex,
                 ),
               )
@@ -183,13 +205,57 @@ class LotteryHistoryCsvService {
     }
   }
 
+  List<LotteryDraw> _mergeWithSeedDraws(List<LotteryDraw> remoteDraws) {
+    final seedDraws = LotteryService.instance.getDraws(
+      remoteDraws.first.lotteryId,
+    );
+    if (seedDraws.isEmpty) return remoteDraws;
+
+    final seen = <String>{};
+    final merged = <LotteryDraw>[];
+    for (final draw in [...remoteDraws, ...seedDraws]) {
+      final key =
+          '${draw.drawDate.toIso8601String()}-${draw.mainNumbers.join(',')}-${(draw.bonusNumbers ?? []).join(',')}';
+      if (seen.add(key)) {
+        merged.add(draw);
+      }
+    }
+
+    return merged..sort((a, b) => b.drawDate.compareTo(a.drawDate));
+  }
+
+  List<int> _numberColumnIndices(
+    List<String> header,
+    String prefix,
+    int count,
+  ) {
+    return List.generate(count, (index) {
+      return header.indexWhere((cell) => cell == '$prefix${index + 1}');
+    }).where((index) => index >= 0).toList();
+  }
+
+  List<int> _bonusColumnIndices(List<String> header, int count) {
+    if (count <= 0) return const [];
+
+    final bonusIndices = _numberColumnIndices(header, 'bonus_', count);
+    if (bonusIndices.length == count) return bonusIndices;
+
+    final suppIndices = _numberColumnIndices(header, 'supp_', count);
+    if (suppIndices.length == count) return suppIndices;
+
+    return bonusIndices.isNotEmpty ? bonusIndices : suppIndices;
+  }
+
   LotteryDraw? _rowToDraw(
     List<dynamic> row,
     Lottery lottery, {
-    required int firstMainIndex,
+    required int dateIndex,
+    required List<int> mainIndices,
+    required List<int> bonusIndices,
+    required int fallbackFirstMainIndex,
     required int roundIndex,
   }) {
-    final drawDateText = row[1]?.toString().trim() ?? '';
+    final drawDateText = _cell(row, dateIndex);
     if (drawDateText.isEmpty) return null;
 
     final drawDate = DateTime.tryParse(drawDateText);
@@ -200,10 +266,11 @@ class LotteryHistoryCsvService {
         : 1;
 
     final mainNumbers = <int>[];
-    for (var i = 0; i < lottery.mainCount; i++) {
-      final index = firstMainIndex + i;
-      if (index >= row.length) break;
-      final value = row[index]?.toString().trim() ?? '';
+    final resolvedMainIndices = mainIndices.length == lottery.mainCount
+        ? mainIndices
+        : List.generate(lottery.mainCount, (i) => fallbackFirstMainIndex + i);
+    for (final index in resolvedMainIndices) {
+      final value = _cell(row, index);
       if (value.isEmpty) continue;
       final parsed = int.tryParse(value);
       if (parsed != null) mainNumbers.add(parsed);
@@ -211,10 +278,14 @@ class LotteryHistoryCsvService {
 
     final bonusNumbers = <int>[];
     final bonusCount = lottery.bonusCount ?? 0;
-    for (var i = 0; i < bonusCount; i++) {
-      final index = firstMainIndex + lottery.mainCount + i;
-      if (index >= row.length) break;
-      final value = row[index]?.toString().trim() ?? '';
+    final resolvedBonusIndices = bonusIndices.length == bonusCount
+        ? bonusIndices
+        : List.generate(
+            bonusCount,
+            (i) => fallbackFirstMainIndex + lottery.mainCount + i,
+          );
+    for (final index in resolvedBonusIndices) {
+      final value = _cell(row, index);
       if (value.isEmpty) continue;
       final parsed = int.tryParse(value);
       if (parsed != null) bonusNumbers.add(parsed);
@@ -231,5 +302,10 @@ class LotteryHistoryCsvService {
       bonusNumbers: bonusNumbers.isEmpty ? null : bonusNumbers,
       drawRound: drawRound,
     );
+  }
+
+  String _cell(List<dynamic> row, int index) {
+    if (index < 0 || index >= row.length) return '';
+    return row[index]?.toString().trim() ?? '';
   }
 }
