@@ -1,6 +1,6 @@
 import '../models/lottery_draw.dart';
 
-const String kFranceLotteriesUpdatedAt = '2026-06-18';
+const String kFranceLotteriesUpdatedAt = '2026-06-19';
 
 /// 500 real France Loto draws from FDJ official API.
 final List<LotteryDraw> kFrLotoDraws = [
