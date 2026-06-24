@@ -1,6 +1,6 @@
 import '../models/lottery_draw.dart';
 
-const String kDeLotto6aus49DrawsUpdatedAt = '2026-06-23';
+const String kDeLotto6aus49DrawsUpdatedAt = '2026-06-24';
 
 /// 120 real German Lotto draws from lotto.net archives.
 final List<LotteryDraw> kDeLotto6aus49Draws = [
