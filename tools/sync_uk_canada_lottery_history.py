@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import csv
 import re
+import sys
 import time
 from dataclasses import dataclass
 from datetime import datetime
@@ -109,9 +110,10 @@ def fetch_html(url: str, retries: int = 3) -> str:
             response = requests.get(url, headers=HEADERS, timeout=20)
             response.raise_for_status()
             return response.text
-        except Exception:
+        except requests.RequestException as exc:
             if attempt == retries - 1:
                 raise
+            print(f"  Retry {attempt + 1}/{retries}: {exc}", file=sys.stderr)
             time.sleep(2 ** attempt)
     return ""
 
@@ -172,6 +174,38 @@ def scrape_game(game: GameConfig, limit: int) -> list[dict]:
     return rows[:limit]
 
 
+def read_csv(game: GameConfig) -> list[dict]:
+    path = Path(game.output_csv)
+    if not path.exists():
+        return []
+
+    rows: list[dict] = []
+    with path.open(newline="", encoding="utf-8") as handle:
+        for item in csv.DictReader(handle):
+            main_numbers = [
+                int(item[f"main_{index}"])
+                for index in range(1, game.main_count + 1)
+                if item.get(f"main_{index}")
+            ]
+            bonus_numbers = [
+                int(item[f"bonus_{index}"])
+                for index in range(1, game.bonus_count + 1)
+                if item.get(f"bonus_{index}")
+            ]
+            rows.append(
+                {
+                    "lottery_id": item["lottery_id"],
+                    "draw_date": item["draw_date"],
+                    "draw_number": item.get("draw_number", ""),
+                    "round": int(item.get("round") or 1),
+                    "main_numbers": main_numbers,
+                    "bonus_numbers": bonus_numbers,
+                }
+            )
+
+    return rows
+
+
 def csv_header(game: GameConfig) -> list[str]:
     return (
         ["lottery_id", "draw_date", "draw_number", "round"]
@@ -199,7 +233,10 @@ def write_csv(game: GameConfig, rows: list[dict]) -> None:
             )
 
 
-def write_dart_seed(path: Path, games_with_rows: list[tuple[GameConfig, list[dict]]]) -> None:
+def write_dart_seed(
+    path: Path,
+    games_with_rows: list[tuple[GameConfig, list[dict], bool]],
+) -> None:
     updated_at = datetime.now().strftime("%Y-%m-%d")
     updated_at_symbol = {
         "seed_uk_lotteries.dart": "kUkLotteryHistoryUpdatedAt",
@@ -212,7 +249,7 @@ def write_dart_seed(path: Path, games_with_rows: list[tuple[GameConfig, list[dic
         "",
     ]
 
-    for game, rows in games_with_rows:
+    for game, rows, _was_refreshed in games_with_rows:
         lines.extend(
             [
                 f"/// {len(rows)} real {game.name} draws from lotto.net archives.",
@@ -245,16 +282,39 @@ def main() -> None:
     parser.add_argument("--limit", type=int, default=120)
     args = parser.parse_args()
 
-    grouped_by_file: dict[str, list[tuple[GameConfig, list[dict]]]] = {}
+    grouped_by_file: dict[str, list[tuple[GameConfig, list[dict], bool]]] = {}
     for game in GAMES:
-        rows = scrape_game(game, args.limit)
+        was_refreshed = True
+        try:
+            rows = scrape_game(game, args.limit)
+        except requests.RequestException as exc:
+            rows = read_csv(game)
+            was_refreshed = False
+            if not rows:
+                raise RuntimeError(
+                    f"{game.name}: fetch failed and no cached CSV exists"
+                ) from exc
+            print(
+                f"{game.name}: fetch failed ({exc}); using {len(rows)} cached draws",
+                file=sys.stderr,
+            )
+
         if len(rows) < min(args.limit, 100):
             raise RuntimeError(f"{game.name}: only scraped {len(rows)} draws")
-        write_csv(game, rows)
-        grouped_by_file.setdefault(game.dart_file, []).append((game, rows))
+        if was_refreshed:
+            write_csv(game, rows)
+        grouped_by_file.setdefault(game.dart_file, []).append(
+            (game, rows[: args.limit], was_refreshed)
+        )
 
     for dart_file, games_with_rows in grouped_by_file.items():
-        write_dart_seed(Path(dart_file), games_with_rows)
+        if any(was_refreshed for _game, _rows, was_refreshed in games_with_rows):
+            write_dart_seed(Path(dart_file), games_with_rows)
+        else:
+            print(
+                f"{dart_file}: all games used cached CSVs; leaving seed file unchanged",
+                file=sys.stderr,
+            )
 
 
 if __name__ == "__main__":
