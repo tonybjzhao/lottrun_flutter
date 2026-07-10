@@ -1,6 +1,6 @@
 import '../models/lottery_draw.dart';
 
-const String kDeEuroJackpotDrawsUpdatedAt = '2026-07-09';
+const String kDeEuroJackpotDrawsUpdatedAt = '2026-07-10';
 
 /// 120 real EuroJackpot draws from lotto.net archives.
 final List<LotteryDraw> kDeEuroJackpotDraws = [
