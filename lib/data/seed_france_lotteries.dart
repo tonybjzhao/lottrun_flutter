@@ -1,6 +1,6 @@
 import '../models/lottery_draw.dart';
 
-const String kFranceLotteriesUpdatedAt = '2026-07-17';
+const String kFranceLotteriesUpdatedAt = '2026-07-18';
 
 /// 500 real France Loto draws from FDJ official API.
 final List<LotteryDraw> kFrLotoDraws = [
@@ -508,6 +508,7 @@ final List<LotteryDraw> kFrLotoDraws = [
 
 /// 500 real France EuroMillions draws from FDJ official API.
 final List<LotteryDraw> kFrEuroMillionsDraws = [
+  LotteryDraw(lotteryId: 'fr_euromillions', drawDate: DateTime(2026, 7, 17), mainNumbers: [12, 21, 23, 34, 40], bonusNumbers: [9, 10]),
   LotteryDraw(lotteryId: 'fr_euromillions', drawDate: DateTime(2026, 7, 14), mainNumbers: [10, 19, 37, 42, 47], bonusNumbers: [9, 12]),
   LotteryDraw(lotteryId: 'fr_euromillions', drawDate: DateTime(2026, 7, 10), mainNumbers: [2, 14, 28, 33, 48], bonusNumbers: [8, 10]),
   LotteryDraw(lotteryId: 'fr_euromillions', drawDate: DateTime(2026, 7, 7), mainNumbers: [5, 29, 33, 45, 47], bonusNumbers: [5, 8]),
@@ -1007,5 +1008,4 @@ final List<LotteryDraw> kFrEuroMillionsDraws = [
   LotteryDraw(lotteryId: 'fr_euromillions', drawDate: DateTime(2021, 10, 12), mainNumbers: [6, 13, 22, 45, 49], bonusNumbers: [10, 11]),
   LotteryDraw(lotteryId: 'fr_euromillions', drawDate: DateTime(2021, 10, 8), mainNumbers: [1, 10, 23, 42, 46], bonusNumbers: [3, 5]),
   LotteryDraw(lotteryId: 'fr_euromillions', drawDate: DateTime(2021, 10, 5), mainNumbers: [11, 13, 14, 36, 45], bonusNumbers: [7, 9]),
-  LotteryDraw(lotteryId: 'fr_euromillions', drawDate: DateTime(2021, 10, 1), mainNumbers: [1, 15, 19, 26, 48], bonusNumbers: [6, 12]),
 ];
