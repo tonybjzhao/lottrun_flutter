@@ -1,9 +1,10 @@
 import '../models/lottery_draw.dart';
 
-const String kJpLoto6DrawsUpdatedAt = '2026-07-26';
+const String kJpLoto6DrawsUpdatedAt = '2026-07-27';
 
 /// 500 real Japan lottery draws from Lottolyzer
 final List<LotteryDraw> kJpLoto6Draws = [
+  LotteryDraw(lotteryId: 'jp_loto6', drawDate: DateTime(2026, 7, 27), mainNumbers: [1, 2, 4, 25, 37, 40], bonusNumbers: [43]),
   LotteryDraw(lotteryId: 'jp_loto6', drawDate: DateTime(2026, 7, 23), mainNumbers: [12, 15, 18, 21, 26, 32], bonusNumbers: [41]),
   LotteryDraw(lotteryId: 'jp_loto6', drawDate: DateTime(2026, 7, 20), mainNumbers: [1, 3, 10, 17, 25, 26], bonusNumbers: [36]),
   LotteryDraw(lotteryId: 'jp_loto6', drawDate: DateTime(2026, 7, 16), mainNumbers: [3, 8, 13, 14, 16, 43], bonusNumbers: [26]),
@@ -503,5 +504,4 @@ final List<LotteryDraw> kJpLoto6Draws = [
   LotteryDraw(lotteryId: 'jp_loto6', drawDate: DateTime(2021, 10, 4), mainNumbers: [9, 11, 19, 23, 30, 43], bonusNumbers: [27]),
   LotteryDraw(lotteryId: 'jp_loto6', drawDate: DateTime(2021, 9, 30), mainNumbers: [1, 4, 8, 11, 30, 42], bonusNumbers: [9]),
   LotteryDraw(lotteryId: 'jp_loto6', drawDate: DateTime(2021, 9, 27), mainNumbers: [3, 5, 17, 25, 33, 39], bonusNumbers: [19]),
-  LotteryDraw(lotteryId: 'jp_loto6', drawDate: DateTime(2021, 9, 23), mainNumbers: [7, 12, 15, 17, 19, 29], bonusNumbers: [22]),
 ];
