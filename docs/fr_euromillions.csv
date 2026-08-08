@@ -1,4 +1,5 @@
 lottery_id,draw_date,draw_number,main_1,main_2,main_3,main_4,main_5,supp_1,supp_2
+fr_euromillions,2026-08-07,26063,26,29,35,38,47,1,2
 fr_euromillions,2026-08-04,26062,25,30,34,46,50,1,12
 fr_euromillions,2026-07-31,26061,10,24,25,31,45,4,5
 fr_euromillions,2026-07-28,26060,5,7,24,30,49,10,11
@@ -498,4 +499,3 @@ fr_euromillions,2021-11-05,20211089,2,12,25,30,41,8,11
 fr_euromillions,2021-11-02,20211088,2,3,17,29,43,1,4
 fr_euromillions,2021-10-29,20211087,10,15,28,32,49,3,9
 fr_euromillions,2021-10-26,20211086,12,15,20,42,44,1,2
-fr_euromillions,2021-10-22,20211085,12,17,22,33,39,2,12
