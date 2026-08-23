@@ -1,9 +1,10 @@
 import '../models/lottery_draw.dart';
 
-const String kDeLotto6aus49DrawsUpdatedAt = '2026-08-22';
+const String kDeLotto6aus49DrawsUpdatedAt = '2026-08-23';
 
 /// 120 real German Lotto draws from lotto.net archives.
 final List<LotteryDraw> kDeLotto6aus49Draws = [
+  LotteryDraw(lotteryId: 'de_lotto_6aus49', drawDate: DateTime(2026, 8, 22), mainNumbers: [7, 16, 22, 28, 30, 31], bonusNumbers: [4]),
   LotteryDraw(lotteryId: 'de_lotto_6aus49', drawDate: DateTime(2026, 8, 19), mainNumbers: [3, 23, 31, 33, 35, 47], bonusNumbers: [6]),
   LotteryDraw(lotteryId: 'de_lotto_6aus49', drawDate: DateTime(2026, 8, 15), mainNumbers: [7, 13, 24, 26, 32, 45], bonusNumbers: [5]),
   LotteryDraw(lotteryId: 'de_lotto_6aus49', drawDate: DateTime(2026, 8, 12), mainNumbers: [7, 20, 22, 27, 29, 39], bonusNumbers: [2]),
@@ -123,5 +124,4 @@ final List<LotteryDraw> kDeLotto6aus49Draws = [
   LotteryDraw(lotteryId: 'de_lotto_6aus49', drawDate: DateTime(2025, 7, 9), mainNumbers: [1, 6, 15, 28, 47, 48], bonusNumbers: [7]),
   LotteryDraw(lotteryId: 'de_lotto_6aus49', drawDate: DateTime(2025, 7, 5), mainNumbers: [1, 8, 29, 37, 42, 44], bonusNumbers: [0]),
   LotteryDraw(lotteryId: 'de_lotto_6aus49', drawDate: DateTime(2025, 7, 2), mainNumbers: [13, 17, 39, 40, 44, 45], bonusNumbers: [6]),
-  LotteryDraw(lotteryId: 'de_lotto_6aus49', drawDate: DateTime(2025, 6, 28), mainNumbers: [7, 10, 11, 20, 23, 37], bonusNumbers: [2]),
 ];
