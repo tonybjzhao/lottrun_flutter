@@ -1,4 +1,5 @@
 lottery_id,draw_date,draw_number,main_1,main_2,main_3,main_4,main_5,supp_1,supp_2
+de_eurojackpot,2026-09-01,,9,14,35,43,50,3,7
 de_eurojackpot,2026-08-28,,23,34,39,45,49,1,4
 de_eurojackpot,2026-08-25,,4,5,7,48,50,4,5
 de_eurojackpot,2026-08-21,,25,35,45,46,50,4,8
@@ -118,4 +119,3 @@ de_eurojackpot,2025-07-22,,5,20,42,46,48,7,8
 de_eurojackpot,2025-07-18,,10,12,21,25,39,2,4
 de_eurojackpot,2025-07-15,,13,28,33,37,45,6,11
 de_eurojackpot,2025-07-11,,6,12,13,43,46,6,11
-de_eurojackpot,2025-07-08,,21,27,29,34,43,6,10
