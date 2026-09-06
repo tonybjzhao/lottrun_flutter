@@ -128,6 +128,7 @@ final List<LotteryDraw> kCaLottoMaxDraws = [
 
 /// 120 real Lotto 6/49 draws from lotto.net archives.
 final List<LotteryDraw> kCaLotto649Draws = [
+  LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2026, 9, 5), mainNumbers: [5, 10, 17, 34, 42, 49], bonusNumbers: [44]),
   LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2026, 9, 2), mainNumbers: [6, 8, 9, 14, 17, 25], bonusNumbers: [16]),
   LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2026, 8, 29), mainNumbers: [16, 20, 23, 24, 25, 33], bonusNumbers: [21]),
   LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2026, 8, 26), mainNumbers: [2, 14, 30, 33, 41, 45], bonusNumbers: [39]),
@@ -247,5 +248,4 @@ final List<LotteryDraw> kCaLotto649Draws = [
   LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2025, 7, 23), mainNumbers: [4, 12, 19, 34, 40, 42], bonusNumbers: [5]),
   LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2025, 7, 19), mainNumbers: [2, 7, 22, 33, 35, 44], bonusNumbers: [3]),
   LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2025, 7, 16), mainNumbers: [2, 4, 9, 17, 20, 46], bonusNumbers: [31]),
-  LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2025, 7, 12), mainNumbers: [2, 12, 25, 26, 27, 36], bonusNumbers: [24]),
 ];
