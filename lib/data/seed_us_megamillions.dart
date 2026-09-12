@@ -1,8 +1,9 @@
 import '../models/lottery_draw.dart';
 
-// US Mega Millions — 2042 draws. Updated: 2026-09-12
+// US Mega Millions — 2043 draws. Updated: 2026-09-12
 // Source: NY Open Data / lottery.net
 final List<LotteryDraw> kUsMegaMillionsDraws = [
+  LotteryDraw(lotteryId: 'us_megamillions', drawDate: DateTime(2026, 9, 11), mainNumbers: [3, 30, 33, 53, 62], bonusNumbers: [22]),
   LotteryDraw(lotteryId: 'us_megamillions', drawDate: DateTime(2026, 9, 8), mainNumbers: [17, 30, 43, 58, 66], bonusNumbers: [20]),
   LotteryDraw(lotteryId: 'us_megamillions', drawDate: DateTime(2026, 9, 4), mainNumbers: [6, 26, 34, 59, 61], bonusNumbers: [24]),
   LotteryDraw(lotteryId: 'us_megamillions', drawDate: DateTime(2026, 9, 1), mainNumbers: [1, 22, 51, 61, 63], bonusNumbers: [17]),
