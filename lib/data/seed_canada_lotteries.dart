@@ -1,6 +1,6 @@
 import '../models/lottery_draw.dart';
 
-const String kCanadaLotteryHistoryUpdatedAt = '2026-09-16';
+const String kCanadaLotteryHistoryUpdatedAt = '2026-09-17';
 
 /// 120 real Lotto Max draws from lotto.net archives.
 final List<LotteryDraw> kCaLottoMaxDraws = [
@@ -128,6 +128,7 @@ final List<LotteryDraw> kCaLottoMaxDraws = [
 
 /// 120 real Lotto 6/49 draws from lotto.net archives.
 final List<LotteryDraw> kCaLotto649Draws = [
+  LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2026, 9, 16), mainNumbers: [3, 5, 19, 32, 46, 48], bonusNumbers: [9]),
   LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2026, 9, 12), mainNumbers: [1, 3, 17, 20, 26, 32], bonusNumbers: [5]),
   LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2026, 9, 9), mainNumbers: [14, 18, 27, 35, 41, 47], bonusNumbers: [17]),
   LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2026, 9, 5), mainNumbers: [5, 10, 17, 34, 42, 49], bonusNumbers: [44]),
@@ -247,5 +248,4 @@ final List<LotteryDraw> kCaLotto649Draws = [
   LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2025, 8, 2), mainNumbers: [7, 11, 23, 29, 44, 46], bonusNumbers: [42]),
   LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2025, 7, 30), mainNumbers: [11, 13, 15, 16, 38, 48], bonusNumbers: [25]),
   LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2025, 7, 26), mainNumbers: [5, 8, 13, 26, 44, 49], bonusNumbers: [47]),
-  LotteryDraw(lotteryId: 'ca_lotto_649', drawDate: DateTime(2025, 7, 23), mainNumbers: [4, 12, 19, 34, 40, 42], bonusNumbers: [5]),
 ];
