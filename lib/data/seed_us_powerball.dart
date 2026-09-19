@@ -1,6 +1,6 @@
 import '../models/lottery_draw.dart';
 
-// US Powerball — 1994 draws. Updated: 2026-09-18
+// US Powerball — 1994 draws. Updated: 2026-09-19
 // Source: NY Open Data / lottery.net
 final List<LotteryDraw> kUsPowerballDraws = [
   LotteryDraw(lotteryId: 'us_powerball', drawDate: DateTime(2026, 9, 16), mainNumbers: [2, 21, 24, 25, 64], bonusNumbers: [7]),
