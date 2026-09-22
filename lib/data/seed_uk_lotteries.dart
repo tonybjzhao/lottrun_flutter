@@ -1,6 +1,6 @@
 import '../models/lottery_draw.dart';
 
-const String kUkLotteryHistoryUpdatedAt = '2026-09-21';
+const String kUkLotteryHistoryUpdatedAt = '2026-09-22';
 
 /// 120 real UK Lotto draws from lotto.net archives.
 final List<LotteryDraw> kUkLottoDraws = [
