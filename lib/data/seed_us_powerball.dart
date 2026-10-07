@@ -1,8 +1,9 @@
 import '../models/lottery_draw.dart';
 
-// US Powerball — 2001 draws. Updated: 2026-10-06
+// US Powerball — 2002 draws. Updated: 2026-10-07
 // Source: NY Open Data / lottery.net
 final List<LotteryDraw> kUsPowerballDraws = [
+  LotteryDraw(lotteryId: 'us_powerball', drawDate: DateTime(2026, 10, 5), mainNumbers: [16, 23, 32, 36, 54], bonusNumbers: [9]),
   LotteryDraw(lotteryId: 'us_powerball', drawDate: DateTime(2026, 10, 3), mainNumbers: [4, 42, 44, 55, 59], bonusNumbers: [14]),
   LotteryDraw(lotteryId: 'us_powerball', drawDate: DateTime(2026, 9, 30), mainNumbers: [4, 6, 23, 33, 44], bonusNumbers: [13]),
   LotteryDraw(lotteryId: 'us_powerball', drawDate: DateTime(2026, 9, 28), mainNumbers: [17, 21, 29, 42, 49], bonusNumbers: [7]),
