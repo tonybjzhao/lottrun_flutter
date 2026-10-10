@@ -1,6 +1,6 @@
 import '../models/lottery_draw.dart';
 
-const String kUkLotteryHistoryUpdatedAt = '2026-10-08';
+const String kUkLotteryHistoryUpdatedAt = '2026-10-10';
 
 /// 120 real UK Lotto draws from lotto.net archives.
 final List<LotteryDraw> kUkLottoDraws = [
@@ -128,6 +128,7 @@ final List<LotteryDraw> kUkLottoDraws = [
 
 /// 120 real EuroMillions draws from lotto.net archives.
 final List<LotteryDraw> kUkEuroMillionsDraws = [
+  LotteryDraw(lotteryId: 'uk_euromillions', drawDate: DateTime(2026, 10, 9), mainNumbers: [5, 20, 24, 31, 45], bonusNumbers: [5, 10]),
   LotteryDraw(lotteryId: 'uk_euromillions', drawDate: DateTime(2026, 10, 6), mainNumbers: [18, 22, 32, 41, 48], bonusNumbers: [8, 10]),
   LotteryDraw(lotteryId: 'uk_euromillions', drawDate: DateTime(2026, 10, 2), mainNumbers: [7, 8, 10, 22, 35], bonusNumbers: [2, 10]),
   LotteryDraw(lotteryId: 'uk_euromillions', drawDate: DateTime(2026, 9, 29), mainNumbers: [4, 7, 12, 31, 44], bonusNumbers: [8, 11]),
@@ -247,5 +248,4 @@ final List<LotteryDraw> kUkEuroMillionsDraws = [
   LotteryDraw(lotteryId: 'uk_euromillions', drawDate: DateTime(2025, 8, 26), mainNumbers: [2, 14, 38, 42, 45], bonusNumbers: [10, 11]),
   LotteryDraw(lotteryId: 'uk_euromillions', drawDate: DateTime(2025, 8, 22), mainNumbers: [6, 9, 12, 30, 39], bonusNumbers: [4, 10]),
   LotteryDraw(lotteryId: 'uk_euromillions', drawDate: DateTime(2025, 8, 19), mainNumbers: [24, 31, 34, 41, 43], bonusNumbers: [6, 8]),
-  LotteryDraw(lotteryId: 'uk_euromillions', drawDate: DateTime(2025, 8, 15), mainNumbers: [13, 30, 35, 36, 40], bonusNumbers: [2, 6]),
 ];
