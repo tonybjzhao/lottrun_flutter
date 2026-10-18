@@ -1,9 +1,10 @@
 import '../models/lottery_draw.dart';
 
-const String kUkLotteryHistoryUpdatedAt = '2026-10-17';
+const String kUkLotteryHistoryUpdatedAt = '2026-10-18';
 
 /// 120 real UK Lotto draws from lotto.net archives.
 final List<LotteryDraw> kUkLottoDraws = [
+  LotteryDraw(lotteryId: 'uk_lotto', drawDate: DateTime(2026, 10, 17), mainNumbers: [6, 19, 30, 45, 46, 57], bonusNumbers: [50]),
   LotteryDraw(lotteryId: 'uk_lotto', drawDate: DateTime(2026, 10, 14), mainNumbers: [18, 24, 29, 35, 39, 47], bonusNumbers: [34]),
   LotteryDraw(lotteryId: 'uk_lotto', drawDate: DateTime(2026, 10, 10), mainNumbers: [12, 29, 35, 46, 52, 53], bonusNumbers: [21]),
   LotteryDraw(lotteryId: 'uk_lotto', drawDate: DateTime(2026, 10, 7), mainNumbers: [2, 17, 31, 32, 52, 53], bonusNumbers: [39]),
@@ -123,7 +124,6 @@ final List<LotteryDraw> kUkLottoDraws = [
   LotteryDraw(lotteryId: 'uk_lotto', drawDate: DateTime(2025, 9, 3), mainNumbers: [7, 15, 18, 22, 31, 54], bonusNumbers: [28]),
   LotteryDraw(lotteryId: 'uk_lotto', drawDate: DateTime(2025, 8, 30), mainNumbers: [6, 10, 19, 20, 43, 59], bonusNumbers: [16]),
   LotteryDraw(lotteryId: 'uk_lotto', drawDate: DateTime(2025, 8, 27), mainNumbers: [5, 25, 43, 45, 47, 55], bonusNumbers: [58]),
-  LotteryDraw(lotteryId: 'uk_lotto', drawDate: DateTime(2025, 8, 23), mainNumbers: [7, 30, 38, 42, 54, 59], bonusNumbers: [5]),
 ];
 
 /// 120 real EuroMillions draws from lotto.net archives.
