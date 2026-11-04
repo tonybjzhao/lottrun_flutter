@@ -4,6 +4,7 @@ const String kCanadaLotteryHistoryUpdatedAt = '2026-11-04';
 
 /// 120 real Lotto Max draws from lotto.net archives.
 final List<LotteryDraw> kCaLottoMaxDraws = [
+  LotteryDraw(lotteryId: 'ca_lotto_max', drawDate: DateTime(2026, 11, 3), mainNumbers: [5, 7, 16, 23, 28, 30, 47], bonusNumbers: [31]),
   LotteryDraw(lotteryId: 'ca_lotto_max', drawDate: DateTime(2026, 10, 30), mainNumbers: [6, 19, 23, 24, 30, 35, 51], bonusNumbers: [2]),
   LotteryDraw(lotteryId: 'ca_lotto_max', drawDate: DateTime(2026, 10, 27), mainNumbers: [1, 20, 24, 26, 33, 36, 50], bonusNumbers: [11]),
   LotteryDraw(lotteryId: 'ca_lotto_max', drawDate: DateTime(2026, 10, 23), mainNumbers: [8, 21, 23, 28, 30, 39, 47], bonusNumbers: [17]),
@@ -123,7 +124,6 @@ final List<LotteryDraw> kCaLottoMaxDraws = [
   LotteryDraw(lotteryId: 'ca_lotto_max', drawDate: DateTime(2025, 9, 19), mainNumbers: [3, 8, 16, 26, 37, 40, 44], bonusNumbers: [5]),
   LotteryDraw(lotteryId: 'ca_lotto_max', drawDate: DateTime(2025, 9, 16), mainNumbers: [12, 18, 25, 30, 31, 38, 43], bonusNumbers: [34]),
   LotteryDraw(lotteryId: 'ca_lotto_max', drawDate: DateTime(2025, 9, 12), mainNumbers: [2, 3, 7, 9, 13, 23, 41], bonusNumbers: [42]),
-  LotteryDraw(lotteryId: 'ca_lotto_max', drawDate: DateTime(2025, 9, 9), mainNumbers: [2, 8, 18, 25, 27, 34, 42], bonusNumbers: [10]),
 ];
 
 /// 120 real Lotto 6/49 draws from lotto.net archives.
