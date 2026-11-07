@@ -1,9 +1,10 @@
 import '../models/lottery_draw.dart';
 
-const String kDeEuroJackpotDrawsUpdatedAt = '2026-11-06';
+const String kDeEuroJackpotDrawsUpdatedAt = '2026-11-07';
 
 /// 120 real EuroJackpot draws from lotto.net archives.
 final List<LotteryDraw> kDeEuroJackpotDraws = [
+  LotteryDraw(lotteryId: 'de_eurojackpot', drawDate: DateTime(2026, 11, 6), mainNumbers: [7, 30, 32, 35, 44], bonusNumbers: [2, 6]),
   LotteryDraw(lotteryId: 'de_eurojackpot', drawDate: DateTime(2026, 11, 3), mainNumbers: [2, 5, 12, 32, 43], bonusNumbers: [1, 3]),
   LotteryDraw(lotteryId: 'de_eurojackpot', drawDate: DateTime(2026, 10, 30), mainNumbers: [21, 26, 37, 39, 42], bonusNumbers: [5, 7]),
   LotteryDraw(lotteryId: 'de_eurojackpot', drawDate: DateTime(2026, 10, 27), mainNumbers: [11, 33, 38, 42, 47], bonusNumbers: [11, 12]),
@@ -123,5 +124,4 @@ final List<LotteryDraw> kDeEuroJackpotDraws = [
   LotteryDraw(lotteryId: 'de_eurojackpot', drawDate: DateTime(2025, 9, 23), mainNumbers: [7, 18, 31, 32, 33], bonusNumbers: [10, 11]),
   LotteryDraw(lotteryId: 'de_eurojackpot', drawDate: DateTime(2025, 9, 19), mainNumbers: [9, 37, 40, 41, 46], bonusNumbers: [1, 12]),
   LotteryDraw(lotteryId: 'de_eurojackpot', drawDate: DateTime(2025, 9, 16), mainNumbers: [8, 9, 14, 37, 39], bonusNumbers: [1, 9]),
-  LotteryDraw(lotteryId: 'de_eurojackpot', drawDate: DateTime(2025, 9, 12), mainNumbers: [7, 22, 24, 33, 45], bonusNumbers: [4, 12]),
 ];
