@@ -1,6 +1,6 @@
 import '../models/lottery_draw.dart';
 
-const String kCanadaLotteryHistoryUpdatedAt = '2026-11-25';
+const String kCanadaLotteryHistoryUpdatedAt = '2026-11-26';
 
 /// 120 real Lotto Max draws from lotto.net archives.
 final List<LotteryDraw> kCaLottoMaxDraws = [
